@@ -1,0 +1,11 @@
+static Package
+==============
+
+:mod:`city` Module
+------------------
+
+.. automodule:: server.static.city
+    :members:
+    :undoc-members:
+    :show-inheritance:
+

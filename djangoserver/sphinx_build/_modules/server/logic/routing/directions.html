@@ -1,0 +1,194 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>server.logic.routing.directions &#8212; DRIGServer 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+   
+  <link rel="stylesheet" href="../../../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for server.logic.routing.directions</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">namedtuple</span>
+<span class="kn">from</span> <span class="nn">server.logic.distance.util</span> <span class="k">import</span> <span class="n">angle</span>
+
+
+<div class="viewcode-block" id="DirectionDict"><a class="viewcode-back" href="../../../../server.logic.routing.html#server.logic.routing.directions.DirectionDict">[docs]</a><span class="k">class</span> <span class="nc">DirectionDict</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">none</span> <span class="o">=</span> <span class="s2">&quot;none&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">forward</span> <span class="o">=</span> <span class="s2">&quot;forward&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hasleft</span> <span class="o">=</span> <span class="s2">&quot;hasleft&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hasright</span> <span class="o">=</span> <span class="s2">&quot;hasright&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">left</span> <span class="o">=</span> <span class="s2">&quot;left&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">right</span> <span class="o">=</span> <span class="s2">&quot;right&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">turn</span> <span class="o">=</span> <span class="s2">&quot;turnaround&quot;</span></div>
+
+
+<span class="n">DIRECTION_DICTIONARY</span> <span class="o">=</span> <span class="n">DirectionDict</span><span class="p">()</span>
+
+
+<div class="viewcode-block" id="Direction"><a class="viewcode-back" href="../../../../server.logic.routing.html#server.logic.routing.directions.Direction">[docs]</a><span class="k">class</span> <span class="nc">Direction</span><span class="p">(</span><span class="n">namedtuple</span><span class="p">(</span><span class="s1">&#39;Direction&#39;</span><span class="p">,</span> <span class="s1">&#39;lat lon c&#39;</span><span class="p">)):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Class for serializing into the direction type</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="Direction.from_index"><a class="viewcode-back" href="../../../../server.logic.routing.html#server.logic.routing.directions.Direction.from_index">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">from_index</span><span class="p">(</span><span class="n">graph</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">c</span><span class="p">):</span>
+        <span class="n">node</span> <span class="o">=</span> <span class="n">graph</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">Direction</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">lat</span><span class="p">,</span> <span class="n">node</span><span class="o">.</span><span class="n">lon</span><span class="p">,</span> <span class="n">c</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="get_direction"><a class="viewcode-back" href="../../../../server.logic.routing.html#server.logic.routing.directions.get_direction">[docs]</a><span class="k">def</span> <span class="nf">get_direction</span><span class="p">(</span><span class="n">node_angle</span><span class="p">,</span> <span class="n">threshold</span><span class="p">,</span> <span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return right or left depending on the angle</span>
+
+<span class="sd">        Function args:</span>
+<span class="sd">        node_angle -- list of three points forming an angle.</span>
+<span class="sd">        threshold -- minimum (-maximum) value of the sine of the angle</span>
+<span class="sd">                     in order to count</span>
+<span class="sd">        left, right -- return values in case of success</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">ag</span> <span class="o">=</span> <span class="n">angle</span><span class="p">(</span><span class="n">node_angle</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">node_angle</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">node_angle</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+    <span class="k">if</span> <span class="n">ag</span> <span class="o">&gt;</span> <span class="n">threshold</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">right</span>
+    <span class="k">elif</span> <span class="n">ag</span> <span class="o">&lt;</span> <span class="o">-</span><span class="n">threshold</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">left</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+<span class="c1"># TODO: add some comment please!</span>
+<div class="viewcode-block" id="into_directions"><a class="viewcode-back" href="../../../../server.logic.routing.html#server.logic.routing.directions.into_directions">[docs]</a><span class="k">def</span> <span class="nf">into_directions</span><span class="p">(</span><span class="n">graph</span><span class="p">,</span> <span class="n">nodelist</span><span class="p">,</span> <span class="n">dirdict</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Annotate a nodelist with directions</span>
+
+<span class="sd">        Returns: list of coordinates with direction metadata.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Minimum sine of an angle to be considered a turn.</span>
+    <span class="n">threshold</span> <span class="o">=</span> <span class="mf">0.7</span>
+
+
+    <span class="n">iterator</span> <span class="o">=</span> <span class="nb">zip</span><span class="p">(</span><span class="n">nodelist</span><span class="p">,</span> <span class="n">nodelist</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span> <span class="n">nodelist</span><span class="p">[</span><span class="mi">2</span><span class="p">:])</span>
+    <span class="n">res_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">Direction</span><span class="o">.</span><span class="n">from_index</span><span class="p">(</span><span class="n">graph</span><span class="p">,</span> <span class="n">nodelist</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">dirdict</span><span class="o">.</span><span class="n">none</span><span class="p">)]</span>
+    <span class="k">for</span> <span class="n">id_prev</span><span class="p">,</span> <span class="n">id_curr</span><span class="p">,</span> <span class="n">id_next</span> <span class="ow">in</span> <span class="n">iterator</span><span class="p">:</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">id_prev</span> <span class="o">==</span> <span class="n">id_next</span><span class="p">:</span>
+            <span class="n">c</span> <span class="o">=</span> <span class="n">dirdict</span><span class="o">.</span><span class="n">turn</span>
+        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">graph</span><span class="o">.</span><span class="n">get_connids</span><span class="p">(</span><span class="n">id_curr</span><span class="p">))</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="p">:</span>
+
+            <span class="c1"># Check if the road makes a sharp turn.</span>
+            <span class="n">node_angle</span> <span class="o">=</span> <span class="p">[</span><span class="n">graph</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">id_prev</span><span class="p">),</span> <span class="n">graph</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+                <span class="n">id_curr</span><span class="p">),</span> <span class="n">graph</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">id_next</span><span class="p">)]</span>
+            <span class="n">c</span> <span class="o">=</span> <span class="n">get_direction</span><span class="p">(</span><span class="n">node_angle</span><span class="p">,</span> <span class="n">threshold</span><span class="p">,</span>
+                              <span class="n">dirdict</span><span class="o">.</span><span class="n">left</span><span class="p">,</span> <span class="n">dirdict</span><span class="o">.</span><span class="n">right</span><span class="p">)</span>
+
+            <span class="c1"># Check if the road could have made a sharp turn.</span>
+            <span class="n">glist</span> <span class="o">=</span> <span class="n">graph</span><span class="o">.</span><span class="n">get_connids</span><span class="p">(</span><span class="n">id_curr</span><span class="p">)</span>
+            <span class="k">while</span> <span class="n">c</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">glist</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">id_poss_next</span> <span class="o">=</span> <span class="n">glist</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">glist</span> <span class="o">=</span> <span class="n">glist</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+                <span class="n">node_angle</span> <span class="o">=</span> <span class="p">[</span><span class="n">graph</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">id_prev</span><span class="p">),</span> <span class="n">graph</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+                    <span class="n">id_curr</span><span class="p">),</span> <span class="n">graph</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">id_poss_next</span><span class="p">)]</span>
+                <span class="n">c</span> <span class="o">=</span> <span class="n">get_direction</span><span class="p">(</span><span class="n">node_angle</span><span class="p">,</span> <span class="n">threshold</span><span class="p">,</span>
+                                  <span class="n">dirdict</span><span class="o">.</span><span class="n">hasleft</span><span class="p">,</span> <span class="n">dirdict</span><span class="o">.</span><span class="n">hasright</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">c</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">c</span> <span class="o">=</span> <span class="n">dirdict</span><span class="o">.</span><span class="n">none</span>
+        <span class="n">res_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Direction</span><span class="o">.</span><span class="n">from_index</span><span class="p">(</span><span class="n">graph</span><span class="p">,</span> <span class="n">id_curr</span><span class="p">,</span> <span class="n">c</span><span class="p">))</span>
+    <span class="n">res_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Direction</span><span class="o">.</span><span class="n">from_index</span><span class="p">(</span>
+        <span class="n">graph</span><span class="p">,</span> <span class="n">nodelist</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">dirdict</span><span class="o">.</span><span class="n">none</span><span class="p">))</span>
+
+    <span class="n">last</span> <span class="o">=</span> <span class="n">dirdict</span><span class="o">.</span><span class="n">none</span>
+    <span class="n">final_list</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="c1"># Iterate over everything we found in reverse order, and apply the transfomation.</span>
+    <span class="c1"># This code is a remnant of when forward was meant to create the message</span>
+    <span class="c1"># &quot;Take the third street on your left.&quot;</span>
+    <span class="n">res_list</span> <span class="o">=</span> <span class="n">res_list</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">res_list</span><span class="p">:</span>
+        <span class="n">new_node</span> <span class="o">=</span> <span class="n">node</span>
+        <span class="k">if</span> <span class="n">node</span><span class="o">.</span><span class="n">c</span> <span class="o">==</span> <span class="n">dirdict</span><span class="o">.</span><span class="n">left</span> <span class="ow">or</span> <span class="n">node</span><span class="o">.</span><span class="n">c</span> <span class="o">==</span> <span class="n">dirdict</span><span class="o">.</span><span class="n">right</span> <span class="ow">or</span> <span class="n">node</span><span class="o">.</span><span class="n">c</span> <span class="o">==</span> <span class="n">dirdict</span><span class="o">.</span><span class="n">turn</span><span class="p">:</span>
+            <span class="c1"># Left/Right -&gt; Left/Right</span>
+            <span class="n">last</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">c</span>
+        <span class="k">elif</span> <span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">c</span> <span class="o">==</span> <span class="n">dirdict</span><span class="o">.</span><span class="n">hasleft</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">c</span> <span class="o">==</span> <span class="n">dirdict</span><span class="o">.</span><span class="n">hasright</span><span class="p">):</span>
+            <span class="c1"># Hasleft/Hasright -&gt; Forward</span>
+            <span class="n">new_node</span> <span class="o">=</span> <span class="n">new_node</span><span class="o">.</span><span class="n">_replace</span><span class="p">(</span><span class="n">c</span><span class="o">=</span><span class="n">dirdict</span><span class="o">.</span><span class="n">forward</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># Other -&gt; None</span>
+            <span class="n">new_node</span> <span class="o">=</span> <span class="n">new_node</span><span class="o">.</span><span class="n">_replace</span><span class="p">(</span><span class="n">c</span><span class="o">=</span><span class="n">dirdict</span><span class="o">.</span><span class="n">none</span><span class="p">)</span>
+        <span class="n">final_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">new_node</span><span class="p">)</span>
+    <span class="n">final_list</span> <span class="o">=</span> <span class="n">final_list</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">final_list</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Gerwin Dox, Olivier Cammaert, Nick Aelterman.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

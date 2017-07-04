@@ -1,0 +1,19 @@
+distance Package
+================
+
+:mod:`tests` Module
+-------------------
+
+.. automodule:: server.logic.distance.tests
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`util` Module
+------------------
+
+.. automodule:: server.logic.distance.util
+    :members:
+    :undoc-members:
+    :show-inheritance:
+

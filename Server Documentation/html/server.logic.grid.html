@@ -1,0 +1,250 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>server.logic.grid package &#8212; Runamic Server 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="server.logic.projection package" href="server.logic.projection.html" />
+    <link rel="prev" title="server.logic.graph package" href="server.logic.graph.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="server-logic-grid-package">
+<h1>server.logic.grid package<a class="headerlink" href="#server-logic-grid-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-server.logic.grid.grid">
+<span id="server-logic-grid-grid-module"></span><h2>server.logic.grid.grid module<a class="headerlink" href="#module-server.logic.grid.grid" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="server.logic.grid.grid.Grid">
+<em class="property">class </em><code class="descclassname">server.logic.grid.grid.</code><code class="descname">Grid</code><span class="sig-paren">(</span><em>context</em><span class="sig-paren">)</span><a class="headerlink" href="#server.logic.grid.grid.Grid" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>A class representing a spatial bucket structure.</p>
+<dl class="method">
+<dt id="server.logic.grid.grid.Grid.add_interval">
+<code class="descname">add_interval</code><span class="sig-paren">(</span><em>interval</em><span class="sig-paren">)</span><a class="headerlink" href="#server.logic.grid.grid.Grid.add_interval" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds the owner of an interval to any cell overlapping with the interval.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="server.logic.grid.grid.Grid.get">
+<code class="descname">get</code><span class="sig-paren">(</span><em>coord</em><span class="sig-paren">)</span><a class="headerlink" href="#server.logic.grid.grid.Grid.get" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the content of the cell containing the coordinate</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="server.logic.grid.grid.Grid.get_xy">
+<code class="descname">get_xy</code><span class="sig-paren">(</span><em>coord</em><span class="sig-paren">)</span><a class="headerlink" href="#server.logic.grid.grid.Grid.get_xy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns an integer tuple containing the two indices to access a cell.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="server.logic.grid.grid.Grid.inside">
+<code class="descname">inside</code><span class="sig-paren">(</span><em>x</em>, <em>y</em><span class="sig-paren">)</span><a class="headerlink" href="#server.logic.grid.grid.Grid.inside" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns whether the indices are not out of bounds.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="server.logic.grid.grid.GridBuilder">
+<em class="property">class </em><code class="descclassname">server.logic.grid.grid.</code><code class="descname">GridBuilder</code><a class="headerlink" href="#server.logic.grid.grid.GridBuilder" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>A class meant for building a grid.</p>
+<dl class="method">
+<dt id="server.logic.grid.grid.GridBuilder.create">
+<code class="descname">create</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#server.logic.grid.grid.GridBuilder.create" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates the actual grid.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="server.logic.grid.grid.GridBuilder.with_binsize">
+<code class="descname">with_binsize</code><span class="sig-paren">(</span><em>binsize</em><span class="sig-paren">)</span><a class="headerlink" href="#server.logic.grid.grid.GridBuilder.with_binsize" title="Permalink to this definition">¶</a></dt>
+<dd><p>sets the bin size.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="server.logic.grid.grid.GridBuilder.with_offset">
+<code class="descname">with_offset</code><span class="sig-paren">(</span><em>min_x</em>, <em>min_y</em><span class="sig-paren">)</span><a class="headerlink" href="#server.logic.grid.grid.GridBuilder.with_offset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets the grid offset</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="server.logic.grid.grid.GridBuilder.with_size">
+<code class="descname">with_size</code><span class="sig-paren">(</span><em>width</em>, <em>height</em><span class="sig-paren">)</span><a class="headerlink" href="#server.logic.grid.grid.GridBuilder.with_size" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets the grid size</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-server.logic.grid.interval">
+<span id="server-logic-grid-interval-module"></span><h2>server.logic.grid.interval module<a class="headerlink" href="#module-server.logic.grid.interval" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="server.logic.grid.interval.Interval">
+<em class="property">class </em><code class="descclassname">server.logic.grid.interval.</code><code class="descname">Interval</code><a class="headerlink" href="#server.logic.grid.interval.Interval" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#server.logic.grid.interval.Interval" title="server.logic.grid.interval.Interval"><code class="xref py py-class docutils literal"><span class="pre">server.logic.grid.interval.Interval</span></code></a></p>
+<p>A class representing a twodimensional interval.</p>
+<p>Fields:
+minx, miny, maxx, maxy – lower/upper x/y bound.
+owner – extra metadata to recognise an interval on retrieval. Usually</p>
+<blockquote>
+<div>contains a tuple of graph nodes (see Graph).</div></blockquote>
+<dl class="method">
+<dt id="server.logic.grid.interval.Interval.into_grid">
+<code class="descname">into_grid</code><span class="sig-paren">(</span><em>bin_size</em><span class="sig-paren">)</span><a class="headerlink" href="#server.logic.grid.interval.Interval.into_grid" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a grid stretching over the interval, with the given bin size</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="server.logic.grid.interval.into_interval">
+<code class="descclassname">server.logic.grid.interval.</code><code class="descname">into_interval</code><span class="sig-paren">(</span><em>startnode</em>, <em>endnode</em>, <em>tolerance</em><span class="sig-paren">)</span><a class="headerlink" href="#server.logic.grid.interval.into_interval" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates an interval that contains the two nodes with a certain tolerance</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-server.logic.grid.test_example">
+<span id="server-logic-grid-test-example-module"></span><h2>server.logic.grid.test_example module<a class="headerlink" href="#module-server.logic.grid.test_example" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="server.logic.grid.test_example.GridTestCase">
+<em class="property">class </em><code class="descclassname">server.logic.grid.test_example.</code><code class="descname">GridTestCase</code><span class="sig-paren">(</span><em>methodName=’runTest’</em><span class="sig-paren">)</span><a class="headerlink" href="#server.logic.grid.test_example.GridTestCase" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">django.test.testcases.TestCase</span></code></p>
+<p>Example of how to use a grid.</p>
+<dl class="method">
+<dt id="server.logic.grid.test_example.GridTestCase.setUp">
+<code class="descname">setUp</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#server.logic.grid.test_example.GridTestCase.setUp" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="server.logic.grid.test_example.GridTestCase.test_grid_addition">
+<code class="descname">test_grid_addition</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#server.logic.grid.test_example.GridTestCase.test_grid_addition" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test grid addition</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="server.logic.grid.test_example.GridTestCase.test_grid_creation">
+<code class="descname">test_grid_creation</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#server.logic.grid.test_example.GridTestCase.test_grid_creation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test grid creation</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="server.logic.grid.test_example.TestNode">
+<em class="property">class </em><code class="descclassname">server.logic.grid.test_example.</code><code class="descname">TestNode</code><a class="headerlink" href="#server.logic.grid.test_example.TestNode" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">server.logic.grid.test_example.Node</span></code></p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-server.logic.grid">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-server.logic.grid" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">server.logic.grid package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-server.logic.grid.grid">server.logic.grid.grid module</a></li>
+<li><a class="reference internal" href="#module-server.logic.grid.interval">server.logic.grid.interval module</a></li>
+<li><a class="reference internal" href="#module-server.logic.grid.test_example">server.logic.grid.test_example module</a></li>
+<li><a class="reference internal" href="#module-server.logic.grid">Module contents</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  <li><a href="modules.html">server</a><ul>
+  <li><a href="server.html">server package</a><ul>
+  <li><a href="server.logic.html">server.logic package</a><ul>
+      <li>Previous: <a href="server.logic.graph.html" title="previous chapter">server.logic.graph package</a></li>
+      <li>Next: <a href="server.logic.projection.html" title="next chapter">server.logic.projection package</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/server.logic.grid.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Groep16.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+      |
+      <a href="_sources/server.logic.grid.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

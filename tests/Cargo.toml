@@ -1,0 +1,11 @@
+[package]
+name = "tests"
+version = "0.1.0"
+authors = ["gedox <gerwin.dox@ugent.be>"]
+
+[dependencies]
+curl = "*"
+serde = "*"
+serde_derive = "*"
+serde_json = "*"
+geo = "*"

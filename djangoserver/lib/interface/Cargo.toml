@@ -1,0 +1,12 @@
+[package]
+name = "interface"
+version = "0.1.0"
+authors = ["gedox <gerwin.dox@ugent.be>"]
+
+[dependencies]
+graph = { path = "../graph"}
+newtypes = { path = "../newtypes"}
+util = { path = "../util"}
+libc = "*"
+num = "*"
+rand = "*"

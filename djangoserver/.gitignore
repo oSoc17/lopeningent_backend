@@ -1,0 +1,15 @@
+*.pyc
+db*
+ghent.txt
+ghent.svg
+*.dot
+*.png
+*,cover
+.coverage
+test.sh
+server.*html
+manage.html
+target/
+include/
+out.prof
+.idea/

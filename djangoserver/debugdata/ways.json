@@ -1,0 +1,45 @@
+{
+  "version" : "0.1.0",
+  "comment" : "THIS IS A FILE MEANT FOR TESTING THE GRAPH ALGORITHM",
+  "elements" : [
+    {
+      "type": "way",
+      "id": 0,
+      "nodes": [
+        0,
+        1,
+        2,
+        0
+      ],
+      "tags": {
+        "highway": "motorway",
+        "int_ref": "E 40",
+        "lanes": "3",
+        "lit": "yes",
+        "maxspeed": "120",
+        "nat_ref": "A10",
+        "oneway": "no",
+        "ref": "E40"
+      }
+    },
+    {
+      "type": "way",
+      "id": 1,
+      "nodes": [
+        0,
+        3,
+        1
+      ],
+      "tags": {
+        "highway": "motorway",
+        "int_ref": "E 40",
+        "lanes": "3",
+        "lit": "yes",
+        "maxspeed": "120",
+        "nat_ref": "A10",
+        "oneway": "yes",
+        "ref": "E40"
+      }
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+server\.logic\.city package
+===========================
+
+Submodules
+----------
+
+server\.logic\.city\.city module
+--------------------------------
+
+.. automodule:: server.logic.city.city
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+
+Module contents
+---------------
+
+.. automodule:: server.logic.city
+    :members:
+    :undoc-members:
+    :show-inheritance:

@@ -1,0 +1,9 @@
+[package]
+name = "util"
+version = "0.1.0"
+authors = ["gedox <gerwin.dox@ugent.be>"]
+
+[dependencies]
+newtypes = {path = "../newtypes"}
+num = "*"
+rand = "*"

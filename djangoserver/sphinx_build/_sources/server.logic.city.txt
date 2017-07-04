@@ -1,0 +1,11 @@
+city Package
+============
+
+:mod:`city` Module
+------------------
+
+.. automodule:: server.logic.city.city
+    :members:
+    :undoc-members:
+    :show-inheritance:
+

@@ -1,0 +1,59 @@
+
+\begin{tikzpicture}[>=latex,line join=bevel,]
+%%
+\begin{scope}
+  \pgfsetstrokecolor{black}
+  \definecolor{strokecol}{rgb}{0.75,0.75,0.75};
+  \pgfsetstrokecolor{strokecol}
+  \draw (10.0bp,8.0bp) -- (10.0bp,227.0bp) -- (224.0bp,227.0bp) -- (224.0bp,8.0bp) -- cycle;
+  \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
+  \pgfsetstrokecolor{strokecol}
+  \draw (203.5bp,215.5bp) node {Rust};
+\end{scope}
+\begin{scope}
+  \pgfsetstrokecolor{black}
+  \definecolor{strokecol}{rgb}{0.75,0.75,0.75};
+  \pgfsetstrokecolor{strokecol}
+  \draw (8.0bp,299.0bp) -- (8.0bp,590.0bp) -- (528.0bp,590.0bp) -- (528.0bp,299.0bp) -- cycle;
+  \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
+  \pgfsetstrokecolor{strokecol}
+  \draw (500.5bp,578.5bp) node {Python};
+\end{scope}
+  \node (distance) at (460.0bp,397.0bp) [draw,ellipse] {logic/distance};
+  \node (projection) at (316.0bp,397.0bp) [draw,ellipse] {logic/projection};
+  \node (libgraph) at (76.0bp,106.0bp) [draw,ellipse] {lib/graph};
+  \node (ffi) at (76.0bp,253.0bp) [draw,ellipse,dotted] {FFI};
+  \node (database) at (316.0bp,325.0bp) [draw,ellipse] {logic/database};
+  \node (libnewtypes) at (74.0bp,34.0bp) [draw,ellipse] {lib/newtypes};
+  \node (gunicorn) at (243.0bp,688.0bp) [draw,ellipse,dotted] {Gunicorn};
+  \node (static) at (243.0bp,469.0bp) [draw,ellipse] {static};
+  \node (pygraph) at (76.0bp,325.0bp) [draw,ellipse] {logic/graph};
+  \node (routing) at (134.0bp,469.0bp) [draw,ellipse] {logic/routing};
+  \node (libinterface) at (76.0bp,178.0bp) [draw,ellipse] {lib/interface};
+  \node (interface) at (243.0bp,541.0bp) [draw,ellipse] {interface};
+  \node (grid) at (187.0bp,397.0bp) [draw,ellipse] {logic/grid};
+  \node (django) at (243.0bp,616.0bp) [draw,ellipse,dotted] {Django};
+  \node (city) at (80.0bp,397.0bp) [draw,ellipse] {logic/city};
+  \node (libutil) at (182.0bp,34.0bp) [draw,ellipse] {lib/util};
+  \node (libdatabase) at (316.0bp,178.0bp) [draw,ellipse,dotted] {MongoDB};
+  \draw [->,dotted] (gunicorn) ..controls (243.0bp,661.98bp) and (243.0bp,652.71bp)  .. (django);
+  \draw [->] (routing) ..controls (66.702bp,450.27bp) and (40.719bp,437.11bp)  .. (27.0bp,415.0bp) .. controls (18.563bp,401.41bp) and (21.168bp,393.9bp)  .. (27.0bp,379.0bp) .. controls (31.487bp,367.54bp) and (39.744bp,357.07bp)  .. (pygraph);
+  \draw [->] (static) ..controls (223.52bp,443.65bp) and (214.54bp,432.43bp)  .. (grid);
+  \draw [->,dotted] (django) ..controls (243.0bp,589.25bp) and (243.0bp,578.87bp)  .. (interface);
+  \draw [->] (libgraph) ..controls (75.285bp,79.983bp) and (75.02bp,70.712bp)  .. (libnewtypes);
+  \draw [->,dotted] (ffi) ..controls (76.0bp,226.25bp) and (76.0bp,215.87bp)  .. (libinterface);
+  \draw [->] (static) ..controls (193.32bp,446.66bp) and (150.1bp,428.11bp)  .. (city);
+  \draw [->] (static) ..controls (303.14bp,448.6bp) and (366.52bp,428.15bp)  .. (distance);
+  \draw [->,dotted] (database) ..controls (316.0bp,281.94bp) and (316.0bp,235.74bp)  .. (libdatabase);
+  \draw [->] (interface) ..controls (303.39bp,500.48bp) and (382.76bp,448.54bp)  .. (distance);
+  \draw [->] (libgraph) ..controls (113.87bp,79.993bp) and (135.53bp,65.687bp)  .. (libutil);
+  \draw [->] (city) ..controls (119.83bp,383.08bp) and (126.62bp,380.95bp)  .. (133.0bp,379.0bp) .. controls (176.81bp,365.63bp) and (226.77bp,351.22bp)  .. (database);
+  \draw [->] (libinterface) ..controls (76.0bp,151.98bp) and (76.0bp,142.71bp)  .. (libgraph);
+  \draw [->,dotted] (pygraph) ..controls (76.0bp,298.98bp) and (76.0bp,289.71bp)  .. (ffi);
+  \draw [->] (static) ..controls (267.76bp,444.26bp) and (280.47bp,432.07bp)  .. (projection);
+  \draw [->] (interface) ..controls (205.19bp,515.72bp) and (184.3bp,502.3bp)  .. (routing);
+  \draw [->] (city) ..controls (78.57bp,370.98bp) and (78.041bp,361.71bp)  .. (pygraph);
+  \draw [->] (interface) ..controls (243.0bp,514.98bp) and (243.0bp,505.71bp)  .. (static);
+%
+\end{tikzpicture}
+

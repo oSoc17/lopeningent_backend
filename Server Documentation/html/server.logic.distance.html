@@ -1,0 +1,191 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>server.logic.distance package &#8212; Runamic Server 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="server.logic.graph package" href="server.logic.graph.html" />
+    <link rel="prev" title="server.logic.database package" href="server.logic.database.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="server-logic-distance-package">
+<h1>server.logic.distance package<a class="headerlink" href="#server-logic-distance-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-server.logic.distance.tests">
+<span id="server-logic-distance-tests-module"></span><h2>server.logic.distance.tests module<a class="headerlink" href="#module-server.logic.distance.tests" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="server.logic.distance.tests.ClosestTestCase">
+<em class="property">class </em><code class="descclassname">server.logic.distance.tests.</code><code class="descname">ClosestTestCase</code><span class="sig-paren">(</span><em>methodName=’runTest’</em><span class="sig-paren">)</span><a class="headerlink" href="#server.logic.distance.tests.ClosestTestCase" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">django.test.testcases.TestCase</span></code></p>
+<p>Class for testing whether the get_closest_edge functions work</p>
+<dl class="method">
+<dt id="server.logic.distance.tests.ClosestTestCase.test_closest_edge_multi_point">
+<code class="descname">test_closest_edge_multi_point</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#server.logic.distance.tests.ClosestTestCase.test_closest_edge_multi_point" title="Permalink to this definition">¶</a></dt>
+<dd><p>This test checks whether the api will localize all street midpoints on the
+correct egde, so that the closest edge to the point is the actual edge that
+created the point.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="server.logic.distance.tests.ClosestTestCase.test_closest_edge_single_point">
+<code class="descname">test_closest_edge_single_point</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#server.logic.distance.tests.ClosestTestCase.test_closest_edge_single_point" title="Permalink to this definition">¶</a></dt>
+<dd><p>This test checks that every node in the graph is closest to an edge that
+contains the node.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-server.logic.distance.util">
+<span id="server-logic-distance-util-module"></span><h2>server.logic.distance.util module<a class="headerlink" href="#module-server.logic.distance.util" title="Permalink to this headline">¶</a></h2>
+<p>Various distance functions.</p>
+<dl class="function">
+<dt id="server.logic.distance.util.angle">
+<code class="descclassname">server.logic.distance.util.</code><code class="descname">angle</code><span class="sig-paren">(</span><em>point_a</em>, <em>mid</em>, <em>point_c</em><span class="sig-paren">)</span><a class="headerlink" href="#server.logic.distance.util.angle" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="server.logic.distance.util.bird_distance">
+<code class="descclassname">server.logic.distance.util.</code><code class="descname">bird_distance</code><span class="sig-paren">(</span><em>point_a</em>, <em>point_b</em><span class="sig-paren">)</span><a class="headerlink" href="#server.logic.distance.util.bird_distance" title="Permalink to this definition">¶</a></dt>
+<dd><p>Simply return the length of a straight line between the two points.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="server.logic.distance.util.distance_to_edge_sqr">
+<code class="descclassname">server.logic.distance.util.</code><code class="descname">distance_to_edge_sqr</code><span class="sig-paren">(</span><em>point</em>, <em>edge_start</em>, <em>edge_end</em><span class="sig-paren">)</span><a class="headerlink" href="#server.logic.distance.util.distance_to_edge_sqr" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieves the distance between a segment (edge) and a point.</p>
+<p>Function args:
+point – a Vector of the point
+edge_start – a Vector of the start point of the edge
+edge_end – a Vector of the endpoint of the edge
+Returns – the distance, measured in km</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="server.logic.distance.util.dot_distance">
+<code class="descclassname">server.logic.distance.util.</code><code class="descname">dot_distance</code><span class="sig-paren">(</span><em>start_a</em>, <em>end_a</em>, <em>start_b</em>, <em>end_b</em><span class="sig-paren">)</span><a class="headerlink" href="#server.logic.distance.util.dot_distance" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="server.logic.distance.util.get_closest_edge">
+<code class="descclassname">server.logic.distance.util.</code><code class="descname">get_closest_edge</code><span class="sig-paren">(</span><em>coord</em>, <em>graph</em>, <em>grid</em><span class="sig-paren">)</span><a class="headerlink" href="#server.logic.distance.util.get_closest_edge" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given a coordinate, a list of nodes and a list of edges, return the edge closest to a point.</p>
+<p>Function args:
+coord – object with xy attributes
+graph – owning graph
+grid – grid generated from the graph</p>
+<p>Returns two nodes, connected according to their owning Graph.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-server.logic.distance">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-server.logic.distance" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">server.logic.distance package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-server.logic.distance.tests">server.logic.distance.tests module</a></li>
+<li><a class="reference internal" href="#module-server.logic.distance.util">server.logic.distance.util module</a></li>
+<li><a class="reference internal" href="#module-server.logic.distance">Module contents</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  <li><a href="modules.html">server</a><ul>
+  <li><a href="server.html">server package</a><ul>
+  <li><a href="server.logic.html">server.logic package</a><ul>
+      <li>Previous: <a href="server.logic.database.html" title="previous chapter">server.logic.database package</a></li>
+      <li>Next: <a href="server.logic.graph.html" title="next chapter">server.logic.graph package</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/server.logic.distance.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Groep16.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+      |
+      <a href="_sources/server.logic.distance.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -1,0 +1,23 @@
+[package]
+name = "graphing"
+version = "0.1.0"
+authors = ["gedox <gerwin.dox@ugent.be>"]
+build = "lib/interface/build/build.rs"
+
+[dependencies]
+num = "*"
+libc = "*"
+rand = "*"
+vec_map = "*"
+newtypes = {path = "lib/newtypes"}
+graph = {path = "lib/graph"}
+interface = {path = "lib/interface"}
+util = {path = "lib/util"}
+
+[build-dependencies]
+rusty-cheddar = "0.3.3"
+
+[lib]
+name = "graphing"
+path = "lib/interface/src/lib.rs"
+crate-type = ["dylib"]

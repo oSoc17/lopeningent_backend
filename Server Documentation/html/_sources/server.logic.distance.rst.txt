@@ -1,0 +1,30 @@
+server\.logic\.distance package
+===============================
+
+Submodules
+----------
+
+server\.logic\.distance\.tests module
+-------------------------------------
+
+.. automodule:: server.logic.distance.tests
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+server\.logic\.distance\.util module
+------------------------------------
+
+.. automodule:: server.logic.distance.util
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+
+Module contents
+---------------
+
+.. automodule:: server.logic.distance
+    :members:
+    :undoc-members:
+    :show-inheritance:

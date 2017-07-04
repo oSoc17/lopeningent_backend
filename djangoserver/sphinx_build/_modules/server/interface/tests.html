@@ -1,0 +1,139 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>server.interface.tests &#8212; DRIGServer 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+   
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for server.interface.tests</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">django.test</span> <span class="k">import</span> <span class="n">TestCase</span>
+<span class="kn">import</span> <span class="nn">server.interface.nodes</span> <span class="k">as</span> <span class="nn">views</span>
+<span class="kn">from</span> <span class="nn">django.http</span> <span class="k">import</span> <span class="n">HttpResponse</span><span class="p">,</span> <span class="n">HttpResponseNotFound</span><span class="p">,</span> <span class="n">HttpResponseBadRequest</span>
+<span class="kn">import</span> <span class="nn">server.interface.closest</span> <span class="k">as</span> <span class="nn">cviews</span>
+<span class="kn">import</span> <span class="nn">server.interface.util</span> <span class="k">as</span> <span class="nn">util</span>
+<span class="kn">from</span> <span class="nn">django.test.client</span> <span class="k">import</span> <span class="n">RequestFactory</span>
+
+<div class="viewcode-block" id="NodeTestCase"><a class="viewcode-back" href="../../../server.interface.html#server.interface.tests.NodeTestCase">[docs]</a><span class="k">class</span> <span class="nc">NodeTestCase</span><span class="p">(</span><span class="n">TestCase</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Test the node interface.</span>
+<span class="sd">        Kind of obsolete due to test_urls, but still useful</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="NodeTestCase.setUp"><a class="viewcode-back" href="../../../server.interface.html#server.interface.tests.NodeTestCase.setUp">[docs]</a>    <span class="k">def</span> <span class="nf">setUp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rf</span> <span class="o">=</span> <span class="n">RequestFactory</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="NodeTestCase.test_get_edge_tuple"><a class="viewcode-back" href="../../../server.interface.html#server.interface.tests.NodeTestCase.test_get_edge_tuple">[docs]</a>    <span class="k">def</span> <span class="nf">test_get_edge_tuple</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">util</span><span class="o">.</span><span class="n">get_edge_tuple</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="mf">51.0</span><span class="p">,</span> <span class="mf">3.8</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="NodeTestCase.test_get_node"><a class="viewcode-back" href="../../../server.interface.html#server.interface.tests.NodeTestCase.test_get_node">[docs]</a>    <span class="k">def</span> <span class="nf">test_get_node</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Fuzzy test</span>
+<span class="sd">            Test whether indexing yields the correct response type</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">node</span> <span class="o">=</span> <span class="n">views</span><span class="o">.</span><span class="n">get_node</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rf</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;/node?index=0&#39;</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">HttpResponse</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertFalse</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">HttpResponseNotFound</span><span class="p">))</span>
+        <span class="n">node</span> <span class="o">=</span> <span class="n">views</span><span class="o">.</span><span class="n">get_node</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rf</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;/node?index=-5&#39;</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">HttpResponseNotFound</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="NodeTestCase.test_get_from"><a class="viewcode-back" href="../../../server.interface.html#server.interface.tests.NodeTestCase.test_get_from">[docs]</a>    <span class="k">def</span> <span class="nf">test_get_from</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Fuzzy tests.</span>
+<span class="sd">            They test whether the function returns the correct response kind.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">node</span> <span class="o">=</span> <span class="n">cviews</span><span class="o">.</span><span class="n">get_id_from_pos</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">rf</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;/node?lat=51.0&amp;lon=3.8&#39;</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">HttpResponse</span><span class="p">))</span>
+        <span class="n">node</span> <span class="o">=</span> <span class="n">cviews</span><span class="o">.</span><span class="n">get_node_from_pos</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">rf</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;/node?lat=5.1.0&amp;lon=3.8&#39;</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">HttpResponseBadRequest</span><span class="p">))</span>
+        <span class="n">node</span> <span class="o">=</span> <span class="n">cviews</span><span class="o">.</span><span class="n">get_id_from_pos</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">rf</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;/node?lat=51.0&amp;lon=3.8.0&#39;</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">HttpResponseBadRequest</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="NodeTestCase.test_in_city"><a class="viewcode-back" href="../../../server.interface.html#server.interface.tests.NodeTestCase.test_in_city">[docs]</a>    <span class="k">def</span> <span class="nf">test_in_city</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Test whether the coordinates are inside/outside the city</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="n">views</span><span class="o">.</span><span class="n">in_city</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rf</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;/node?lat=51.0&amp;lon=3.8&#39;</span><span class="p">))</span><span class="o">.</span><span class="n">content</span><span class="p">,</span> <span class="s2">&quot;true&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="n">views</span><span class="o">.</span><span class="n">in_city</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rf</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;/node?lat=51.0&amp;lon=2.8&#39;</span><span class="p">))</span><span class="o">.</span><span class="n">content</span><span class="p">,</span> <span class="s2">&quot;false&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">views</span><span class="o">.</span><span class="n">in_city</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rf</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;/node?lat=51.0&amp;lon=3.8.0&#39;</span><span class="p">)),</span> <span class="n">HttpResponseBadRequest</span><span class="p">))</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Gerwin Dox, Olivier Cammaert, Nick Aelterman.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

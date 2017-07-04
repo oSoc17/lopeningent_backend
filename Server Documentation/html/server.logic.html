@@ -1,0 +1,209 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>server.logic package &#8212; Runamic Server 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="server.logic.city package" href="server.logic.city.html" />
+    <link rel="prev" title="server.interface package" href="server.interface.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="server-logic-package">
+<h1>server.logic package<a class="headerlink" href="#server-logic-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="server.logic.city.html">server.logic.city package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="server.logic.city.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="server.logic.city.html#module-server.logic.city.city">server.logic.city.city module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="server.logic.city.html#module-server.logic.city">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="server.logic.database.html">server.logic.database package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="server.logic.database.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="server.logic.database.html#module-server.logic.database.edge_database">server.logic.database.edge_database module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="server.logic.database.html#module-server.logic.database.tests">server.logic.database.tests module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="server.logic.database.html#module-server.logic.database">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="server.logic.distance.html">server.logic.distance package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="server.logic.distance.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="server.logic.distance.html#module-server.logic.distance.tests">server.logic.distance.tests module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="server.logic.distance.html#module-server.logic.distance.util">server.logic.distance.util module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="server.logic.distance.html#module-server.logic.distance">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="server.logic.graph.html">server.logic.graph package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="server.logic.graph.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="server.logic.graph.html#module-server.logic.graph.debug">server.logic.graph.debug module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="server.logic.graph.html#module-server.logic.graph.graph">server.logic.graph.graph module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="server.logic.graph.html#module-server.logic.graph.poison">server.logic.graph.poison module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="server.logic.graph.html#module-server.logic.graph.test_example">server.logic.graph.test_example module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="server.logic.graph.html#module-server.logic.graph.tests">server.logic.graph.tests module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="server.logic.graph.html#module-server.logic.graph.util">server.logic.graph.util module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="server.logic.graph.html#module-server.logic.graph">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="server.logic.grid.html">server.logic.grid package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="server.logic.grid.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="server.logic.grid.html#module-server.logic.grid.grid">server.logic.grid.grid module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="server.logic.grid.html#module-server.logic.grid.interval">server.logic.grid.interval module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="server.logic.grid.html#module-server.logic.grid.test_example">server.logic.grid.test_example module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="server.logic.grid.html#module-server.logic.grid">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="server.logic.projection.html">server.logic.projection package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="server.logic.projection.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="server.logic.projection.html#module-server.logic.projection.util">server.logic.projection.util module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="server.logic.projection.html#module-server.logic.projection">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="server.logic.routing.html">server.logic.routing package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="server.logic.routing.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="server.logic.routing.html#module-server.logic.routing.compress">server.logic.routing.compress module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="server.logic.routing.html#module-server.logic.routing.config">server.logic.routing.config module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="server.logic.routing.html#module-server.logic.routing.directions">server.logic.routing.directions module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="server.logic.routing.html#module-server.logic.routing.poison">server.logic.routing.poison module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="server.logic.routing.html#module-server.logic.routing.ratings">server.logic.routing.ratings module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="server.logic.routing.html#module-server.logic.routing.routing">server.logic.routing.routing module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="server.logic.routing.html#module-server.logic.routing.tests">server.logic.routing.tests module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="server.logic.routing.html#module-server.logic.routing.util">server.logic.routing.util module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="server.logic.routing.html#module-server.logic.routing">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-server.logic.server_util">
+<span id="server-logic-server-util-module"></span><h2>server.logic.server_util module<a class="headerlink" href="#module-server.logic.server_util" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="server.logic.server_util.into_json">
+<code class="descclassname">server.logic.server_util.</code><code class="descname">into_json</code><span class="sig-paren">(</span><em>struct</em><span class="sig-paren">)</span><a class="headerlink" href="#server.logic.server_util.into_json" title="Permalink to this definition">¶</a></dt>
+<dd><p>Transforms a named tuple into a json object in a nice way.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="server.logic.server_util.time_fn">
+<code class="descclassname">server.logic.server_util.</code><code class="descname">time_fn</code><span class="sig-paren">(</span><em>lbd</em><span class="sig-paren">)</span><a class="headerlink" href="#server.logic.server_util.time_fn" title="Permalink to this definition">¶</a></dt>
+<dd><p>Times an expression.</p>
+<dl class="docutils">
+<dt>If you need to time the operation:</dt>
+<dd>result = heavy_function()</dd>
+<dt>Then just write:</dt>
+<dd>result = time_fn(lambda : heavy_function())</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-server.logic">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-server.logic" title="Permalink to this headline">¶</a></h2>
+<p>This module contains all logic for generating the dynamic data.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">server.logic package</a><ul>
+<li><a class="reference internal" href="#subpackages">Subpackages</a></li>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-server.logic.server_util">server.logic.server_util module</a></li>
+<li><a class="reference internal" href="#module-server.logic">Module contents</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  <li><a href="modules.html">server</a><ul>
+  <li><a href="server.html">server package</a><ul>
+      <li>Previous: <a href="server.interface.html" title="previous chapter">server.interface package</a></li>
+      <li>Next: <a href="server.logic.city.html" title="next chapter">server.logic.city package</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/server.logic.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Groep16.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+      |
+      <a href="_sources/server.logic.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -1,0 +1,19 @@
+database Package
+================
+
+:mod:`edge_database` Module
+---------------------------
+
+.. automodule:: server.logic.database.edge_database
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`tests` Module
+-------------------
+
+.. automodule:: server.logic.database.tests
+    :members:
+    :undoc-members:
+    :show-inheritance:
+

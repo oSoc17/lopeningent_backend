@@ -1,0 +1,71 @@
+server package
+==============
+
+Subpackages
+-----------
+
+.. toctree::
+
+    server.interface
+    server.logic
+    server.static
+
+Submodules
+----------
+
+server\.config module
+---------------------
+
+.. automodule:: server.config
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+server\.setdebug module
+-----------------------
+
+.. automodule:: server.setdebug
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+server\.settings module
+-----------------------
+
+.. automodule:: server.settings
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+server\.test\_urls module
+-------------------------
+
+.. automodule:: server.test_urls
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+server\.urls module
+-------------------
+
+.. automodule:: server.urls
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+server\.wsgi module
+-------------------
+
+.. automodule:: server.wsgi
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+
+Module contents
+---------------
+
+.. automodule:: server
+    :members:
+    :undoc-members:
+    :show-inheritance:

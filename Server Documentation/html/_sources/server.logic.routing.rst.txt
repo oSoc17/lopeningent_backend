@@ -1,0 +1,78 @@
+server\.logic\.routing package
+==============================
+
+Submodules
+----------
+
+server\.logic\.routing\.compress module
+---------------------------------------
+
+.. automodule:: server.logic.routing.compress
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+server\.logic\.routing\.config module
+-------------------------------------
+
+.. automodule:: server.logic.routing.config
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+server\.logic\.routing\.directions module
+-----------------------------------------
+
+.. automodule:: server.logic.routing.directions
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+server\.logic\.routing\.poison module
+-------------------------------------
+
+.. automodule:: server.logic.routing.poison
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+server\.logic\.routing\.ratings module
+--------------------------------------
+
+.. automodule:: server.logic.routing.ratings
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+server\.logic\.routing\.routing module
+--------------------------------------
+
+.. automodule:: server.logic.routing.routing
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+server\.logic\.routing\.tests module
+------------------------------------
+
+.. automodule:: server.logic.routing.tests
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+server\.logic\.routing\.util module
+-----------------------------------
+
+.. automodule:: server.logic.routing.util
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+
+Module contents
+---------------
+
+.. automodule:: server.logic.routing
+    :members:
+    :undoc-members:
+    :show-inheritance:

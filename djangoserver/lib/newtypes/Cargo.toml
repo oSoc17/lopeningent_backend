@@ -1,0 +1,7 @@
+[package]
+name = "newtypes"
+version = "0.1.0"
+authors = ["gedox <gerwin.dox@ugent.be>"]
+
+[dependencies]
+num = "*"

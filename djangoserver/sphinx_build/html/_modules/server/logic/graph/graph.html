@@ -1,0 +1,342 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>server.logic.graph.graph &#8212; DRIGServer 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+   
+  <link rel="stylesheet" href="../../../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for server.logic.graph.graph</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Implementation of the class AbstractGraph</span>
+<span class="c1"># This implementation is templated</span>
+
+<span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">namedtuple</span>
+
+<span class="kn">from</span> <span class="nn">cffi</span> <span class="k">import</span> <span class="n">FFI</span>
+
+<span class="kn">from</span> <span class="nn">server.logic.graph.util</span> <span class="k">import</span> <span class="n">parse</span>
+
+<span class="n">ffi</span> <span class="o">=</span> <span class="n">FFI</span><span class="p">()</span>
+
+<span class="n">lib</span> <span class="o">=</span> <span class="n">ffi</span><span class="o">.</span><span class="n">dlopen</span><span class="p">(</span><span class="s2">&quot;target/release/libgraphing.so&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Loaded lib </span><span class="si">{0}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">lib</span><span class="p">))</span>
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;include/graphing.h&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="n">ffi</span><span class="o">.</span><span class="n">cdef</span><span class="p">(</span><span class="n">parse</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()))</span>
+
+<span class="n">stop</span> <span class="o">=</span> <span class="mi">2</span><span class="o">**</span><span class="mi">64</span> <span class="o">-</span> <span class="mi">1</span>
+
+
+<div class="viewcode-block" id="DijkstraIterator"><a class="viewcode-back" href="../../../../server.logic.graph.html#server.logic.graph.graph.DijkstraIterator">[docs]</a><span class="k">class</span> <span class="nc">DijkstraIterator</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Iterator that yields the edges and nodes of a graph, sorted by distance to the origin.</span>
+
+<span class="sd">        This class should be instantiated by one of the methods of Graph.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span>
+
+<div class="viewcode-block" id="DijkstraIterator.next"><a class="viewcode-back" href="../../../../server.logic.graph.html#server.logic.graph.graph.DijkstraIterator.next">[docs]</a>    <span class="k">def</span> <span class="nf">next</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="n">lib</span><span class="o">.</span><span class="n">graph_dijkstra_next</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dijkstra</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">res</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="n">stop</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">StopIteration</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">size_value</span><span class="p">,</span> <span class="n">res</span><span class="o">.</span><span class="n">actual_value</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="DijkstraIterator.root"><a class="viewcode-back" href="../../../../server.logic.graph.html#server.logic.graph.graph.DijkstraIterator.root">[docs]</a>    <span class="k">def</span> <span class="nf">root</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Yields the shortest path between node index and the starting node.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">root</span> <span class="o">=</span> <span class="n">lib</span><span class="o">.</span><span class="n">graph_dijkstra_root</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dijkstra</span><span class="p">,</span> <span class="n">index</span><span class="p">)</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="n">n</span> <span class="o">=</span> <span class="n">lib</span><span class="o">.</span><span class="n">graph_root_next</span><span class="p">(</span><span class="n">root</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">n</span> <span class="o">==</span> <span class="n">stop</span><span class="p">:</span>
+                <span class="n">lib</span><span class="o">.</span><span class="n">graph_root_delete</span><span class="p">(</span><span class="n">root</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">res</span>
+            <span class="n">res</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">n</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="DijkstraIterator.filter"><a class="viewcode-back" href="../../../../server.logic.graph.html#server.logic.graph.graph.DijkstraIterator.filter">[docs]</a>    <span class="k">def</span> <span class="nf">filter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rod</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Creates a new iterator that only yields when the destination node is</span>
+<span class="sd">            in rod.</span>
+
+<span class="sd">            Function args:</span>
+<span class="sd">            rod -- list (!) of node indices.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">rods</span> <span class="o">=</span> <span class="n">ffi</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="s2">&quot;size_t[]&quot;</span><span class="p">,</span> <span class="n">rod</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dijkstra</span> <span class="o">=</span> <span class="n">lib</span><span class="o">.</span><span class="n">graph_dijkstra_filter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dijkstra</span><span class="p">,</span> <span class="n">rods</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">rod</span><span class="p">))</span>
+        <span class="k">return</span> <span class="bp">self</span></div>
+
+<div class="viewcode-block" id="DijkstraIterator.choose"><a class="viewcode-back" href="../../../../server.logic.graph.html#server.logic.graph.graph.DijkstraIterator.choose">[docs]</a>    <span class="k">def</span> <span class="nf">choose</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Creates a new iterator that yields a single random node.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">conf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gen_config</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dijkstra</span> <span class="o">=</span> <span class="n">lib</span><span class="o">.</span><span class="n">graph_dijkstra_choose</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dijkstra</span><span class="p">,</span> <span class="n">conf</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span></div>
+
+<div class="viewcode-block" id="DijkstraIterator.gen_config"><a class="viewcode-back" href="../../../../server.logic.graph.html#server.logic.graph.graph.DijkstraIterator.gen_config">[docs]</a>    <span class="k">def</span> <span class="nf">gen_config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Generate configuration.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">ffi</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="s2">&quot;Configuration*&quot;</span><span class="p">,</span>
+                       <span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">measure_length</span><span class="p">,</span>
+                        <span class="p">[</span><span class="n">config</span><span class="o">.</span><span class="n">measure_highway</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">measure_rating</span><span class="p">,</span>
+                         <span class="n">config</span><span class="o">.</span><span class="n">measure_sheep</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">measure_water</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">measure_park</span><span class="p">],</span>
+                        <span class="n">config</span><span class="o">.</span><span class="n">max_length</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">min_length</span><span class="p">)</span>
+                       <span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="Vertex"><a class="viewcode-back" href="../../../../server.logic.graph.html#server.logic.graph.graph.Vertex">[docs]</a><span class="k">class</span> <span class="nc">Vertex</span><span class="p">(</span><span class="n">namedtuple</span><span class="p">(</span><span class="s1">&#39;Node&#39;</span><span class="p">,</span> <span class="s1">&#39;data edges&#39;</span><span class="p">)):</span>
+    <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="Edge"><a class="viewcode-back" href="../../../../server.logic.graph.html#server.logic.graph.graph.Edge">[docs]</a><span class="k">class</span> <span class="nc">Edge</span><span class="p">(</span><span class="n">namedtuple</span><span class="p">(</span><span class="s1">&#39;Edge&#39;</span><span class="p">,</span> <span class="s1">&#39;data to&#39;</span><span class="p">)):</span>
+    <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="Graph"><a class="viewcode-back" href="../../../../server.logic.graph.html#server.logic.graph.graph.Graph">[docs]</a><span class="k">class</span> <span class="nc">Graph</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Main class for holding information about roads and crossroads.</span>
+<span class="sd">        Most of the functionality is contained in the .so file.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nodelist</span><span class="p">,</span> <span class="n">edgelist</span><span class="p">,</span> <span class="n">from_c</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Create a new graph given nodes and edges.</span>
+
+<span class="sd">        Function args:</span>
+<span class="sd">        nodelist -- list of nodes, in an (id, node_data) format.</span>
+<span class="sd">        edgelist -- list of edges, in an (id, edge_data, to) format.</span>
+
+<span class="sd">        Returns: a graph containing the nodes and edges, where every edge</span>
+<span class="sd">        (id, edge_data, to) connects the nodes (id, node_data) and (to, node_data)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">def</span> <span class="nf">into_c_edge</span><span class="p">(</span><span class="n">edge</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">from_c</span><span class="p">:</span>
+                <span class="k">return</span> <span class="p">(</span><span class="n">edge</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">edge</span><span class="o">.</span><span class="n">distance</span><span class="p">,</span> <span class="n">edge</span><span class="o">.</span><span class="n">modifiers</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="n">edge</span><span class="o">.</span><span class="n">to</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="p">(</span><span class="n">edge</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">edge</span><span class="o">.</span><span class="n">distance</span><span class="p">,</span>
+                        <span class="p">[</span><span class="n">edge</span><span class="o">.</span><span class="n">highway</span><span class="p">,</span> <span class="n">edge</span><span class="o">.</span><span class="n">rating_sum</span><span class="p">,</span> <span class="n">edge</span><span class="o">.</span><span class="n">rating_count</span><span class="p">,</span> <span class="n">edge</span><span class="o">.</span><span class="n">water</span><span class="p">,</span> <span class="n">edge</span><span class="o">.</span><span class="n">park</span><span class="p">],</span> <span class="mf">1.0</span><span class="p">,</span> <span class="n">edge</span><span class="o">.</span><span class="n">to</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">lib</span> <span class="o">=</span> <span class="n">lib</span>
+        <span class="n">nodes</span> <span class="o">=</span> <span class="p">[(</span><span class="n">node</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">node</span><span class="o">.</span><span class="n">mapid</span><span class="p">,</span> <span class="n">node</span><span class="o">.</span><span class="n">lat</span><span class="p">,</span> <span class="n">node</span><span class="o">.</span><span class="n">lon</span><span class="p">,</span> <span class="n">node</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">node</span><span class="o">.</span><span class="n">y</span><span class="p">)</span> <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">nodelist</span><span class="p">]</span>
+        <span class="n">edges</span> <span class="o">=</span> <span class="p">[</span><span class="n">into_c_edge</span><span class="p">(</span><span class="n">edge</span><span class="p">)</span> <span class="k">for</span> <span class="n">edge_id</span><span class="p">,</span> <span class="n">edge</span><span class="p">,</span> <span class="n">edge_to</span> <span class="ow">in</span> <span class="n">edgelist</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">largest</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">id</span> <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">nodelist</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">graph</span> <span class="o">=</span> <span class="n">lib</span><span class="o">.</span><span class="n">graph_new</span><span class="p">(</span>
+            <span class="n">ffi</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="s2">&quot;Node[]&quot;</span><span class="p">,</span> <span class="n">nodes</span><span class="p">),</span>
+            <span class="nb">len</span><span class="p">(</span><span class="n">nodes</span><span class="p">),</span>
+            <span class="n">ffi</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="s2">&quot;Edge[]&quot;</span><span class="p">,</span> <span class="n">edges</span><span class="p">),</span>
+            <span class="nb">len</span><span class="p">(</span><span class="n">edges</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">__del__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lib</span><span class="o">.</span><span class="n">graph_delete</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Graph.get"><a class="viewcode-back" href="../../../../server.logic.graph.html#server.logic.graph.graph.Graph.get">[docs]</a>    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">lib</span><span class="o">.</span><span class="n">graph_get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="p">,</span> <span class="n">index</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Graph.get_conn_idval"><a class="viewcode-back" href="../../../../server.logic.graph.html#server.logic.graph.graph.Graph.get_conn_idval">[docs]</a>    <span class="k">def</span> <span class="nf">get_conn_idval</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Returns a list of connections given the index</span>
+
+<span class="sd">            Connections are returned in (to, data) format for every edge (index, data, to)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">class</span> <span class="nc">ConnIdVal</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+            <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">graph</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">connidval</span> <span class="o">=</span> <span class="n">lib</span><span class="o">.</span><span class="n">graph_conn_idval_new</span><span class="p">(</span><span class="n">graph</span><span class="p">,</span> <span class="n">index</span><span class="p">)</span>
+
+            <span class="k">def</span> <span class="nf">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+                <span class="k">return</span> <span class="bp">self</span>
+
+            <span class="k">def</span> <span class="nf">next</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+                <span class="n">res</span> <span class="o">=</span> <span class="n">lib</span><span class="o">.</span><span class="n">graph_conn_idval_next</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">connidval</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">res</span><span class="o">.</span><span class="n">e</span> <span class="o">==</span> <span class="n">ffi</span><span class="o">.</span><span class="n">NULL</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">StopIteration</span>
+                <span class="k">return</span> <span class="n">res</span>
+
+            <span class="k">def</span> <span class="nf">__del__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+                <span class="n">lib</span><span class="o">.</span><span class="n">graph_conn_idval_delete</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">connidval</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="p">[(</span><span class="n">i</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">i</span><span class="o">.</span><span class="n">e</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">ConnIdVal</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="p">,</span> <span class="n">index</span><span class="p">)]</span></div>
+
+<div class="viewcode-block" id="Graph.get_edges"><a class="viewcode-back" href="../../../../server.logic.graph.html#server.logic.graph.graph.Graph.get_edges">[docs]</a>    <span class="k">def</span> <span class="nf">get_edges</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
+        <span class="k">class</span> <span class="nc">Edges</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+            <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">graph</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">edges</span> <span class="o">=</span> <span class="n">lib</span><span class="o">.</span><span class="n">graph_edges_new</span><span class="p">(</span><span class="n">graph</span><span class="p">,</span> <span class="n">index</span><span class="p">)</span>
+
+            <span class="k">def</span> <span class="nf">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+                <span class="k">return</span> <span class="bp">self</span>
+
+            <span class="k">def</span> <span class="nf">next</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+                <span class="n">res</span> <span class="o">=</span> <span class="n">lib</span><span class="o">.</span><span class="n">graph_edges_next</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">edges</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">res</span> <span class="o">==</span> <span class="n">ffi</span><span class="o">.</span><span class="n">NULL</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">StopIteration</span>
+                <span class="k">return</span> <span class="n">res</span>
+
+            <span class="k">def</span> <span class="nf">__del__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+                <span class="n">lib</span><span class="o">.</span><span class="n">graph_edges_delete</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">edges</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="p">[</span><span class="n">e</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">Edges</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="p">,</span> <span class="n">index</span><span class="p">)]</span></div>
+
+<div class="viewcode-block" id="Graph.get_connids"><a class="viewcode-back" href="../../../../server.logic.graph.html#server.logic.graph.graph.Graph.get_connids">[docs]</a>    <span class="k">def</span> <span class="nf">get_connids</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Returns a list of node indices the node itself is connected to. &quot;&quot;&quot;</span>
+        <span class="k">class</span> <span class="nc">ConnIds</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+            <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">graph</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">connids</span> <span class="o">=</span> <span class="n">lib</span><span class="o">.</span><span class="n">graph_connids_new</span><span class="p">(</span><span class="n">graph</span><span class="p">,</span> <span class="n">index</span><span class="p">)</span>
+
+            <span class="k">def</span> <span class="nf">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+                <span class="k">return</span> <span class="bp">self</span>
+
+            <span class="k">def</span> <span class="nf">next</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+                <span class="n">res</span> <span class="o">=</span> <span class="n">lib</span><span class="o">.</span><span class="n">graph_connids_next</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">connids</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">res</span> <span class="o">==</span> <span class="n">stop</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">StopIteration</span>
+                <span class="k">return</span> <span class="n">res</span>
+
+            <span class="k">def</span> <span class="nf">__del__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+                <span class="n">lib</span><span class="o">.</span><span class="n">graph_connids_delete</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">connids</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">ConnIds</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="p">,</span> <span class="n">index</span><span class="p">)]</span></div>
+
+<div class="viewcode-block" id="Graph.list_ids"><a class="viewcode-back" href="../../../../server.logic.graph.html#server.logic.graph.graph.Graph.list_ids">[docs]</a>    <span class="k">def</span> <span class="nf">list_ids</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Returns a list of all indices in the graph. &quot;&quot;&quot;</span>
+        <span class="k">class</span> <span class="nc">ListIds</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+            <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">graph</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">listids</span> <span class="o">=</span> <span class="n">lib</span><span class="o">.</span><span class="n">graph_listids_new</span><span class="p">(</span><span class="n">graph</span><span class="p">)</span>
+
+            <span class="k">def</span> <span class="nf">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+                <span class="k">return</span> <span class="bp">self</span>
+
+            <span class="k">def</span> <span class="nf">next</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+                <span class="n">res</span> <span class="o">=</span> <span class="n">lib</span><span class="o">.</span><span class="n">graph_listids_next</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">listids</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">res</span> <span class="o">==</span> <span class="n">stop</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">StopIteration</span>
+                <span class="k">return</span> <span class="n">res</span>
+
+            <span class="k">def</span> <span class="nf">__del__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+                <span class="n">lib</span><span class="o">.</span><span class="n">graph_listids_delete</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">listids</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="p">(</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">ListIds</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="Graph.contains"><a class="viewcode-back" href="../../../../server.logic.graph.html#server.logic.graph.graph.Graph.contains">[docs]</a>    <span class="k">def</span> <span class="nf">contains</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Checks if a node index is present &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">index</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="n">lib</span><span class="o">.</span><span class="n">graph_contains</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="p">,</span> <span class="n">index</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">node_dict</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Graph.iter_nodes"><a class="viewcode-back" href="../../../../server.logic.graph.html#server.logic.graph.graph.Graph.iter_nodes">[docs]</a>    <span class="k">def</span> <span class="nf">iter_nodes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Iterates over all nodes in a graph, in (id, node_data) format.</span>
+
+<span class="sd">        Useful for transformation into a new graph &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">((</span><span class="n">node_id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">node_id</span><span class="p">))</span> <span class="k">for</span> <span class="n">node_id</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">list_ids</span><span class="p">())</span></div>
+
+<div class="viewcode-block" id="Graph.iter_edges"><a class="viewcode-back" href="../../../../server.logic.graph.html#server.logic.graph.graph.Graph.iter_edges">[docs]</a>    <span class="k">def</span> <span class="nf">iter_edges</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Iterates over all edges in a graph, in (id, edge_data, to) format.</span>
+
+<span class="sd">        Useful for transformation into a new graph &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">((</span><span class="nb">id</span><span class="p">,</span> <span class="n">conn</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">conn</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="k">for</span> <span class="nb">id</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">list_ids</span><span class="p">()</span> <span class="k">for</span> <span class="n">conn</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_conn_idval</span><span class="p">(</span><span class="nb">id</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="Graph.map_graph"><a class="viewcode-back" href="../../../../server.logic.graph.html#server.logic.graph.graph.Graph.map_graph">[docs]</a>    <span class="k">def</span> <span class="nf">map_graph</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vertex_fn</span><span class="p">,</span> <span class="n">edge_fn</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Creates a new graph, which has the same structure, but every node and edge</span>
+<span class="sd">        data field has the function vertex_fn or edge_fn applied to it.</span>
+
+<span class="sd">        Function args:</span>
+<span class="sd">        vertex_fn -- function that maps a node_data to another node_data</span>
+<span class="sd">        egde_fn -- function that maps an edge_data to another edge_data</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">Graph</span><span class="p">([</span><span class="n">vertex_fn</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="k">for</span> <span class="n">node_id</span><span class="p">,</span> <span class="n">data</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">iter_nodes</span><span class="p">()],</span>
+                     <span class="p">[(</span><span class="n">node_id</span><span class="p">,</span> <span class="n">edge_fn</span><span class="p">(</span><span class="n">data</span><span class="p">),</span> <span class="n">to</span><span class="p">)</span> <span class="k">for</span> <span class="n">node_id</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">to</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">iter_edges</span><span class="p">()],</span>
+                     <span class="kc">True</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Graph.generate_dijkstra"><a class="viewcode-back" href="../../../../server.logic.graph.html#server.logic.graph.graph.Graph.generate_dijkstra">[docs]</a>    <span class="k">def</span> <span class="nf">generate_dijkstra</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">start_node</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
+        <span class="k">class</span> <span class="nc">DijkstraIteratorPath</span><span class="p">(</span><span class="n">DijkstraIterator</span><span class="p">):</span>
+            <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">graph</span><span class="p">,</span> <span class="n">start_node</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">graph</span> <span class="o">=</span> <span class="n">graph</span>
+                <span class="n">configuration</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gen_config</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">dijkstra</span> <span class="o">=</span> <span class="n">lib</span><span class="o">.</span><span class="n">graph_graph_generate</span><span class="p">(</span><span class="n">graph</span><span class="p">,</span> <span class="n">start_node</span><span class="p">,</span> <span class="n">configuration</span><span class="p">)</span>
+
+            <span class="k">def</span> <span class="nf">__del__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+                <span class="n">lib</span><span class="o">.</span><span class="n">graph_dijkstra_delete</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dijkstra</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">DijkstraIteratorPath</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="p">,</span> <span class="n">start_node</span><span class="p">,</span> <span class="n">config</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Graph.add_rating"><a class="viewcode-back" href="../../../../server.logic.graph.html#server.logic.graph.graph.Graph.add_rating">[docs]</a>    <span class="k">def</span> <span class="nf">add_rating</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">start_node</span><span class="p">,</span> <span class="n">end_node</span><span class="p">,</span> <span class="n">rating</span><span class="p">):</span>
+        <span class="n">lib</span><span class="o">.</span><span class="n">graph_update_rating</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="p">,</span> <span class="n">start_node</span><span class="p">,</span> <span class="n">end_node</span><span class="p">,</span> <span class="n">rating</span><span class="p">)</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Gerwin Dox, Olivier Cammaert, Nick Aelterman.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

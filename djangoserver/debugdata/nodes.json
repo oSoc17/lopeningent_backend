@@ -1,0 +1,30 @@
+{
+  "version" : "0.1.0",
+  "comment" : "THIS IS A FILE MEANT FOR TESTING THE GRAPH ALGORITHM",
+  "elements" : [
+    {
+      "type": "node",
+      "id": 0,
+      "lat": 0.0,
+      "lon": 0.0
+    },
+    {
+      "type": "node",
+      "id": 1,
+      "lat": 1.0,
+      "lon": 0.0
+    },
+    {
+      "type": "node",
+      "id": 2,
+      "lat": 0.0,
+      "lon": 1.0
+    },
+    {
+      "type": "node",
+      "id": 3,
+      "lat": 1.0,
+      "lon": 1.0
+    }
+  ]
+}

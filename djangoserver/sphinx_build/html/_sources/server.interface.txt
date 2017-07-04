@@ -1,0 +1,67 @@
+interface Package
+=================
+
+:mod:`interface` Package
+------------------------
+
+.. automodule:: server.interface
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`closest` Module
+---------------------
+
+.. automodule:: server.interface.closest
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`geojson` Module
+---------------------
+
+.. automodule:: server.interface.geojson
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`nodes` Module
+-------------------
+
+.. automodule:: server.interface.nodes
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`readme` Module
+--------------------
+
+.. automodule:: server.interface.readme
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`routes` Module
+--------------------
+
+.. automodule:: server.interface.routes
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`tests` Module
+-------------------
+
+.. automodule:: server.interface.tests
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`util` Module
+------------------
+
+.. automodule:: server.interface.util
+    :members:
+    :undoc-members:
+    :show-inheritance:
+

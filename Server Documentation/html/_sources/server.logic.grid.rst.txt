@@ -1,0 +1,38 @@
+server\.logic\.grid package
+===========================
+
+Submodules
+----------
+
+server\.logic\.grid\.grid module
+--------------------------------
+
+.. automodule:: server.logic.grid.grid
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+server\.logic\.grid\.interval module
+------------------------------------
+
+.. automodule:: server.logic.grid.interval
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+server\.logic\.grid\.test\_example module
+-----------------------------------------
+
+.. automodule:: server.logic.grid.test_example
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+
+Module contents
+---------------
+
+.. automodule:: server.logic.grid
+    :members:
+    :undoc-members:
+    :show-inheritance:

@@ -1,0 +1,32 @@
+logic Package
+=============
+
+:mod:`logic` Package
+--------------------
+
+.. automodule:: server.logic
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`server_util` Module
+-------------------------
+
+.. automodule:: server.logic.server_util
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+Subpackages
+-----------
+
+.. toctree::
+
+    server.logic.city
+    server.logic.database
+    server.logic.distance
+    server.logic.graph
+    server.logic.grid
+    server.logic.projection
+    server.logic.routing
+

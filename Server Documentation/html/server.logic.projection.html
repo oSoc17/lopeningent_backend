@@ -1,0 +1,229 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>server.logic.projection package &#8212; Runamic Server 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="server.logic.routing package" href="server.logic.routing.html" />
+    <link rel="prev" title="server.logic.grid package" href="server.logic.grid.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="server-logic-projection-package">
+<h1>server.logic.projection package<a class="headerlink" href="#server-logic-projection-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-server.logic.projection.util">
+<span id="server-logic-projection-util-module"></span><h2>server.logic.projection.util module<a class="headerlink" href="#module-server.logic.projection.util" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="server.logic.projection.util.Coordinate">
+<em class="property">class </em><code class="descclassname">server.logic.projection.util.</code><code class="descname">Coordinate</code><a class="headerlink" href="#server.logic.projection.util.Coordinate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#server.logic.projection.util.Coordinate" title="server.logic.projection.util.Coordinate"><code class="xref py py-class docutils literal"><span class="pre">server.logic.projection.util.Coordinate</span></code></a></p>
+<p>A class representing a position projected on a plane.</p>
+<dl class="staticmethod">
+<dt id="server.logic.projection.util.Coordinate.from_named">
+<em class="property">static </em><code class="descname">from_named</code><span class="sig-paren">(</span><em>node</em><span class="sig-paren">)</span><a class="headerlink" href="#server.logic.projection.util.Coordinate.from_named" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="server.logic.projection.util.Coordinate.into_vector">
+<code class="descname">into_vector</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#server.logic.projection.util.Coordinate.into_vector" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="server.logic.projection.util.Projection">
+<em class="property">class </em><code class="descclassname">server.logic.projection.util.</code><code class="descname">Projection</code><a class="headerlink" href="#server.logic.projection.util.Projection" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#server.logic.projection.util.Projection" title="server.logic.projection.util.Projection"><code class="xref py py-class docutils literal"><span class="pre">server.logic.projection.util.Projection</span></code></a></p>
+<p>A class representing a node projected on a plane.</p>
+<dl class="staticmethod">
+<dt id="server.logic.projection.util.Projection.from_named">
+<em class="property">static </em><code class="descname">from_named</code><span class="sig-paren">(</span><em>node</em><span class="sig-paren">)</span><a class="headerlink" href="#server.logic.projection.util.Projection.from_named" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="server.logic.projection.util.Projection.into_vector">
+<code class="descname">into_vector</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#server.logic.projection.util.Projection.into_vector" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="server.logic.projection.util.Projector">
+<em class="property">class </em><code class="descclassname">server.logic.projection.util.</code><code class="descname">Projector</code><span class="sig-paren">(</span><em>projection_vector</em>, <em>up_vector</em><span class="sig-paren">)</span><a class="headerlink" href="#server.logic.projection.util.Projector" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>A class that projects nodes on a plane.</p>
+<p>It is meant for transforming nodes, with lat/lon coordinates, to Projections,
+with x/y coordinates, making calculations like distance and angle less accurate,
+but far easier to implement and cheaper to calculate.</p>
+<dl class="method">
+<dt id="server.logic.projection.util.Projector.map">
+<code class="descname">map</code><span class="sig-paren">(</span><em>node</em><span class="sig-paren">)</span><a class="headerlink" href="#server.logic.projection.util.Projector.map" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="server.logic.projection.util.Vector">
+<em class="property">class </em><code class="descclassname">server.logic.projection.util.</code><code class="descname">Vector</code><a class="headerlink" href="#server.logic.projection.util.Vector" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#server.logic.projection.util.Vector" title="server.logic.projection.util.Vector"><code class="xref py py-class docutils literal"><span class="pre">server.logic.projection.util.Vector</span></code></a></p>
+<p>A class containing a 3D vector.</p>
+<dl class="method">
+<dt id="server.logic.projection.util.Vector.cross">
+<code class="descname">cross</code><span class="sig-paren">(</span><em>other</em><span class="sig-paren">)</span><a class="headerlink" href="#server.logic.projection.util.Vector.cross" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="server.logic.projection.util.Vector.dot">
+<code class="descname">dot</code><span class="sig-paren">(</span><em>other</em><span class="sig-paren">)</span><a class="headerlink" href="#server.logic.projection.util.Vector.dot" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="server.logic.projection.util.Vector.lensqr">
+<code class="descname">lensqr</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#server.logic.projection.util.Vector.lensqr" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="server.logic.projection.util.Vector.scale">
+<code class="descname">scale</code><span class="sig-paren">(</span><em>const</em><span class="sig-paren">)</span><a class="headerlink" href="#server.logic.projection.util.Vector.scale" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="server.logic.projection.util.Vector.unit">
+<code class="descname">unit</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#server.logic.projection.util.Vector.unit" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="server.logic.projection.util.get_center_node">
+<code class="descclassname">server.logic.projection.util.</code><code class="descname">get_center_node</code><span class="sig-paren">(</span><em>vector_list</em><span class="sig-paren">)</span><a class="headerlink" href="#server.logic.projection.util.get_center_node" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a vector that is of unit length, and about in the middle of a vector cluster.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="server.logic.projection.util.project_city">
+<code class="descclassname">server.logic.projection.util.</code><code class="descname">project_city</code><span class="sig-paren">(</span><em>node_list</em><span class="sig-paren">)</span><a class="headerlink" href="#server.logic.projection.util.project_city" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a list of Projections mirroring a list of Nodes which represent a city.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="server.logic.projection.util.vector_from">
+<code class="descclassname">server.logic.projection.util.</code><code class="descname">vector_from</code><span class="sig-paren">(</span><em>lat</em>, <em>lon</em><span class="sig-paren">)</span><a class="headerlink" href="#server.logic.projection.util.vector_from" title="Permalink to this definition">¶</a></dt>
+<dd><p>Transforms lon/lat spherical coordinates into a 3D vector.</p>
+<p>for example:
+(0, 0)  -&gt; (1,0,0)
+(0, 90) -&gt; (0,1,0)
+(90, <a href="#id1"><span class="problematic" id="id2">*</span></a>) -&gt; (0,0,1)</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-server.logic.projection">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-server.logic.projection" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">server.logic.projection package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-server.logic.projection.util">server.logic.projection.util module</a></li>
+<li><a class="reference internal" href="#module-server.logic.projection">Module contents</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  <li><a href="modules.html">server</a><ul>
+  <li><a href="server.html">server package</a><ul>
+  <li><a href="server.logic.html">server.logic package</a><ul>
+      <li>Previous: <a href="server.logic.grid.html" title="previous chapter">server.logic.grid package</a></li>
+      <li>Next: <a href="server.logic.routing.html" title="next chapter">server.logic.routing package</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/server.logic.projection.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Groep16.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+      |
+      <a href="_sources/server.logic.projection.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

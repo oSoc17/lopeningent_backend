@@ -1,0 +1,207 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>server.logic.projection.util &#8212; DRIGServer 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+   
+  <link rel="stylesheet" href="../../../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for server.logic.projection.util</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">namedtuple</span>
+
+<span class="kn">from</span> <span class="nn">server.config</span> <span class="k">import</span> <span class="n">EARTH_RADIUS</span>
+
+
+<span class="c1">#</span>
+<span class="c1"># ^ Lat</span>
+<span class="c1"># |</span>
+<span class="c1"># |</span>
+<span class="c1"># |</span>
+<span class="c1"># |       Lon</span>
+<span class="c1"># L-------&gt;</span>
+<span class="c1">#</span>
+
+
+<div class="viewcode-block" id="Vector"><a class="viewcode-back" href="../../../../server.logic.projection.html#server.logic.projection.util.Vector">[docs]</a><span class="k">class</span> <span class="nc">Vector</span><span class="p">(</span><span class="n">namedtuple</span><span class="p">(</span><span class="s1">&#39;Vector&#39;</span><span class="p">,</span> <span class="s1">&#39;x y z&#39;</span><span class="p">)):</span>
+    <span class="sd">&quot;&quot;&quot; A class containing a 3D vector.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__add__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">Vector</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">+</span> <span class="n">other</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">+</span> <span class="n">other</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">z</span> <span class="o">+</span> <span class="n">other</span><span class="o">.</span><span class="n">z</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__sub__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">Vector</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">-</span> <span class="n">other</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">-</span> <span class="n">other</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">z</span> <span class="o">-</span> <span class="n">other</span><span class="o">.</span><span class="n">z</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Vector.scale"><a class="viewcode-back" href="../../../../server.logic.projection.html#server.logic.projection.util.Vector.scale">[docs]</a>    <span class="k">def</span> <span class="nf">scale</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">const</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">Vector</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">*</span> <span class="n">const</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">*</span> <span class="n">const</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">z</span> <span class="o">*</span> <span class="n">const</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Vector.dot"><a class="viewcode-back" href="../../../../server.logic.projection.html#server.logic.projection.util.Vector.dot">[docs]</a>    <span class="k">def</span> <span class="nf">dot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">*</span> <span class="n">other</span><span class="o">.</span><span class="n">x</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">*</span> <span class="n">other</span><span class="o">.</span><span class="n">y</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">z</span> <span class="o">*</span> <span class="n">other</span><span class="o">.</span><span class="n">z</span></div>
+
+<div class="viewcode-block" id="Vector.cross"><a class="viewcode-back" href="../../../../server.logic.projection.html#server.logic.projection.util.Vector.cross">[docs]</a>    <span class="k">def</span> <span class="nf">cross</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">Vector</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">*</span> <span class="n">other</span><span class="o">.</span><span class="n">z</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">z</span> <span class="o">*</span> <span class="n">other</span><span class="o">.</span><span class="n">y</span><span class="p">,</span>
+                      <span class="bp">self</span><span class="o">.</span><span class="n">z</span> <span class="o">*</span> <span class="n">other</span><span class="o">.</span><span class="n">x</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">*</span> <span class="n">other</span><span class="o">.</span><span class="n">z</span><span class="p">,</span>
+                      <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">*</span> <span class="n">other</span><span class="o">.</span><span class="n">y</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">*</span> <span class="n">other</span><span class="o">.</span><span class="n">x</span><span class="p">)</span></div>
+
+    <span class="c1"># Returns the square length of a vector</span>
+<div class="viewcode-block" id="Vector.lensqr"><a class="viewcode-back" href="../../../../server.logic.projection.html#server.logic.projection.util.Vector.lensqr">[docs]</a>    <span class="k">def</span> <span class="nf">lensqr</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Vector.unit"><a class="viewcode-back" href="../../../../server.logic.projection.html#server.logic.projection.util.Vector.unit">[docs]</a>    <span class="k">def</span> <span class="nf">unit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">scale</span><span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lensqr</span><span class="p">()))</span></div></div>
+
+
+<div class="viewcode-block" id="Projection"><a class="viewcode-back" href="../../../../server.logic.projection.html#server.logic.projection.util.Projection">[docs]</a><span class="k">class</span> <span class="nc">Projection</span><span class="p">(</span><span class="n">namedtuple</span><span class="p">(</span><span class="s1">&#39;Projection&#39;</span><span class="p">,</span> <span class="s1">&#39;id x y&#39;</span><span class="p">)):</span>
+    <span class="sd">&quot;&quot;&quot; A class representing a node projected on a plane.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Projection.into_vector"><a class="viewcode-back" href="../../../../server.logic.projection.html#server.logic.projection.util.Projection.into_vector">[docs]</a>    <span class="k">def</span> <span class="nf">into_vector</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">Vector</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Projection.from_named"><a class="viewcode-back" href="../../../../server.logic.projection.html#server.logic.projection.util.Projection.from_named">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">from_named</span><span class="p">(</span><span class="n">node</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">Projection</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">node</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">node</span><span class="o">.</span><span class="n">y</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="Coordinate"><a class="viewcode-back" href="../../../../server.logic.projection.html#server.logic.projection.util.Coordinate">[docs]</a><span class="k">class</span> <span class="nc">Coordinate</span><span class="p">(</span><span class="n">namedtuple</span><span class="p">(</span><span class="s1">&#39;Coordinate&#39;</span><span class="p">,</span> <span class="s1">&#39;x y&#39;</span><span class="p">)):</span>
+    <span class="sd">&quot;&quot;&quot; A class representing a position projected on a plane.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Coordinate.into_vector"><a class="viewcode-back" href="../../../../server.logic.projection.html#server.logic.projection.util.Coordinate.into_vector">[docs]</a>    <span class="k">def</span> <span class="nf">into_vector</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">Vector</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Coordinate.from_named"><a class="viewcode-back" href="../../../../server.logic.projection.html#server.logic.projection.util.Coordinate.from_named">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">from_named</span><span class="p">(</span><span class="n">node</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">Coordinate</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">node</span><span class="o">.</span><span class="n">y</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="get_center_node"><a class="viewcode-back" href="../../../../server.logic.projection.html#server.logic.projection.util.get_center_node">[docs]</a><span class="k">def</span> <span class="nf">get_center_node</span><span class="p">(</span><span class="n">vector_list</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Returns a vector that is of unit length, and about in the middle of a vector cluster.&quot;&quot;&quot;</span>
+    <span class="n">average</span> <span class="o">=</span> <span class="n">Vector</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">vector</span> <span class="ow">in</span> <span class="n">vector_list</span><span class="p">:</span>
+        <span class="n">average</span> <span class="o">=</span> <span class="n">average</span> <span class="o">+</span> <span class="n">vector</span>
+    <span class="n">average</span> <span class="o">=</span> <span class="n">average</span><span class="o">.</span><span class="n">scale</span><span class="p">(</span><span class="mf">1.</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">vector_list</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">average</span><span class="o">.</span><span class="n">unit</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="vector_from"><a class="viewcode-back" href="../../../../server.logic.projection.html#server.logic.projection.util.vector_from">[docs]</a><span class="k">def</span> <span class="nf">vector_from</span><span class="p">(</span><span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Transforms lon/lat spherical coordinates into a 3D vector.</span>
+
+<span class="sd">    for example:</span>
+<span class="sd">    (0, 0)  -&gt; (1,0,0)</span>
+<span class="sd">    (0, 90) -&gt; (0,1,0)</span>
+<span class="sd">    (90, *) -&gt; (0,0,1)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">lon_rad</span> <span class="o">=</span> <span class="n">lon</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mi">180</span>
+    <span class="n">lat_rad</span> <span class="o">=</span> <span class="n">lat</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mi">180</span>
+    <span class="k">return</span> <span class="n">Vector</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">lat_rad</span><span class="p">)</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">lon_rad</span><span class="p">),</span>
+                  <span class="n">math</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">lat_rad</span><span class="p">)</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">lon_rad</span><span class="p">),</span>
+                  <span class="n">math</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">lat_rad</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="Projector"><a class="viewcode-back" href="../../../../server.logic.projection.html#server.logic.projection.util.Projector">[docs]</a><span class="k">class</span> <span class="nc">Projector</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        A class that projects nodes on a plane.</span>
+
+<span class="sd">        It is meant for transforming nodes, with lat/lon coordinates, to Projections,</span>
+<span class="sd">        with x/y coordinates, making calculations like distance and angle less accurate,</span>
+<span class="sd">        but far easier to implement and cheaper to calculate.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">projection_vector</span><span class="p">,</span> <span class="n">up_vector</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">projection_vector</span> <span class="o">=</span> <span class="n">projection_vector</span><span class="o">.</span><span class="n">unit</span><span class="p">()</span>
+        <span class="n">lenproduct</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">projection_vector</span><span class="o">.</span><span class="n">lensqr</span><span class="p">()</span> <span class="o">*</span> <span class="n">up_vector</span><span class="o">.</span><span class="n">lensqr</span><span class="p">())</span>
+        <span class="n">scale_factor</span> <span class="o">=</span> <span class="n">up_vector</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">projection_vector</span><span class="p">)</span> <span class="o">/</span> <span class="n">lenproduct</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">up_vector</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">up_vector</span> <span class="o">-</span> <span class="n">projection_vector</span><span class="o">.</span><span class="n">scale</span><span class="p">(</span><span class="n">scale_factor</span><span class="p">))</span><span class="o">.</span><span class="n">unit</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">remaining</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">projection_vector</span><span class="o">.</span><span class="n">cross</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">up_vector</span><span class="p">)</span><span class="o">.</span><span class="n">unit</span><span class="p">()</span>
+
+<div class="viewcode-block" id="Projector.map"><a class="viewcode-back" href="../../../../server.logic.projection.html#server.logic.projection.util.Projector.map">[docs]</a>    <span class="k">def</span> <span class="nf">map</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">):</span>
+        <span class="n">point</span> <span class="o">=</span> <span class="n">vector_from</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">lat</span><span class="p">,</span> <span class="n">node</span><span class="o">.</span><span class="n">lon</span><span class="p">)</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">up_vector</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">point</span><span class="p">)</span> <span class="o">*</span> <span class="n">EARTH_RADIUS</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">remaining</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">point</span><span class="p">)</span> <span class="o">*</span> <span class="n">EARTH_RADIUS</span>
+        <span class="k">return</span> <span class="n">Coordinate</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="project_city"><a class="viewcode-back" href="../../../../server.logic.projection.html#server.logic.projection.util.project_city">[docs]</a><span class="k">def</span> <span class="nf">project_city</span><span class="p">(</span><span class="n">node_list</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Returns a list of Projections mirroring a list of Nodes which represent a city.&quot;&quot;&quot;</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">node</span><span class="p">:</span> <span class="n">vector_from</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">lat</span><span class="p">,</span> <span class="n">node</span><span class="o">.</span><span class="n">lon</span><span class="p">),</span> <span class="n">node_list</span><span class="p">)</span>
+    <span class="n">average</span> <span class="o">=</span> <span class="n">get_center_node</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+    <span class="n">projector</span> <span class="o">=</span> <span class="n">Projector</span><span class="p">(</span><span class="n">average</span><span class="p">,</span> <span class="n">Vector</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">projector</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Gerwin Dox, Olivier Cammaert, Nick Aelterman.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -1,0 +1,67 @@
+routing Package
+===============
+
+:mod:`compress` Module
+----------------------
+
+.. automodule:: server.logic.routing.compress
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`config` Module
+--------------------
+
+.. automodule:: server.logic.routing.config
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`directions` Module
+------------------------
+
+.. automodule:: server.logic.routing.directions
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`poison` Module
+--------------------
+
+.. automodule:: server.logic.routing.poison
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`ratings` Module
+---------------------
+
+.. automodule:: server.logic.routing.ratings
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`routing` Module
+---------------------
+
+.. automodule:: server.logic.routing.routing
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`tests` Module
+-------------------
+
+.. automodule:: server.logic.routing.tests
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`util` Module
+------------------
+
+.. automodule:: server.logic.routing.util
+    :members:
+    :undoc-members:
+    :show-inheritance:
+

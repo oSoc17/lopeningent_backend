@@ -1,0 +1,277 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>server.logic.database package &#8212; Runamic Server 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="server.logic.distance package" href="server.logic.distance.html" />
+    <link rel="prev" title="server.logic.city package" href="server.logic.city.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="server-logic-database-package">
+<h1>server.logic.database package<a class="headerlink" href="#server-logic-database-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-server.logic.database.edge_database">
+<span id="server-logic-database-edge-database-module"></span><h2>server.logic.database.edge_database module<a class="headerlink" href="#module-server.logic.database.edge_database" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="server.logic.database.edge_database.EdgeDatabase">
+<em class="property">class </em><code class="descclassname">server.logic.database.edge_database.</code><code class="descname">EdgeDatabase</code><a class="headerlink" href="#server.logic.database.edge_database.EdgeDatabase" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>Class responsible for saving and loading statistics for edges.
+Every method in this class is sets up it’s own connection to the database.
+As a result, if you wish to load a lot of data,
+it is better to use “get_all_edges()” instead of iterating over “get_edge()”.</p>
+<dl class="docutils">
+<dt>Usage example:</dt>
+<dd>database = EdgeDatabase()
+database.add_rating(edge_from, edge_to, 6)</dd>
+</dl>
+<dl class="method">
+<dt id="server.logic.database.edge_database.EdgeDatabase.add_rating">
+<code class="descname">add_rating</code><span class="sig-paren">(</span><em>edge_from</em>, <em>edge_to</em>, <em>rating</em><span class="sig-paren">)</span><a class="headerlink" href="#server.logic.database.edge_database.EdgeDatabase.add_rating" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds a rating to an edge in the database. If an edge does not exist, it is created.
+For a bulk version: see ‘add_rating_list()’
+:param edge_from: ID of node on one side.
+:param edge_to: ID of node on the other side.
+:param rating: rating to add to this edge total. Type: anything that can be added to a number.
+:return: Nothing</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="server.logic.database.edge_database.EdgeDatabase.add_rating_list">
+<code class="descname">add_rating_list</code><span class="sig-paren">(</span><em>edge_list</em><span class="sig-paren">)</span><a class="headerlink" href="#server.logic.database.edge_database.EdgeDatabase.add_rating_list" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bulk version of ‘add_rating()’
+:param edge_list: List of tuples of the type (edge_from, edge_to, rating)
+:return: Nothing</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="server.logic.database.edge_database.EdgeDatabase.get_all_edges">
+<code class="descname">get_all_edges</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#server.logic.database.edge_database.EdgeDatabase.get_all_edges" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieves all edges in the database and returns them in a dict with key (edge_from, edge_to)
+and values (total_rating, amount_voted, average_rating).</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="server.logic.database.edge_database.EdgeDatabase.get_amount_voted">
+<code class="descname">get_amount_voted</code><span class="sig-paren">(</span><em>edge_from</em>, <em>edge_to</em><span class="sig-paren">)</span><a class="headerlink" href="#server.logic.database.edge_database.EdgeDatabase.get_amount_voted" title="Permalink to this definition">¶</a></dt>
+<dd><p>Looks up an edge in the database and returns the amount of people that voted for it.
+:param edge_from: ID of node on one side.
+:param edge_to: ID of node on the other side.
+:return: average rating for that node. 0 if the edge was not found or has no votes.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="server.logic.database.edge_database.EdgeDatabase.get_average_rating">
+<code class="descname">get_average_rating</code><span class="sig-paren">(</span><em>edge_from</em>, <em>edge_to</em><span class="sig-paren">)</span><a class="headerlink" href="#server.logic.database.edge_database.EdgeDatabase.get_average_rating" title="Permalink to this definition">¶</a></dt>
+<dd><p>Looks up an edge in the database and returns the average rating for it.
+:param edge_from: ID of node on one side.
+:param edge_to: ID of node on the other side.
+:return: average rating for that node. 0 if the edge was not found or has no rating.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="server.logic.database.edge_database.EdgeDatabase.get_edge">
+<code class="descname">get_edge</code><span class="sig-paren">(</span><em>edge_from</em>, <em>edge_to</em><span class="sig-paren">)</span><a class="headerlink" href="#server.logic.database.edge_database.EdgeDatabase.get_edge" title="Permalink to this definition">¶</a></dt>
+<dd><p>Looks up an edge in the database and returns all the data on it as a tupple:
+(total_rating, amount_voted, average_rating).
+:param edge_from: ID of node on one side.
+:param edge_to: ID of node on the other side.
+:return: (total_rating, amount_voted, average_rating), None if no edge is found.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="server.logic.database.edge_database.EdgeDatabase.get_or_insert_edge">
+<code class="descname">get_or_insert_edge</code><span class="sig-paren">(</span><em>edge_from</em>, <em>edge_to</em>, <em>total_rating=0</em>, <em>amount_voted=0</em><span class="sig-paren">)</span><a class="headerlink" href="#server.logic.database.edge_database.EdgeDatabase.get_or_insert_edge" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieves an edge from the database. If the edge is not present, an new one will be created.
+:param edge_from: ID of node on one side.
+:param edge_to: ID of node on the other side.
+:param total_rating: Total rating to insert of new edge has to be created.
+:param amount_voted: Amount voted to insert of new edge has to be created.
+:return: (total_rating, amount_voted, average_rating) of the requested edge.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="server.logic.database.edge_database.EdgeDatabase.save_new">
+<code class="descname">save_new</code><span class="sig-paren">(</span><em>edge_from</em>, <em>edge_to</em>, <em>total_rating=0</em>, <em>amount_voted=0</em><span class="sig-paren">)</span><a class="headerlink" href="#server.logic.database.edge_database.EdgeDatabase.save_new" title="Permalink to this definition">¶</a></dt>
+<dd><p>Saves a new edge into the database.
+If a node with the same ID’s (in the same order) already exists, it will NOT be overwritten.
+If you wish to initialize a large amount of edges, consider using ‘add_rating_list()’ with the rating set to 0.
+For a bulk version: see ‘save_new_list()’
+:param edge_from: ID of node on one side.
+:param edge_to: ID of node on the other side.
+:param total_rating: rating of this edge (default 0).
+:param amount_voted: amount of people that voted for this edge (default 0).
+:return: Nothing.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="server.logic.database.edge_database.EdgeDatabase.save_new_list">
+<code class="descname">save_new_list</code><span class="sig-paren">(</span><em>edge_list</em><span class="sig-paren">)</span><a class="headerlink" href="#server.logic.database.edge_database.EdgeDatabase.save_new_list" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bulk version of ‘save_new()’.
+Note: this bulk version has no default values.
+:param edge_list: List of tuples of the type (edge_from, edge_to, total_rating, amount_voted)
+:return: Nothing.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-server.logic.database.tests">
+<span id="server-logic-database-tests-module"></span><h2>server.logic.database.tests module<a class="headerlink" href="#module-server.logic.database.tests" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="server.logic.database.tests.DatabaseTestCase">
+<em class="property">class </em><code class="descclassname">server.logic.database.tests.</code><code class="descname">DatabaseTestCase</code><span class="sig-paren">(</span><em>methodName=’runTest’</em><span class="sig-paren">)</span><a class="headerlink" href="#server.logic.database.tests.DatabaseTestCase" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">unittest.case.TestCase</span></code></p>
+<dl class="method">
+<dt id="server.logic.database.tests.DatabaseTestCase.check_edge_in_database">
+<code class="descname">check_edge_in_database</code><span class="sig-paren">(</span><em>edge_from</em>, <em>edge_to</em>, <em>total_rating</em>, <em>amount_voted</em><span class="sig-paren">)</span><a class="headerlink" href="#server.logic.database.tests.DatabaseTestCase.check_edge_in_database" title="Permalink to this definition">¶</a></dt>
+<dd><p>Utility method for direct checking if an edge is in the database.
+:return True if an edge with the given parameters is in the database, False otherwise</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="server.logic.database.tests.DatabaseTestCase.setUp">
+<code class="descname">setUp</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#server.logic.database.tests.DatabaseTestCase.setUp" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set up database class and instruct to use test database.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="server.logic.database.tests.DatabaseTestCase.tearDown">
+<code class="descname">tearDown</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#server.logic.database.tests.DatabaseTestCase.tearDown" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wipe test database.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="server.logic.database.tests.DatabaseTestCase.test_bulk_methods">
+<code class="descname">test_bulk_methods</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#server.logic.database.tests.DatabaseTestCase.test_bulk_methods" title="Permalink to this definition">¶</a></dt>
+<dd><p>Tests all functionality for save_new_list(), add_rating_list(), get_all_edges().</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="server.logic.database.tests.DatabaseTestCase.test_load_methods">
+<code class="descname">test_load_methods</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#server.logic.database.tests.DatabaseTestCase.test_load_methods" title="Permalink to this definition">¶</a></dt>
+<dd><p>Tests all functionality for get_average_rating(), get_amount_voted(), get_edge().
+Assumes the save methods are working correctly.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="server.logic.database.tests.DatabaseTestCase.test_save_new_and_add_rating">
+<code class="descname">test_save_new_and_add_rating</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#server.logic.database.tests.DatabaseTestCase.test_save_new_and_add_rating" title="Permalink to this definition">¶</a></dt>
+<dd><p>Tests all functionality of save_new() and add_rating().</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-server.logic.database">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-server.logic.database" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">server.logic.database package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-server.logic.database.edge_database">server.logic.database.edge_database module</a></li>
+<li><a class="reference internal" href="#module-server.logic.database.tests">server.logic.database.tests module</a></li>
+<li><a class="reference internal" href="#module-server.logic.database">Module contents</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  <li><a href="modules.html">server</a><ul>
+  <li><a href="server.html">server package</a><ul>
+  <li><a href="server.logic.html">server.logic package</a><ul>
+      <li>Previous: <a href="server.logic.city.html" title="previous chapter">server.logic.city package</a></li>
+      <li>Next: <a href="server.logic.distance.html" title="next chapter">server.logic.distance package</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/server.logic.database.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Groep16.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+      |
+      <a href="_sources/server.logic.database.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

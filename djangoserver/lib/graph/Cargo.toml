@@ -1,0 +1,12 @@
+[package]
+name = "graph"
+version = "0.1.0"
+authors = ["gedox <gerwin.dox@ugent.be>"]
+
+[dependencies]
+num = "*"
+libc = "*"
+rand = "*"
+vec_map = "*"
+newtypes = { path = "../newtypes" }
+util = { path = "../util" }

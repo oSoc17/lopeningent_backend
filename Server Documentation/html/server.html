@@ -1,0 +1,293 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>server package &#8212; Runamic Server 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="server.interface package" href="server.interface.html" />
+    <link rel="prev" title="server" href="modules.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="server-package">
+<h1>server package<a class="headerlink" href="#server-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="server.interface.html">server.interface package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="server.interface.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="server.interface.html#module-server.interface.closest">server.interface.closest module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="server.interface.html#module-server.interface.geojson">server.interface.geojson module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="server.interface.html#module-server.interface.nodes">server.interface.nodes module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="server.interface.html#module-server.interface.readme">server.interface.readme module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="server.interface.html#module-server.interface.routes">server.interface.routes module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="server.interface.html#module-server.interface.tests">server.interface.tests module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="server.interface.html#module-server.interface.util">server.interface.util module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="server.interface.html#module-server.interface">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="server.logic.html">server.logic package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="server.logic.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="server.logic.city.html">server.logic.city package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="server.logic.city.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="server.logic.city.html#module-server.logic.city.city">server.logic.city.city module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="server.logic.city.html#module-server.logic.city">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="server.logic.database.html">server.logic.database package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="server.logic.database.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="server.logic.database.html#module-server.logic.database.edge_database">server.logic.database.edge_database module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="server.logic.database.html#module-server.logic.database.tests">server.logic.database.tests module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="server.logic.database.html#module-server.logic.database">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="server.logic.distance.html">server.logic.distance package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="server.logic.distance.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="server.logic.distance.html#module-server.logic.distance.tests">server.logic.distance.tests module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="server.logic.distance.html#module-server.logic.distance.util">server.logic.distance.util module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="server.logic.distance.html#module-server.logic.distance">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="server.logic.graph.html">server.logic.graph package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="server.logic.graph.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="server.logic.graph.html#module-server.logic.graph.debug">server.logic.graph.debug module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="server.logic.graph.html#module-server.logic.graph.graph">server.logic.graph.graph module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="server.logic.graph.html#module-server.logic.graph.poison">server.logic.graph.poison module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="server.logic.graph.html#module-server.logic.graph.test_example">server.logic.graph.test_example module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="server.logic.graph.html#module-server.logic.graph.tests">server.logic.graph.tests module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="server.logic.graph.html#module-server.logic.graph.util">server.logic.graph.util module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="server.logic.graph.html#module-server.logic.graph">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="server.logic.grid.html">server.logic.grid package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="server.logic.grid.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="server.logic.grid.html#module-server.logic.grid.grid">server.logic.grid.grid module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="server.logic.grid.html#module-server.logic.grid.interval">server.logic.grid.interval module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="server.logic.grid.html#module-server.logic.grid.test_example">server.logic.grid.test_example module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="server.logic.grid.html#module-server.logic.grid">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="server.logic.projection.html">server.logic.projection package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="server.logic.projection.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="server.logic.projection.html#module-server.logic.projection.util">server.logic.projection.util module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="server.logic.projection.html#module-server.logic.projection">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="server.logic.routing.html">server.logic.routing package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="server.logic.routing.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="server.logic.routing.html#module-server.logic.routing.compress">server.logic.routing.compress module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="server.logic.routing.html#module-server.logic.routing.config">server.logic.routing.config module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="server.logic.routing.html#module-server.logic.routing.directions">server.logic.routing.directions module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="server.logic.routing.html#module-server.logic.routing.poison">server.logic.routing.poison module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="server.logic.routing.html#module-server.logic.routing.ratings">server.logic.routing.ratings module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="server.logic.routing.html#module-server.logic.routing.routing">server.logic.routing.routing module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="server.logic.routing.html#module-server.logic.routing.tests">server.logic.routing.tests module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="server.logic.routing.html#module-server.logic.routing.util">server.logic.routing.util module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="server.logic.routing.html#module-server.logic.routing">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="server.logic.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="server.logic.html#module-server.logic.server_util">server.logic.server_util module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="server.logic.html#module-server.logic">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="server.static.html">server.static package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="server.static.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="server.static.html#module-server.static.city">server.static.city module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="server.static.html#module-server.static">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-server.config">
+<span id="server-config-module"></span><h2>server.config module<a class="headerlink" href="#module-server.config" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-server.setdebug">
+<span id="server-setdebug-module"></span><h2>server.setdebug module<a class="headerlink" href="#module-server.setdebug" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-server.settings">
+<span id="server-settings-module"></span><h2>server.settings module<a class="headerlink" href="#module-server.settings" title="Permalink to this headline">¶</a></h2>
+<p>Django settings for server project.</p>
+<p>Generated by ‘django-admin startproject’ using Django 1.10.5.</p>
+<p>For more information on this file, see
+<a class="reference external" href="https://docs.djangoproject.com/en/1.10/topics/settings/">https://docs.djangoproject.com/en/1.10/topics/settings/</a></p>
+<p>For the full list of settings and their values, see
+<a class="reference external" href="https://docs.djangoproject.com/en/1.10/ref/settings/">https://docs.djangoproject.com/en/1.10/ref/settings/</a></p>
+</div>
+<div class="section" id="module-server.test_urls">
+<span id="server-test-urls-module"></span><h2>server.test_urls module<a class="headerlink" href="#module-server.test_urls" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="server.test_urls.TestUrls">
+<em class="property">class </em><code class="descclassname">server.test_urls.</code><code class="descname">TestUrls</code><span class="sig-paren">(</span><em>methodName=’runTest’</em><span class="sig-paren">)</span><a class="headerlink" href="#server.test_urls.TestUrls" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">django.test.testcases.TestCase</span></code></p>
+<p>Very coarse grained tests.
+Mainly test whether certain requests cause certain response types.
+Occasionally also test whether certain requests yield predefined responses.</p>
+<dl class="method">
+<dt id="server.test_urls.TestUrls.setUp">
+<code class="descname">setUp</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#server.test_urls.TestUrls.setUp" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="server.test_urls.TestUrls.test_urls">
+<code class="descname">test_urls</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#server.test_urls.TestUrls.test_urls" title="Permalink to this definition">¶</a></dt>
+<dd><p>Kind of a predefined fuzzy tester:
+All these url’s are valid and should return a valid, formatted response.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-server.urls">
+<span id="server-urls-module"></span><h2>server.urls module<a class="headerlink" href="#module-server.urls" title="Permalink to this headline">¶</a></h2>
+<p>server URL Configuration</p>
+<dl class="docutils">
+<dt>The <cite>urlpatterns</cite> list routes URLs to views. For more information please see:</dt>
+<dd><a class="reference external" href="https://docs.djangoproject.com/en/1.10/topics/http/urls/">https://docs.djangoproject.com/en/1.10/topics/http/urls/</a></dd>
+</dl>
+<p>Examples:
+Function views</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li>Add an import:  from my_app import views</li>
+<li>Add a URL to urlpatterns:  url(r’^$’, views.home, name=’home’)</li>
+</ol>
+</div></blockquote>
+<dl class="docutils">
+<dt>Class-based views</dt>
+<dd><ol class="first last arabic simple">
+<li>Add an import:  from other_app.views import Home</li>
+<li>Add a URL to urlpatterns:  url(r’^$’, Home.as_view(), name=’home’)</li>
+</ol>
+</dd>
+<dt>Including another URLconf</dt>
+<dd><ol class="first last arabic simple">
+<li>Import the include() function: from django.conf.urls import url, include</li>
+<li>Add a URL to urlpatterns:  url(r’^blog/’, include(‘blog.urls’))</li>
+</ol>
+</dd>
+</dl>
+</div>
+<div class="section" id="module-server.wsgi">
+<span id="server-wsgi-module"></span><h2>server.wsgi module<a class="headerlink" href="#module-server.wsgi" title="Permalink to this headline">¶</a></h2>
+<p>WSGI config for server project.</p>
+<p>It exposes the WSGI callable as a module-level variable named <code class="docutils literal"><span class="pre">application</span></code>.</p>
+<p>For more information on this file, see
+<a class="reference external" href="https://docs.djangoproject.com/en/1.10/howto/deployment/wsgi/">https://docs.djangoproject.com/en/1.10/howto/deployment/wsgi/</a></p>
+</div>
+<div class="section" id="module-server">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-server" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">server package</a><ul>
+<li><a class="reference internal" href="#subpackages">Subpackages</a></li>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-server.config">server.config module</a></li>
+<li><a class="reference internal" href="#module-server.setdebug">server.setdebug module</a></li>
+<li><a class="reference internal" href="#module-server.settings">server.settings module</a></li>
+<li><a class="reference internal" href="#module-server.test_urls">server.test_urls module</a></li>
+<li><a class="reference internal" href="#module-server.urls">server.urls module</a></li>
+<li><a class="reference internal" href="#module-server.wsgi">server.wsgi module</a></li>
+<li><a class="reference internal" href="#module-server">Module contents</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  <li><a href="modules.html">server</a><ul>
+      <li>Previous: <a href="modules.html" title="previous chapter">server</a></li>
+      <li>Next: <a href="server.interface.html" title="next chapter">server.interface package</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/server.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Groep16.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+      |
+      <a href="_sources/server.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

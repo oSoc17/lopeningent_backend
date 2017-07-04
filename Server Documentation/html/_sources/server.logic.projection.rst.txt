@@ -1,0 +1,22 @@
+server\.logic\.projection package
+=================================
+
+Submodules
+----------
+
+server\.logic\.projection\.util module
+--------------------------------------
+
+.. automodule:: server.logic.projection.util
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+
+Module contents
+---------------
+
+.. automodule:: server.logic.projection
+    :members:
+    :undoc-members:
+    :show-inheritance:

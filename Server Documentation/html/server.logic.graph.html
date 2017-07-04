@@ -1,0 +1,343 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>server.logic.graph package &#8212; Runamic Server 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="server.logic.grid package" href="server.logic.grid.html" />
+    <link rel="prev" title="server.logic.distance package" href="server.logic.distance.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="server-logic-graph-package">
+<h1>server.logic.graph package<a class="headerlink" href="#server-logic-graph-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-server.logic.graph.debug">
+<span id="server-logic-graph-debug-module"></span><h2>server.logic.graph.debug module<a class="headerlink" href="#module-server.logic.graph.debug" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="server.logic.graph.debug.store_coverage">
+<code class="descclassname">server.logic.graph.debug.</code><code class="descname">store_coverage</code><span class="sig-paren">(</span><em>grid</em><span class="sig-paren">)</span><a class="headerlink" href="#server.logic.graph.debug.store_coverage" title="Permalink to this definition">¶</a></dt>
+<dd><p>output filled cells to text file “Ghent.txt”</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="server.logic.graph.debug.store_graph">
+<code class="descclassname">server.logic.graph.debug.</code><code class="descname">store_graph</code><span class="sig-paren">(</span><em>graph</em><span class="sig-paren">)</span><a class="headerlink" href="#server.logic.graph.debug.store_graph" title="Permalink to this definition">¶</a></dt>
+<dd><p>output city roads to svg file.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-server.logic.graph.graph">
+<span id="server-logic-graph-graph-module"></span><h2>server.logic.graph.graph module<a class="headerlink" href="#module-server.logic.graph.graph" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="server.logic.graph.graph.DijkstraIterator">
+<em class="property">class </em><code class="descclassname">server.logic.graph.graph.</code><code class="descname">DijkstraIterator</code><a class="headerlink" href="#server.logic.graph.graph.DijkstraIterator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>Iterator that yields the edges and nodes of a graph, sorted by distance to the origin.</p>
+<p>This class should be instantiated by one of the methods of Graph.</p>
+<dl class="method">
+<dt id="server.logic.graph.graph.DijkstraIterator.choose">
+<code class="descname">choose</code><span class="sig-paren">(</span><em>config</em><span class="sig-paren">)</span><a class="headerlink" href="#server.logic.graph.graph.DijkstraIterator.choose" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a new iterator that yields a single random node.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="server.logic.graph.graph.DijkstraIterator.filter">
+<code class="descname">filter</code><span class="sig-paren">(</span><em>rod</em><span class="sig-paren">)</span><a class="headerlink" href="#server.logic.graph.graph.DijkstraIterator.filter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a new iterator that only yields when the destination node is
+in rod.</p>
+<p>Function args:
+rod – list (!) of node indices.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="server.logic.graph.graph.DijkstraIterator.gen_config">
+<code class="descname">gen_config</code><span class="sig-paren">(</span><em>config</em><span class="sig-paren">)</span><a class="headerlink" href="#server.logic.graph.graph.DijkstraIterator.gen_config" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate configuration.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="server.logic.graph.graph.DijkstraIterator.next">
+<code class="descname">next</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#server.logic.graph.graph.DijkstraIterator.next" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="server.logic.graph.graph.DijkstraIterator.root">
+<code class="descname">root</code><span class="sig-paren">(</span><em>index</em><span class="sig-paren">)</span><a class="headerlink" href="#server.logic.graph.graph.DijkstraIterator.root" title="Permalink to this definition">¶</a></dt>
+<dd><p>Yields the shortest path between node index and the starting node.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="server.logic.graph.graph.Edge">
+<em class="property">class </em><code class="descclassname">server.logic.graph.graph.</code><code class="descname">Edge</code><a class="headerlink" href="#server.logic.graph.graph.Edge" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#server.logic.graph.graph.Edge" title="server.logic.graph.graph.Edge"><code class="xref py py-class docutils literal"><span class="pre">server.logic.graph.graph.Edge</span></code></a></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="server.logic.graph.graph.Graph">
+<em class="property">class </em><code class="descclassname">server.logic.graph.graph.</code><code class="descname">Graph</code><span class="sig-paren">(</span><em>nodelist</em>, <em>edgelist</em>, <em>from_c=False</em><span class="sig-paren">)</span><a class="headerlink" href="#server.logic.graph.graph.Graph" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>Main class for holding information about roads and crossroads.
+Most of the functionality is contained in the .so file.</p>
+<dl class="method">
+<dt id="server.logic.graph.graph.Graph.add_rating">
+<code class="descname">add_rating</code><span class="sig-paren">(</span><em>start_node</em>, <em>end_node</em>, <em>rating</em><span class="sig-paren">)</span><a class="headerlink" href="#server.logic.graph.graph.Graph.add_rating" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="server.logic.graph.graph.Graph.contains">
+<code class="descname">contains</code><span class="sig-paren">(</span><em>index</em><span class="sig-paren">)</span><a class="headerlink" href="#server.logic.graph.graph.Graph.contains" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks if a node index is present</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="server.logic.graph.graph.Graph.generate_dijkstra">
+<code class="descname">generate_dijkstra</code><span class="sig-paren">(</span><em>start_node</em>, <em>config</em><span class="sig-paren">)</span><a class="headerlink" href="#server.logic.graph.graph.Graph.generate_dijkstra" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="server.logic.graph.graph.Graph.get">
+<code class="descname">get</code><span class="sig-paren">(</span><em>index</em><span class="sig-paren">)</span><a class="headerlink" href="#server.logic.graph.graph.Graph.get" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="server.logic.graph.graph.Graph.get_conn_idval">
+<code class="descname">get_conn_idval</code><span class="sig-paren">(</span><em>index</em><span class="sig-paren">)</span><a class="headerlink" href="#server.logic.graph.graph.Graph.get_conn_idval" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a list of connections given the index</p>
+<p>Connections are returned in (to, data) format for every edge (index, data, to)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="server.logic.graph.graph.Graph.get_connids">
+<code class="descname">get_connids</code><span class="sig-paren">(</span><em>index</em><span class="sig-paren">)</span><a class="headerlink" href="#server.logic.graph.graph.Graph.get_connids" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a list of node indices the node itself is connected to.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="server.logic.graph.graph.Graph.get_edges">
+<code class="descname">get_edges</code><span class="sig-paren">(</span><em>index</em><span class="sig-paren">)</span><a class="headerlink" href="#server.logic.graph.graph.Graph.get_edges" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="server.logic.graph.graph.Graph.iter_edges">
+<code class="descname">iter_edges</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#server.logic.graph.graph.Graph.iter_edges" title="Permalink to this definition">¶</a></dt>
+<dd><p>Iterates over all edges in a graph, in (id, edge_data, to) format.</p>
+<p>Useful for transformation into a new graph</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="server.logic.graph.graph.Graph.iter_nodes">
+<code class="descname">iter_nodes</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#server.logic.graph.graph.Graph.iter_nodes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Iterates over all nodes in a graph, in (id, node_data) format.</p>
+<p>Useful for transformation into a new graph</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="server.logic.graph.graph.Graph.list_ids">
+<code class="descname">list_ids</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#server.logic.graph.graph.Graph.list_ids" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a list of all indices in the graph.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="server.logic.graph.graph.Graph.map_graph">
+<code class="descname">map_graph</code><span class="sig-paren">(</span><em>vertex_fn</em>, <em>edge_fn</em><span class="sig-paren">)</span><a class="headerlink" href="#server.logic.graph.graph.Graph.map_graph" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a new graph, which has the same structure, but every node and edge
+data field has the function vertex_fn or edge_fn applied to it.</p>
+<p>Function args:
+vertex_fn – function that maps a node_data to another node_data
+egde_fn – function that maps an edge_data to another edge_data</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="server.logic.graph.graph.Vertex">
+<em class="property">class </em><code class="descclassname">server.logic.graph.graph.</code><code class="descname">Vertex</code><a class="headerlink" href="#server.logic.graph.graph.Vertex" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">server.logic.graph.graph.Node</span></code></p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-server.logic.graph.poison">
+<span id="server-logic-graph-poison-module"></span><h2>server.logic.graph.poison module<a class="headerlink" href="#module-server.logic.graph.poison" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="server.logic.graph.poison.PoisonedGraph">
+<em class="property">class </em><code class="descclassname">server.logic.graph.poison.</code><code class="descname">PoisonedGraph</code><span class="sig-paren">(</span><em>origin</em>, <em>rod</em>, <em>max_distance</em>, <em>max_value</em><span class="sig-paren">)</span><a class="headerlink" href="#server.logic.graph.poison.PoisonedGraph" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>A class that represents a poisoned graph
+This class basically overwrites and saves a subset of the original graph,
+and refers to the original graph itself if the data inside is not found.</p>
+<dl class="method">
+<dt id="server.logic.graph.poison.PoisonedGraph.generate_dijkstra">
+<code class="descname">generate_dijkstra</code><span class="sig-paren">(</span><em>start_node</em>, <em>config</em><span class="sig-paren">)</span><a class="headerlink" href="#server.logic.graph.poison.PoisonedGraph.generate_dijkstra" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-server.logic.graph.test_example">
+<span id="server-logic-graph-test-example-module"></span><h2>server.logic.graph.test_example module<a class="headerlink" href="#module-server.logic.graph.test_example" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="server.logic.graph.test_example.TestExample">
+<em class="property">class </em><code class="descclassname">server.logic.graph.test_example.</code><code class="descname">TestExample</code><span class="sig-paren">(</span><em>methodName=’runTest’</em><span class="sig-paren">)</span><a class="headerlink" href="#server.logic.graph.test_example.TestExample" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">django.test.testcases.TestCase</span></code></p>
+<p>Example of how to use this graph library
+Please read this carefully if you’re going to work with it.</p>
+<dl class="method">
+<dt id="server.logic.graph.test_example.TestExample.example">
+<code class="descname">example</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#server.logic.graph.test_example.TestExample.example" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-server.logic.graph.tests">
+<span id="server-logic-graph-tests-module"></span><h2>server.logic.graph.tests module<a class="headerlink" href="#module-server.logic.graph.tests" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="server.logic.graph.tests.GraphTestCase">
+<em class="property">class </em><code class="descclassname">server.logic.graph.tests.</code><code class="descname">GraphTestCase</code><span class="sig-paren">(</span><em>methodName=’runTest’</em><span class="sig-paren">)</span><a class="headerlink" href="#server.logic.graph.tests.GraphTestCase" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">django.test.testcases.TestCase</span></code></p>
+<p>Test the size of the GRID</p>
+<dl class="method">
+<dt id="server.logic.graph.tests.GraphTestCase.test">
+<code class="descname">test</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#server.logic.graph.tests.GraphTestCase.test" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-server.logic.graph.util">
+<span id="server-logic-graph-util-module"></span><h2>server.logic.graph.util module<a class="headerlink" href="#module-server.logic.graph.util" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="server.logic.graph.util.distance">
+<code class="descclassname">server.logic.graph.util.</code><code class="descname">distance</code><span class="sig-paren">(</span><em>startnode</em>, <em>endnode</em><span class="sig-paren">)</span><a class="headerlink" href="#server.logic.graph.util.distance" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the distance between two nodes in km.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="server.logic.graph.util.haversine">
+<code class="descclassname">server.logic.graph.util.</code><code class="descname">haversine</code><span class="sig-paren">(</span><em>rad</em><span class="sig-paren">)</span><a class="headerlink" href="#server.logic.graph.util.haversine" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the haversine function of an angle in radians.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="server.logic.graph.util.parse">
+<code class="descclassname">server.logic.graph.util.</code><code class="descname">parse</code><span class="sig-paren">(</span><em>data</em><span class="sig-paren">)</span><a class="headerlink" href="#server.logic.graph.util.parse" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-server.logic.graph">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-server.logic.graph" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">server.logic.graph package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-server.logic.graph.debug">server.logic.graph.debug module</a></li>
+<li><a class="reference internal" href="#module-server.logic.graph.graph">server.logic.graph.graph module</a></li>
+<li><a class="reference internal" href="#module-server.logic.graph.poison">server.logic.graph.poison module</a></li>
+<li><a class="reference internal" href="#module-server.logic.graph.test_example">server.logic.graph.test_example module</a></li>
+<li><a class="reference internal" href="#module-server.logic.graph.tests">server.logic.graph.tests module</a></li>
+<li><a class="reference internal" href="#module-server.logic.graph.util">server.logic.graph.util module</a></li>
+<li><a class="reference internal" href="#module-server.logic.graph">Module contents</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  <li><a href="modules.html">server</a><ul>
+  <li><a href="server.html">server package</a><ul>
+  <li><a href="server.logic.html">server.logic package</a><ul>
+      <li>Previous: <a href="server.logic.distance.html" title="previous chapter">server.logic.distance package</a></li>
+      <li>Next: <a href="server.logic.grid.html" title="next chapter">server.logic.grid package</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/server.logic.graph.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Groep16.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+      |
+      <a href="_sources/server.logic.graph.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -1,0 +1,357 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>server.interface package &#8212; Runamic Server 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="server.logic package" href="server.logic.html" />
+    <link rel="prev" title="server package" href="server.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="server-interface-package">
+<h1>server.interface package<a class="headerlink" href="#server-interface-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-server.interface.closest">
+<span id="server-interface-closest-module"></span><h2>server.interface.closest module<a class="headerlink" href="#module-server.interface.closest" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="server.interface.closest.get_id_from_pos">
+<code class="descclassname">server.interface.closest.</code><code class="descname">get_id_from_pos</code><span class="sig-paren">(</span><em>request</em><span class="sig-paren">)</span><a class="headerlink" href="#server.interface.closest.get_id_from_pos" title="Permalink to this definition">¶</a></dt>
+<dd><p>Respond with the node index closest to the given coordinate.</p>
+<p>Query args:
+lat – coordinate latitude
+lon – coordinate longitude</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="server.interface.closest.get_node_from_pos">
+<code class="descclassname">server.interface.closest.</code><code class="descname">get_node_from_pos</code><span class="sig-paren">(</span><em>request</em><span class="sig-paren">)</span><a class="headerlink" href="#server.interface.closest.get_node_from_pos" title="Permalink to this definition">¶</a></dt>
+<dd><p>Respond with the node data closest to the given coordinate.</p>
+<p>Query args:
+lat – coordinate latitude
+lon – coordinate longitude</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-server.interface.geojson">
+<span id="server-interface-geojson-module"></span><h2>server.interface.geojson module<a class="headerlink" href="#module-server.interface.geojson" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="server.interface.geojson.GeoCoord">
+<em class="property">class </em><code class="descclassname">server.interface.geojson.</code><code class="descname">GeoCoord</code><a class="headerlink" href="#server.interface.geojson.GeoCoord" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">server.interface.geojson.GEOCOORD</span></code></p>
+<dl class="staticmethod">
+<dt id="server.interface.geojson.GeoCoord.from_named">
+<em class="property">static </em><code class="descname">from_named</code><span class="sig-paren">(</span><em>named</em><span class="sig-paren">)</span><a class="headerlink" href="#server.interface.geojson.GeoCoord.from_named" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="server.interface.geojson.respond_path">
+<code class="descclassname">server.interface.geojson.</code><code class="descname">respond_path</code><span class="sig-paren">(</span><em>request_dict</em>, <em>path</em>, <em>markers</em><span class="sig-paren">)</span><a class="headerlink" href="#server.interface.geojson.respond_path" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wraps a path into a response object, given the request as sent to the server.</p>
+<p>Keyword arguments:
+request – The request as received by the server
+path – a set of graph indices.
+markers – a set of graph indices.</p>
+<p>Query arguments:
+type – the response type (default: “indices”). Possible values are:</p>
+<blockquote>
+<div>“indices”: return just the list of indices;
+“coordinates”: return a list of coordinates which are interpretable by the app;
+“geojson”: return a geojson object.
+“length” : return length information, not the route.
+“debug” : useful information for debugging.</div></blockquote>
+</dd></dl>
+
+</div>
+<div class="section" id="module-server.interface.nodes">
+<span id="server-interface-nodes-module"></span><h2>server.interface.nodes module<a class="headerlink" href="#module-server.interface.nodes" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="server.interface.nodes.get_node">
+<code class="descclassname">server.interface.nodes.</code><code class="descname">get_node</code><span class="sig-paren">(</span><em>request</em><span class="sig-paren">)</span><a class="headerlink" href="#server.interface.nodes.get_node" title="Permalink to this definition">¶</a></dt>
+<dd><p>Responds with information about a node.</p>
+<p>Query args:
+index – the index of the node</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="server.interface.nodes.in_city">
+<code class="descclassname">server.interface.nodes.</code><code class="descname">in_city</code><span class="sig-paren">(</span><em>request</em><span class="sig-paren">)</span><a class="headerlink" href="#server.interface.nodes.in_city" title="Permalink to this definition">¶</a></dt>
+<dd><p>Responds whether a coordinate is inside the city or not</p>
+<p>Query args:
+lat – coordinate latitude
+lon – coordinate longitude</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-server.interface.readme">
+<span id="server-interface-readme-module"></span><h2>server.interface.readme module<a class="headerlink" href="#module-server.interface.readme" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="server.interface.readme.readme">
+<code class="descclassname">server.interface.readme.</code><code class="descname">readme</code><span class="sig-paren">(</span><em>request</em><span class="sig-paren">)</span><a class="headerlink" href="#server.interface.readme.readme" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-server.interface.routes">
+<span id="server-interface-routes-module"></span><h2>server.interface.routes module<a class="headerlink" href="#module-server.interface.routes" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="server.interface.routes.async_exec">
+<code class="descclassname">server.interface.routes.</code><code class="descname">async_exec</code><span class="sig-paren">(</span><em>graph</em>, <em>start</em>, <em>end</em>, <em>config</em><span class="sig-paren">)</span><a class="headerlink" href="#server.interface.routes.async_exec" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="server.interface.routes.convert">
+<code class="descclassname">server.interface.routes.</code><code class="descname">convert</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#server.interface.routes.convert" title="Permalink to this definition">¶</a></dt>
+<dd><p>Converts a route into another type</p>
+<p>Deprecated and replaced by ‘parse’</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="server.interface.routes.go_home">
+<code class="descclassname">server.interface.routes.</code><code class="descname">go_home</code><span class="sig-paren">(</span><em>request</em><span class="sig-paren">)</span><a class="headerlink" href="#server.interface.routes.go_home" title="Permalink to this definition">¶</a></dt>
+<dd><p>Responds with a route leading the user back to his starting point.</p>
+<p>Query args:
+tag – the route that the user used to run.
+lon, lat – position of the user.
+distance – The preferred distance to the starting point.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="server.interface.routes.import_json">
+<code class="descclassname">server.interface.routes.</code><code class="descname">import_json</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#server.interface.routes.import_json" title="Permalink to this definition">¶</a></dt>
+<dd><p>Processes a json structure that contains route and applies the score in the MongoDB database.
+The structure should have the following structure:
+{</p>
+<blockquote>
+<div>‘route_id (e.g. 1)’ : { ‘length’: int, ‘score’: int, ‘name’: string, ‘tags’: arrays[string] }</div></blockquote>
+<p>}</p>
+<dl class="docutils">
+<dt>The data segment should contain the structure</dt>
+<dd>(can be done through e.g. curl “&lt;domain&gt;/route/import” –data “&#64;filename”)</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="server.interface.routes.parse">
+<code class="descclassname">server.interface.routes.</code><code class="descname">parse</code><span class="sig-paren">(</span><em>request</em><span class="sig-paren">)</span><a class="headerlink" href="#server.interface.routes.parse" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert a tag into another type.</p>
+<p>Query args:
+tag – route to be converted.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="server.interface.routes.rate">
+<code class="descclassname">server.interface.routes.</code><code class="descname">rate</code><span class="sig-paren">(</span><em>request</em><span class="sig-paren">)</span><a class="headerlink" href="#server.interface.routes.rate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds the rating to all edges in a route, and saves it both in the structure and in the database.</p>
+<p>Query args:
+tag – the tag of the route you want to rate
+rating – a float between 0 and 5</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="server.interface.routes.rod">
+<code class="descclassname">server.interface.routes.</code><code class="descname">rod</code><span class="sig-paren">(</span><em>request</em><span class="sig-paren">)</span><a class="headerlink" href="#server.interface.routes.rod" title="Permalink to this definition">¶</a></dt>
+<dd><p>Responds with a rod starting from an index</p>
+<p>This function is mostly useless and should - currently - only be used for
+testing and/or speed metrics.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="server.interface.routes.route_from_coord">
+<code class="descclassname">server.interface.routes.</code><code class="descname">route_from_coord</code><span class="sig-paren">(</span><em>request</em><span class="sig-paren">)</span><a class="headerlink" href="#server.interface.routes.route_from_coord" title="Permalink to this definition">¶</a></dt>
+<dd><p>Responds with a route starting and ending in a certain coordinate</p>
+<p>This function uses the lightning rod (Stroobant) algorithm: it generates a
+rod through the city and then tries different paths going to that rod</p>
+<p>Query args:
+lat – coordinate latitude
+lon – coordinate longitude
+type – the response type. See the geojson.respond_path function for more details</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-server.interface.tests">
+<span id="server-interface-tests-module"></span><h2>server.interface.tests module<a class="headerlink" href="#module-server.interface.tests" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="server.interface.tests.NodeTestCase">
+<em class="property">class </em><code class="descclassname">server.interface.tests.</code><code class="descname">NodeTestCase</code><span class="sig-paren">(</span><em>methodName=’runTest’</em><span class="sig-paren">)</span><a class="headerlink" href="#server.interface.tests.NodeTestCase" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">django.test.testcases.TestCase</span></code></p>
+<p>Test the node interface.
+Kind of obsolete due to test_urls, but still useful</p>
+<dl class="method">
+<dt id="server.interface.tests.NodeTestCase.setUp">
+<code class="descname">setUp</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#server.interface.tests.NodeTestCase.setUp" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="server.interface.tests.NodeTestCase.test_get_edge_tuple">
+<code class="descname">test_get_edge_tuple</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#server.interface.tests.NodeTestCase.test_get_edge_tuple" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="server.interface.tests.NodeTestCase.test_get_from">
+<code class="descname">test_get_from</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#server.interface.tests.NodeTestCase.test_get_from" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fuzzy tests.
+They test whether the function returns the correct response kind.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="server.interface.tests.NodeTestCase.test_get_node">
+<code class="descname">test_get_node</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#server.interface.tests.NodeTestCase.test_get_node" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fuzzy test
+Test whether indexing yields the correct response type</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="server.interface.tests.NodeTestCase.test_in_city">
+<code class="descname">test_in_city</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#server.interface.tests.NodeTestCase.test_in_city" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test whether the coordinates are inside/outside the city</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-server.interface.util">
+<span id="server-interface-util-module"></span><h2>server.interface.util module<a class="headerlink" href="#module-server.interface.util" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="server.interface.util.SerialConn">
+<em class="property">class </em><code class="descclassname">server.interface.util.</code><code class="descname">SerialConn</code><a class="headerlink" href="#server.interface.util.SerialConn" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#server.interface.util.SerialConn" title="server.interface.util.SerialConn"><code class="xref py py-class docutils literal"><span class="pre">server.interface.util.SerialConn</span></code></a></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="server.interface.util.SerialNode">
+<em class="property">class </em><code class="descclassname">server.interface.util.</code><code class="descname">SerialNode</code><a class="headerlink" href="#server.interface.util.SerialNode" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#server.interface.util.SerialNode" title="server.interface.util.SerialNode"><code class="xref py py-class docutils literal"><span class="pre">server.interface.util.SerialNode</span></code></a></p>
+</dd></dl>
+
+<dl class="function">
+<dt id="server.interface.util.get_edge_tuple">
+<code class="descclassname">server.interface.util.</code><code class="descname">get_edge_tuple</code><span class="sig-paren">(</span><em>_</em>, <em>lat</em>, <em>lon</em><span class="sig-paren">)</span><a class="headerlink" href="#server.interface.util.get_edge_tuple" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="server.interface.util.serialize_node">
+<code class="descclassname">server.interface.util.</code><code class="descname">serialize_node</code><span class="sig-paren">(</span><em>graph</em>, <em>index</em><span class="sig-paren">)</span><a class="headerlink" href="#server.interface.util.serialize_node" title="Permalink to this definition">¶</a></dt>
+<dd><p>Transforms a node index into node information</p>
+<p>Keyword args:
+graph – the current graph
+index – the node index</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-server.interface">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-server.interface" title="Permalink to this headline">¶</a></h2>
+<p>This module contains all function that are accessible by URL, in other words
+all functions that form the interface of the REST server</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">server.interface package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-server.interface.closest">server.interface.closest module</a></li>
+<li><a class="reference internal" href="#module-server.interface.geojson">server.interface.geojson module</a></li>
+<li><a class="reference internal" href="#module-server.interface.nodes">server.interface.nodes module</a></li>
+<li><a class="reference internal" href="#module-server.interface.readme">server.interface.readme module</a></li>
+<li><a class="reference internal" href="#module-server.interface.routes">server.interface.routes module</a></li>
+<li><a class="reference internal" href="#module-server.interface.tests">server.interface.tests module</a></li>
+<li><a class="reference internal" href="#module-server.interface.util">server.interface.util module</a></li>
+<li><a class="reference internal" href="#module-server.interface">Module contents</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  <li><a href="modules.html">server</a><ul>
+  <li><a href="server.html">server package</a><ul>
+      <li>Previous: <a href="server.html" title="previous chapter">server package</a></li>
+      <li>Next: <a href="server.logic.html" title="next chapter">server.logic package</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/server.interface.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Groep16.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+      |
+      <a href="_sources/server.interface.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

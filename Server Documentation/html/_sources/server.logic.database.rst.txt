@@ -1,0 +1,30 @@
+server\.logic\.database package
+===============================
+
+Submodules
+----------
+
+server\.logic\.database\.edge\_database module
+----------------------------------------------
+
+.. automodule:: server.logic.database.edge_database
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+server\.logic\.database\.tests module
+-------------------------------------
+
+.. automodule:: server.logic.database.tests
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+
+Module contents
+---------------
+
+.. automodule:: server.logic.database
+    :members:
+    :undoc-members:
+    :show-inheritance:
