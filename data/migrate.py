@@ -6,15 +6,6 @@ from os import listdir
 from json import loads
 
 
-class Node:
-
-    def __init__(self, lat, lon):
-        self.coord = (lat, lon)
-
-    def __str__(self):
-        return "({:.8}, {:.8})".format(self.coord[0], self.coord[1])
-
-
 class Edge:
 
     def __init__(self, osm_id):
@@ -22,14 +13,10 @@ class Edge:
         self.nodes = list()
         self.attributes = list()
 
-    def __str__(self):
-        return str([str(node) for node in self.nodes] +
-                   [str(attr) for attr in self.attributes])
-
     def get_bounds(self):
         # Get all latitudes and longtitudes inside the edge
-        lats = [node.coord[0] for node in self.nodes]
-        longs = [node.coord[1] for node in self.nodes]
+        lats = [node[0] for node in self.nodes]
+        longs = [node[1] for node in self.nodes]
 
         # Get the smallest and largest coordinate points
         min_coord = (min(lats), min(longs))
@@ -73,7 +60,7 @@ def load_osm(osm_file):
                 curr_id = int(elem.attrib["id"])
                 lat = float(elem.attrib["lat"])
                 lon = float(elem.attrib["lon"])
-                curr_elem = Node(lat, lon)
+                curr_elem = (lat, lon)
             elif elem.tag == "way":
                 curr_elem = Edge(int(elem.attrib["id"]))
             elif elem.tag == "nd":
@@ -160,19 +147,23 @@ def map_pois(edges, pois):
         poi = poi_into_box(poi)
         return [i for i in idx.intersection(poi)]
 
-    # Go through all the POI sets and check for 
-    # intersections with the edges inside the rtree. 
-    # If it's intersecting, add an attribute 
+    # Go through all the POI sets and check for
+    # intersections with the edges inside the rtree.
+    # If it's intersecting, add an attribute
     # with the name of the POI set.
     for pset in pois:
         for element in pset["elements"]:
             for edge_id in find_intersects(element):
                 if pset["name"] not in edge_dict[edge_id].attributes:
                     edge_dict[edge_id].attributes.append(pset["name"])
-                else: 
+                else:
                     break
 
     return edge_dict.values()
+
+
+def db_write(nodes, edges, pois):
+    pass
 
 
 if __name__ == "__main__":
@@ -180,5 +171,6 @@ if __name__ == "__main__":
     nodes, edges = load_osm("ghent.osm")
     pois = load_pois("poisets")
     edges = map_pois(edges, pois)
+    db_write(nodes, edges, pois)
     end = time()
     print "Migration took {:.3}s".format(end - start)
