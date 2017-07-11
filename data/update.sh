@@ -12,7 +12,7 @@ lat2=51.1100
 
 # This downloads the latest map data from OSM,
 # the result is stored inside the raw_ghent.osm xml file.
-#curl "$url=$lon1,$lat1,$lon2,$lat2" > raw_ghent.osm
+curl "$url=$lon1,$lat1,$lon2,$lat2" > raw_ghent.osm
 
 # We're filtering out the ways which are suitable for pedestrians.
 # https://wiki.openstreetmap.org/wiki/Pedestrian
@@ -28,7 +28,7 @@ osmosis \
 	--write-xml ghent.osm
 
 # Delete the raw file
-#rm -f raw_ghent.osm
+rm -f raw_ghent.osm
 
 # Run the migration script to update the,
 # data inside the postgresql database.
