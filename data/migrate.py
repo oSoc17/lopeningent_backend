@@ -124,7 +124,7 @@ def map_pois(edges, pois):
     :param edges: edges which have node data included (list of Edge)
     :param poi: all POI sets (list of POI sets)
     """
-    # Open up an rtree index with a pickl file as a cache
+    # Open up an rtree
     idx = index.Rtree()
     edge_dict = dict()
 
