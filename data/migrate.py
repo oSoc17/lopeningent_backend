@@ -1,9 +1,11 @@
 #!/usr/bin/env python
+import psycopg2
 from xml.etree.cElementTree import iterparse
 from rtree import index
 from time import time
 from os import listdir
 from json import loads
+import migrate_config as C
 
 
 class Edge:
@@ -11,12 +13,12 @@ class Edge:
     def __init__(self, osm_id):
         self.osm_id = osm_id
         self.nodes = list()
-        self.attributes = list()
+        self.tags = list()
 
     def get_bounds(self):
         # Get all latitudes and longtitudes inside the edge
-        lats = [node[0] for node in self.nodes]
-        longs = [node[1] for node in self.nodes]
+        lats = [node["coord"][0] for node in self.nodes]
+        longs = [node["coord"][1] for node in self.nodes]
 
         # Get the smallest and largest coordinate points
         min_coord = (min(lats), min(longs))
@@ -73,12 +75,7 @@ def load_osm(osm_file):
             elif elem.tag == "way":
                 edges.append(curr_elem)
 
-    def assign_nodes(edge):
-        node_ids = list(edge.nodes)
-        edge.nodes = [nodes[int(i)] for i in node_ids]
-        return edge
-
-    return nodes, map(assign_nodes, edges)
+    return nodes, edges
 
 
 def load_pois(poi_dir):
@@ -98,16 +95,35 @@ def load_pois(poi_dir):
             pois.append(loads(file.read()))
 
     # helper function to extract coords out of an element
-    def extract_coords(element):
-        return {"coord": (element["lat"], element["lon"])}
+    def extract_relevant(element):
+        name = "" if "name" not in element else element["name"]    
+        descr = "" if "description" not in element else element["description"]
+
+        return {
+            "name": name,
+            "description": descr,
+            "coord": (element["lat"], element["lon"])
+        }
 
     for pset in pois:
         # Remove 'null' entries
         pset["elements"] = filter(lambda elem: elem != None, pset["elements"])
         # Only use 'lat' & 'lon'
-        pset["elements"] = map(extract_coords, pset["elements"])
+        pset["elements"] = map(extract_relevant, pset["elements"])
 
     return pois
+
+
+def update_edge_nodes(edges, nodes, osm_nid_dict):
+    def assign_nodes(edge):
+        osm_ids = list(edge.nodes)
+        edge.nodes = list()
+        for osm_id in osm_ids:
+            nid = osm_nid_dict[int(osm_id)]
+            edge.nodes.append({"nid": nid, "coord": nodes[int(osm_id)]})
+        return edge
+
+    return map(assign_nodes, edges)
 
 
 def map_pois(edges, pois):
@@ -154,23 +170,121 @@ def map_pois(edges, pois):
     for pset in pois:
         for element in pset["elements"]:
             for edge_id in find_intersects(element):
-                if pset["name"] not in edge_dict[edge_id].attributes:
-                    edge_dict[edge_id].attributes.append(pset["name"])
+                if pset["name"] not in edge_dict[edge_id].tags:
+                    edge_dict[edge_id].tags.append(pset["name"])
                 else:
                     break
 
     return edge_dict.values()
 
 
-def db_write(nodes, edges, pois):
-    pass
+def db_connect(connstr):
+    return psycopg2.connect(connstr)
+
+
+def db_truncate(connection):
+    cursor = connection.cursor()
+    cursor.execute(
+        """
+        TRUNCATE lopeningent.edges, lopeningent.nodes, lopeningent.pois 
+            RESTART IDENTITY CASCADE
+        """
+    )
+    cursor.close()
+
+
+def db_write_nodes(connection, nodes):
+    cursor = connection.cursor()
+    osm_nid_dict = dict()
+
+    def convert_node(node):
+        return "({}, {})".format(node[0], node[1])
+
+    for osm_id, node in nodes.iteritems():
+        cursor.execute(
+            """
+            INSERT INTO lopeningent.nodes (coord) 
+                VALUES (%s) RETURNING nid
+            """
+            , (convert_node(node), )
+        )
+        osm_nid_dict[osm_id] = cursor.fetchone()[0]
+
+    cursor.close()
+    return osm_nid_dict
+
+
+def db_write_edges(connection, edges):
+    cursor = connection.cursor()
+
+    def list_into_pg(list):
+        list = str(map(str, list))
+        return list.replace('[', '{').replace(']', '}').replace('\'', '\"')
+
+    for edge in edges:
+        cursor.execute(
+            """
+            INSERT INTO lopeningent.edges (rating, tags)
+                VALUES (%s, %s) RETURNING eid
+            """
+            , (2.5, list_into_pg(edge.tags))
+        )
+
+        eid = cursor.fetchone()[0]
+
+        for node in edge.nodes:
+            cursor.execute(
+                """
+                INSERT INTO lopeningent.edge_nodes (eid, nid)
+                    VALUES (%s, %s)
+                """
+                , (eid, node["nid"])
+            )
+
+    cursor.close()
+
+
+def db_write_pois(connection, pois):
+    cursor = connection.cursor()
+
+    def convert_poi_coord(poi):
+        return "({}, {})".format(poi["coord"][0], poi["coord"][1])
+
+    for pset in pois:
+        for poi in pset["elements"]:
+            cursor.execute(
+                """
+                INSERT INTO lopeningent.pois (name, description, coord, type)
+                    VALUES(%s, %s, %s, %s)
+                """
+                , (poi["name"], poi["description"], 
+                    convert_poi_coord(poi), pset["name"])
+            )
+
+    cursor.close()
+
+
+def db_close(connection):
+    connection.commit()
+    connection.close()
 
 
 if __name__ == "__main__":
     start = time()
-    nodes, edges = load_osm("ghent.osm")
-    pois = load_pois("poisets")
-    edges = map_pois(edges, pois)
-    db_write(nodes, edges, pois)
+
+    nodes, edges = load_osm(C.OSM_FILE)
+    pois = load_pois(C.POI_DIR)
+
+    conn = db_connect(C.DB_CONN)
+
+    db_truncate(conn)
+    osm_nid_dict = db_write_nodes(conn, nodes)
+    edges = map_pois(update_edge_nodes(edges, nodes, osm_nid_dict), pois)
+
+    db_write_edges(conn, edges)
+    db_write_pois(conn, pois)
+
+    db_close(conn)
+
     end = time()
     print "Migration took {:.3}s".format(end - start)

@@ -5,7 +5,7 @@
 -- Dumped from database version 9.6.3
 -- Dumped by pg_dump version 9.6.3
 
--- Started on 2017-07-12 09:21:32 CEST
+-- Started on 2017-07-12 13:31:10 CEST
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -25,6 +25,23 @@ CREATE SCHEMA lopeningent;
 
 
 ALTER SCHEMA lopeningent OWNER TO postgres;
+
+--
+-- TOC entry 1 (class 3079 OID 12393)
+-- Name: plpgsql; Type: EXTENSION; Schema: -; Owner: 
+--
+
+CREATE EXTENSION IF NOT EXISTS plpgsql WITH SCHEMA pg_catalog;
+
+
+--
+-- TOC entry 2175 (class 0 OID 0)
+-- Dependencies: 1
+-- Name: EXTENSION plpgsql; Type: COMMENT; Schema: -; Owner: 
+--
+
+COMMENT ON EXTENSION plpgsql IS 'PL/pgSQL procedural language';
+
 
 SET search_path = lopeningent, pg_catalog;
 
@@ -76,7 +93,7 @@ CREATE SEQUENCE edges_eid_seq
 ALTER TABLE edges_eid_seq OWNER TO postgres;
 
 --
--- TOC entry 2175 (class 0 OID 0)
+-- TOC entry 2176 (class 0 OID 0)
 -- Dependencies: 188
 -- Name: edges_eid_seq; Type: SEQUENCE OWNED BY; Schema: lopeningent; Owner: postgres
 --
@@ -113,7 +130,7 @@ CREATE SEQUENCE nodes_nid_seq
 ALTER TABLE nodes_nid_seq OWNER TO postgres;
 
 --
--- TOC entry 2176 (class 0 OID 0)
+-- TOC entry 2177 (class 0 OID 0)
 -- Dependencies: 186
 -- Name: nodes_nid_seq; Type: SEQUENCE OWNED BY; Schema: lopeningent; Owner: postgres
 --
@@ -153,7 +170,7 @@ CREATE SEQUENCE pois_pid_seq
 ALTER TABLE pois_pid_seq OWNER TO postgres;
 
 --
--- TOC entry 2177 (class 0 OID 0)
+-- TOC entry 2178 (class 0 OID 0)
 -- Dependencies: 191
 -- Name: pois_pid_seq; Type: SEQUENCE OWNED BY; Schema: lopeningent; Owner: postgres
 --
@@ -192,7 +209,7 @@ CREATE SEQUENCE routes_rid_seq
 ALTER TABLE routes_rid_seq OWNER TO postgres;
 
 --
--- TOC entry 2178 (class 0 OID 0)
+-- TOC entry 2179 (class 0 OID 0)
 -- Dependencies: 193
 -- Name: routes_rid_seq; Type: SEQUENCE OWNED BY; Schema: lopeningent; Owner: postgres
 --
@@ -252,15 +269,6 @@ ALTER TABLE ONLY routes ALTER COLUMN rid SET DEFAULT nextval('routes_rid_seq'::r
 
 
 --
--- TOC entry 2045 (class 2606 OID 16412)
--- Name: edge_nodes edge_nodes_pkey; Type: CONSTRAINT; Schema: lopeningent; Owner: postgres
---
-
-ALTER TABLE ONLY edge_nodes
-    ADD CONSTRAINT edge_nodes_pkey PRIMARY KEY (eid, nid);
-
-
---
 -- TOC entry 2043 (class 2606 OID 16407)
 -- Name: edges edges_pkey; Type: CONSTRAINT; Schema: lopeningent; Owner: postgres
 --
@@ -279,7 +287,7 @@ ALTER TABLE ONLY nodes
 
 
 --
--- TOC entry 2047 (class 2606 OID 16433)
+-- TOC entry 2045 (class 2606 OID 16433)
 -- Name: pois pois_pkey; Type: CONSTRAINT; Schema: lopeningent; Owner: postgres
 --
 
@@ -288,7 +296,7 @@ ALTER TABLE ONLY pois
 
 
 --
--- TOC entry 2049 (class 2606 OID 16445)
+-- TOC entry 2047 (class 2606 OID 16445)
 -- Name: routes routes_pkey; Type: CONSTRAINT; Schema: lopeningent; Owner: postgres
 --
 
@@ -297,7 +305,7 @@ ALTER TABLE ONLY routes
 
 
 --
--- TOC entry 2051 (class 2606 OID 16450)
+-- TOC entry 2049 (class 2606 OID 16450)
 -- Name: users users_pkey; Type: CONSTRAINT; Schema: lopeningent; Owner: postgres
 --
 
@@ -306,7 +314,7 @@ ALTER TABLE ONLY users
 
 
 --
--- TOC entry 2052 (class 2606 OID 16413)
+-- TOC entry 2050 (class 2606 OID 16413)
 -- Name: edge_nodes edges_fkey; Type: FK CONSTRAINT; Schema: lopeningent; Owner: postgres
 --
 
@@ -315,7 +323,7 @@ ALTER TABLE ONLY edge_nodes
 
 
 --
--- TOC entry 2053 (class 2606 OID 16418)
+-- TOC entry 2051 (class 2606 OID 16418)
 -- Name: edge_nodes nodes_fkey; Type: FK CONSTRAINT; Schema: lopeningent; Owner: postgres
 --
 
@@ -323,7 +331,7 @@ ALTER TABLE ONLY edge_nodes
     ADD CONSTRAINT nodes_fkey FOREIGN KEY (nid) REFERENCES nodes(nid);
 
 
--- Completed on 2017-07-12 09:21:32 CEST
+-- Completed on 2017-07-12 13:31:10 CEST
 
 --
 -- PostgreSQL database dump complete
