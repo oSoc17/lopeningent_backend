@@ -44,7 +44,8 @@ the packages depend on a list of Linux shared libraries, a comprehensive list wi
 Coming soon
 ```
 
-Load the `data/lopeningent_schema.sql` into your `PostgreSQL` server and update the settings in `data/migrate_config.py`. Oh, also make sure you've installed [Osmosis](http://wiki.openstreetmap.org/wiki/Osmosis)
+Load the `data/lopeningent_schema.sql` into your `PostgreSQL` server and update the settings in `data/migrate_config.py`. Oh, also make sure you've installed [Osmosis](http://wiki.openstreetmap.org/wiki/Osmosis).
+
 To load the data into the database run: 
 ```
 $ cd data
