@@ -16,13 +16,11 @@ curl "$url=$lon1,$lat1,$lon2,$lat2" > raw_ghent.osm
 
 # We're filtering out the ways which are suitable for pedestrians.
 # https://wiki.openstreetmap.org/wiki/Pedestrian
-highway_tags="pedestrian,footway,path,cylceway"
-foot_tags="yes,designated"
+highway_tags="motorway,motorway_link"
 
 osmosis \
 	--read-xml raw_ghent.osm \
-	--tag-filter accept-ways highway=$highway_tags \
-	--tag-filter accept-ways foot=$foot_tags \
+	--tag-filter reject-ways highway=$highway_tags \
 	--tag-filter reject-relations \
 	--used-node \
 	--write-xml ghent.osm
