@@ -12,7 +12,7 @@ extern crate util;
 
 use std::ptr;
 use std::slice;
-use std::ops::Mul;
+/*use std::ops::Mul;*/
 
 use graph::error::Error;
 use num::traits::WrappingSub;
@@ -60,64 +60,64 @@ fn borrowed_ptr<T>(t : Option<&T>) -> *const T {
 /// Every edge (road) has a few properties: whether it is a highway or a footpath,
 /// whether it is in a park, or near water, etc.
 /// This structure contains all that data in a slightly compressed format.
-#[repr(C)]
-#[derive(Clone)]
-pub struct Modifiers {
+///#[repr(C)]
+///#[derive(Clone)]
+///pub struct Modifiers {
     /// Highway modifier, between 1.0 (footpath) and infinity (motorway)
-    pub highway : libc::c_double,
+///    pub highway : libc::c_double,
     /// Sum of all the ratings, or `rating_count * average_rating`
-    pub rating_sum : libc::c_double,
+///    pub rating_sum : libc::c_double,
     /// Number of ratings, or `rating_sum / average_rating`
-    pub rating_count : libc::size_t,
+///    pub rating_count : libc::size_t,
     /// 1 if the road is near water, else 0
-    pub water : libc::size_t,
+///    pub water : libc::size_t,
     /// 1 if the road is in a park, else 0
-    pub park : libc::size_t,
-}
+///    pub park : libc::size_t,
+///}
 
 /// Modifier of the configuration.
 ///
 /// This structure corresponds to the [Modifiers](Modifiers.html) structure.
 /// The larger the value, the larger the importance of the corresponding field in the Modifiers struct.
-#[repr(C)]
-#[derive(Clone)]
-#[allow(missing_docs)]
-pub struct Modifier_Dot {
-    pub highway : libc::c_double,
-    pub rating_sum : libc::c_double,
-    pub rating_count : libc::c_double,
-    pub water : libc::c_double,
-    pub park : libc::c_double,
-}
+///#[repr(C)]
+///#[derive(Clone)]
+///#[allow(missing_docs)]
+///pub struct Modifier_Dot {
+///    pub highway : libc::c_double,
+///    pub rating_sum : libc::c_double,
+///    pub rating_count : libc::c_double,
+///    pub water : libc::c_double,
+///    pub park : libc::c_double,
+///}
 
-impl<'a, 'b> Mul<&'a Modifier_Dot> for &'b Modifiers {
-    type Output=f64;
-    fn mul(self, other : &'a Modifier_Dot) -> f64 {
-        (self.highway*other.highway
-        + match self.rating_count {
-            0 => 0.0,
-            x => self.rating_sum / x as f64
-        } * other.rating_sum
-        + self.rating_count as f64 * other.rating_count)
-        * (1.0 / if self.water == 1 {other.water.exp()} else {1.0})
-        * (1.0 / if self.park == 1 {other.park.exp()} else {1.0})
-    }
-}
+///impl<'a, 'b> Mul<&'a Modifier_Dot> for &'b Modifiers {
+///    type Output=f64;
+///    fn mul(self, other : &'a Modifier_Dot) -> f64 {
+///        (self.highway*other.highway
+//        + match self.rating_count {
+///            0 => 0.0,
+///            x => self.rating_sum / x as f64
+///        } * other.rating_sum
+///        + self.rating_count as f64 * other.rating_count)
+///        * (1.0 / if self.water == 1 {other.water.exp()} else {1.0})
+///        * (1.0 / if self.park == 1 {other.park.exp()} else {1.0})
+///    }
+///}
 
-impl Mul<Modifier_Dot> for Modifiers {
-    type Output=f64;
-    fn mul(self, other : Modifier_Dot) -> f64 {
-        (&self) * (&other)
-    }
-}
+///impl Mul<Modifier_Dot> for Modifiers {
+///    type Output=f64;
+///    fn mul(self, other : Modifier_Dot) -> f64 {
+///        (&self) * (&other)
+///    }
+///}
 
-impl Modifiers {
+///impl Modifiers {
     /// Add a rating to the edge
-    fn update(&mut self, rating : f64) {
-        self.rating_count += 1;
-        self.rating_sum += rating;
-    }
-}
+///    fn update(&mut self, rating : f64) {
+///        self.rating_count += 1;
+///        self.rating_sum += rating;
+///    }
+///}
 
 /// Representation of a node.
 #[repr(C)]
@@ -126,8 +126,6 @@ pub struct Node {
     /// Identification number. The graph is more efficient if the id's are successive
     /// (as it relies on a Vector map.)
     pub id : libc::size_t,
-    /// The identification number in OpenStreetMaps.
-    pub mapid : libc::size_t,
     /// Latitude.
     pub lat : libc::c_double,
     /// Longitude
@@ -154,8 +152,8 @@ pub struct Edge {
     pub id : libc::size_t,
     /// Length of the road
     pub distance : libc::c_double,
-    /// Road metadata
-    pub modifiers : Modifiers,
+    /// The modifier by which to change the edge length.
+    pub modifier : libc::c_double,
     /// Poison value. Used in distance metrics.
     pub poison : libc::c_double,
     /// Identification number of the destination node.
@@ -210,8 +208,6 @@ pub struct DijkstraNode {
 pub struct Configuration {
     /// Importance of the actual distance travelled.
     pub value_length : libc::c_double,
-    /// Modifiers.
-    pub value_modifiers : Modifier_Dot,
     /// Maximum distance allowed.
     pub distance_max : libc::c_double,
     /// Minimum distance allowed
@@ -251,12 +247,12 @@ impl Graph {
         ))
     }
 
-    fn update_rating(&mut self, from : usize, to : usize, rating : f64) -> bool {
-        match self.0.get_edge_mut(from, to) {
-            Some(ref mut t) => {t.modifiers.update(rating); true},
-            _ => false
-        }
-    }
+    ///fn update_rating(&mut self, from : usize, to : usize, rating : f64) -> bool {
+    ///    match self.0.get_edge_mut(from, to) {
+    ///        Some(ref mut t) => {t.modifiers.update(rating); true},
+    ///        _ => false
+    ///    }
+    ///}
 
     fn poison(&'static self, rod : &[usize], max_distance : f64, max_value : f64) -> Poison {
         let iterator = self.0.gen_limited_dijkstra_vec(
@@ -277,27 +273,16 @@ impl Graph {
 }
 
 fn generate_route<G : GraphTrait<V=Node, E=Edge>>(graph : &'static G, start_node : usize, config : Configuration) -> DijkstraIterator {
-    let (vm, vl, dh, _) = (
-        config.value_modifiers,
-        config.value_length,
-        Km::from_f64(config.distance_max),
-        Km::from_f64(config.distance_min),
-    );
+    let (vl, dh) = (config.value_length, Km::from_f64(config.distance_max));
     let iterator = graph.gen_limited_dijkstra_vec(
         &[start_node] as &[usize],
-        move |edge| Comp::new(Km::from_f64_checked((
-                &edge.modifiers * &vm
-                 + vl) * edge.distance
-                 * edge.poison),
+        move |edge| Comp::new(Km::from_f64_checked(
+            (&edge.modifier + vl) * edge.distance * edge.poison),
             Km::from_f64(edge.distance)
         ),
         move |_, comp| {
-            comp.is_finite()
-               && comp.actual()
-                //+ distance(graph.get(id).unwrap(), graph.get(start_node).unwrap())
-                //+ graph.get_measure(id)
-                < dh
-            }
+            comp.is_finite() && comp.actual() < dh
+        }
     );
     let visited = iterator.visited();
     DijkstraIterator::new(Box::new(iterator), visited)
@@ -510,7 +495,7 @@ pub unsafe extern "C" fn graph_dijkstra_choose(dijkstra : *mut DijkstraIterator,
     owned_ptr(Some(DijkstraIterator(res)))
 }
 
-/// Update the rating of the road in the graph
+/* Update the rating of the road in the graph
 #[no_mangle]
 pub unsafe extern "C" fn graph_update_rating(graph : *mut Graph, from : libc::size_t, to : libc::size_t, rating : libc::c_double) -> libc::c_int {
     if (&mut *graph).update_rating(from, to, rating) {
@@ -520,3 +505,4 @@ pub unsafe extern "C" fn graph_update_rating(graph : *mut Graph, from : libc::si
         0
     }
 }
+*/
