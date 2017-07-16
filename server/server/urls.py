@@ -33,4 +33,15 @@ urlpatterns = [
     url(r'^route/parse$', routeview.parse),
     url(r'^route/rate$', routeview.rate),
     url(r'^route/import$', routeview.import_json),
-]
+    # get user statistics based on given userid
+
+    # uppdate user statistics based on given userid, if id not in database --> add id
+    # to table and put in the statistics
+
+    # request route ----> return nodes with an id for the route --> with this id
+    # the edges that were used can be found in the database and their ratings get updated.
+
+    # send route id and rating to server, server processes and updates database if needed
+
+
+    ]
