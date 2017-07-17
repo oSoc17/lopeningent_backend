@@ -12,35 +12,33 @@ start = time.time()
 # A graph containing the roads and crossroads of the city.
 # Type: Graph
 GRAPH = city.load()
-print "loaded graph..."
+print "Loaded the initial graph..."
 
 # A projector that maps crossroads on a plane.
 # Type : Projector
 PROJECTOR = project_city([GRAPH.get(ident) for ident in GRAPH.list_ids()])
-print "finished projection..."
+print "Loaded the projector..."
 
 # Annotate the graph with xy data
 GRAPH = city.project(GRAPH, PROJECTOR)
-print "annotated graph with xy data..."
+print "Mapped x/y projections to all nodes..."
 
 # The interval containing every projected road and crossroad of the city.
 # Type : Interval<()>
 CITY_BOUNDS = reduce(lambda x, y: x + y, 
     (into_interval(node, node, 0.0) for node in GRAPH.iter_nodes()))
-print "calculated bounds... {}".format(CITY_BOUNDS)
+print "Computed city bounds..."
 
 # A grid containing GRAPH, for faster access.
 GRID = CITY_BOUNDS.into_grid(BINSIZE)
-print "created grid..."
+print "Created the city grid..."
 
 ### SEGMENTATION FAULT SOMEWHERE HERE
 for startnode in GRAPH.list_ids():
-    for edge in GRAPH.get_conn_idval(startnode):
-        print edge.to
-        #print endnode
-        #GRID.add_interval(into_interval(GRAPH.get(startnode), GRAPH.get(endnode), TOLERANCE))
-        #print GRAPH.get(endnode)
-print "populated grid..."
+    for endnode in GRAPH.get_connids(startnode):
+        GRID.add_interval(into_interval(GRAPH.get(startnode), GRAPH.get(endnode), TOLERANCE))
+
+print "Mapped all edges to the grid..."
 
 end = time.time()
 print("TOTAL GRAPH TIME", end - start)

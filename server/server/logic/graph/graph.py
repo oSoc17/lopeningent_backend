@@ -19,7 +19,7 @@ with open("include/graphing.h") as f:
 stop = 2**64 - 1
 
 
-class DijkstraIterator(object):
+class DijkstraIterator:
     """
     Iterator that yields the edges and nodes of a graph, 
     sorted by distance to the origin.
@@ -30,6 +30,7 @@ class DijkstraIterator(object):
 
     def next(self):
         res = lib.graph_dijkstra_next(self.dijkstra)
+        print res
         if res.id == stop:
             raise StopIteration
         return (res.id, (res.size_value, res.actual_value))

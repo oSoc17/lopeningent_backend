@@ -277,7 +277,7 @@ fn generate_route<G : GraphTrait<V=Node, E=Edge>>(graph : &'static G, start_node
     let iterator = graph.gen_limited_dijkstra_vec(
         &[start_node] as &[usize],
         move |edge| Comp::new(Km::from_f64_checked(
-            (edge.modifier + vl) * edge.distance * edge.poison),
+            vl * edge.distance * edge.poison),
             Km::from_f64(edge.distance)
         ),
         move |_, comp| {

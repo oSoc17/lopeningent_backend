@@ -88,7 +88,7 @@ def get_graph_data():
     for eid, nids in relations.iteritems():
         for start, end in zip(nids, nids[1:]):
             rating, tags = edges[eid]
-            edge = Edge(start, end)
+            edge = Edge(start, 0.0, 0.0, 1.0, end)
             edge.set_modifier_data(rating, tags)
             edgelist.append(edge)
 

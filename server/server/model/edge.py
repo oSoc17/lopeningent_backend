@@ -1,6 +1,6 @@
 class Edge:
 
-    def __init__(self, id, to, distance=0.0, modifier=0.0, poison=1.0):
+    def __init__(self, id, distance, modifier, poison, to):
         # Data used in Rust struct
         self.id = int(id)
         self.distance = float(distance)

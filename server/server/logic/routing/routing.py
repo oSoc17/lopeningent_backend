@@ -23,6 +23,7 @@ def generate_rod(graph, start_node, routing_config):
 
     dijkstra = graph.generate_dijkstra(start_node, routing_config).choose(routing_config)
     (node_id, _) = dijkstra.next()
+    print node_id.id
     res = dijkstra.root(node_id)
     return res[::-1]
 
