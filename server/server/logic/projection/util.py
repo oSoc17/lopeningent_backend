@@ -105,8 +105,8 @@ class Projector(object):
             up_vector - projection_vector.scale(scale_factor)).unit()
         self.remaining = self.projection_vector.cross(self.up_vector).unit()
 
-    def map(self, node):
-        point = vector_from(node.lat, node.lon)
+    def map(self, lat, lon):
+        point = vector_from(lat, lon)
         y = self.up_vector.dot(point) * EARTH_RADIUS
         x = self.remaining.dot(point) * EARTH_RADIUS
         return Coordinate(x, y)

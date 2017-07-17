@@ -1,5 +1,5 @@
 from collections import namedtuple
-from server.static.city import GRAPH
+from server.static.data import GRAPH
 from server.logic.routing.directions import into_directions, DIRECTION_DICTIONARY
 from server.logic.city.city import path_length
 from server.logic.routing.compress import into_string

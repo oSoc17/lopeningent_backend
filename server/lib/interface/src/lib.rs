@@ -277,7 +277,7 @@ fn generate_route<G : GraphTrait<V=Node, E=Edge>>(graph : &'static G, start_node
     let iterator = graph.gen_limited_dijkstra_vec(
         &[start_node] as &[usize],
         move |edge| Comp::new(Km::from_f64_checked(
-            (&edge.modifier + vl) * edge.distance * edge.poison),
+            (edge.modifier + vl) * edge.distance * edge.poison),
             Km::from_f64(edge.distance)
         ),
         move |_, comp| {
@@ -337,7 +337,7 @@ pub unsafe extern "C" fn graph_conn_idval_new(graph : *const Graph, index : libc
 pub unsafe extern "C" fn graph_conn_idval_next(conn_idval : *mut ConnIdVal) -> IdVal {
     (&mut *conn_idval).0.next()
         .map(|(id, e)| IdVal{id : id, e : e})
-        .unwrap_or(IdVal{id : 0, e : ptr::null()})
+        .unwrap_or(IdVal{id : 0, e : ptr::null()}) //here's exactly where shit hits the fan
 }
 
 /// Delete the iterator

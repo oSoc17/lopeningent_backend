@@ -17,12 +17,7 @@ DEFAULT_ROUTING_CONFIG = {
     'poison_max_distance': 2.0,
     'poison_min_value': 1.0,
     'cross_penalty': 100.0,
-    'measure_length': 1.0,
-    'measure_highway': 1.0,
-    'measure_rating' : 0.0,
-    'measure_sheep' : 0.0,
-    'measure_water' : 0.0,
-    'measure_park' : 0.0,
+    'measure_length': 1.0
 }
 
 RETURN_ROUTING_CONFIG = DEFAULT_ROUTING_CONFIG

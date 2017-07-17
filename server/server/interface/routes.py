@@ -1,4 +1,4 @@
-from server.static.city import GRAPH
+from server.static.data import GRAPH
 from django.http import HttpResponse, HttpResponseNotFound
 from server.logic.server_util import into_json
 from server.logic.routing import config as routing_config
