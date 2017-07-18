@@ -17,15 +17,22 @@ def store_coverage(grid):
 def store_graph(graph):
     """ output city roads to svg file. """
     bounds = reduce(lambda x, y: x + y, (into_interval(node, node, 0.0)
-                                         for (_, node) in graph.iter_nodes()))
+                                         for node in graph.iter_nodes()))
+
     SCALE = 100
+    
     with open("ghent.svg", "w+") as f:
         f.write('<svg xmlns="http://www.w3.org/2000/svg" \
             xmlns:xlink="http://www.w3.org/1999/xlink">\n')
-        for (start_id, _, end_id) in graph.iter_edges():
+        for edge in graph.iter_edges():
             f.write('<line x1="%f" y1="%f" x2="%f" y2="%f" style="stroke:#000000;"/>\n' %
-                    ((-graph.get(start_id).x + bounds.maxx) * SCALE,
-                     (-graph.get(start_id).y + bounds.maxy) * SCALE,
-                     (-graph.get(end_id).x + bounds.maxx) * SCALE,
-                     (-graph.get(end_id).y + bounds.maxy) * SCALE))
+                    ((-graph.get(edge.id).x + bounds.maxx) * SCALE,
+                     (-graph.get(edge.id).y + bounds.maxy) * SCALE,
+                     (-graph.get(edge.to).x + bounds.maxx) * SCALE,
+                     (-graph.get(edge.to).y + bounds.maxy) * SCALE))
         f.write("</svg>")
+
+    with open("edges.txt", "w+") as f:
+        for edge in graph.iter_edges():
+            f.write("{}".format(edge))
+            f.write("\n")

@@ -20,6 +20,7 @@ highway_tags="motorway,motorway_link"
 
 osmosis \
 	--read-xml raw_ghent.osm \
+	--tag-filter accept-ways highway=* \
 	--tag-filter reject-ways highway=$highway_tags \
 	--tag-filter reject-relations \
 	--used-node \

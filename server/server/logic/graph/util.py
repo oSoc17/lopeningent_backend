@@ -14,10 +14,12 @@ def distance(startnode, endnode):
     """
         Returns the distance between two nodes in km.
     """
-    phi1 = startnode.lat * math.pi / 180
-    phi2 = endnode.lat * math.pi / 180
+    startlat, startlon = startnode
+    endlat, endlon = endnode
+    phi1 = startlat * math.pi / 180
+    phi2 = endlat * math.pi / 180
     dphi = phi1 - phi2
-    dtheta = (startnode.lon - endnode.lon) * math.pi / 180
+    dtheta = (startlon - endlon) * math.pi / 180
     return 2 * EARTH_RADIUS * math.asin(
         math.sqrt(haversine(dphi) + math.cos(phi1) *
                   math.cos(phi2) * haversine(dtheta))

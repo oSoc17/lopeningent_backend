@@ -30,7 +30,6 @@ class DijkstraIterator:
 
     def next(self):
         res = lib.graph_dijkstra_next(self.dijkstra)
-        print res
         if res.id == stop:
             raise StopIteration
         return (res.id, (res.size_value, res.actual_value))

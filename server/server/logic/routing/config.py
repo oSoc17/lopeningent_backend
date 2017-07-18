@@ -2,8 +2,10 @@ from collections import namedtuple
 import json
 
 
-class RoutingConfig(namedtuple('RoutingConfig', 
-    'measure_length max_length min_length')):
+class RoutingConfig(namedtuple('RoutingConfig', 'min_length max_length \
+                                poison_min_value poison_max_value \
+                                poison_max_distance cross_penalty \
+                                measure_length')):
                                 
     """
         The class containing all possible config options for routing.

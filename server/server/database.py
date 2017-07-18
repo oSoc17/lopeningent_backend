@@ -1,6 +1,7 @@
 from psycopg2 import pool, InterfaceError
 from model.edge import Edge
 from model.node import Node
+from logic.graph.util import distance
 from time import time
 import threading, re, config
 
@@ -88,9 +89,12 @@ def get_graph_data():
     for eid, nids in relations.iteritems():
         for start, end in zip(nids, nids[1:]):
             rating, tags = edges[eid]
-            edge = Edge(start, 0.0, 0.0, 1.0, end)
-            edge.set_modifier_data(rating, tags)
-            edgelist.append(edge)
+            dist = distance(nodes[start], nodes[end])
+            edgeA = Edge(start, dist, 0.0, 1.0, end)
+            edgeA.set_modifier_data(rating, tags)
+            edgeB = Edge(end, dist, 0.0, 1.0, start)
+            edgelist.append(edgeA)
+            edgelist.append(edgeB)
 
     end_time = time()
     print "merging the dataset took {} seconds".format(end_time - start_time)

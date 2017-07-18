@@ -33,7 +33,6 @@ print "Computed city bounds..."
 GRID = CITY_BOUNDS.into_grid(BINSIZE)
 print "Created the city grid..."
 
-### SEGMENTATION FAULT SOMEWHERE HERE
 for startnode in GRAPH.list_ids():
     for endnode in GRAPH.get_connids(startnode):
         GRID.add_interval(into_interval(GRAPH.get(startnode), GRAPH.get(endnode), TOLERANCE))
@@ -44,6 +43,6 @@ end = time.time()
 print("TOTAL GRAPH TIME", end - start)
 
 # Debug stuff. Can be left out.
-# store_coverage(GRID)
-# store_graph(GRAPH)
+#store_coverage(GRID)
+#store_graph(GRAPH)
 print("Ready")

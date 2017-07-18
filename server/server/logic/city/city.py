@@ -1,4 +1,5 @@
 from server.logic.graph.graph import Graph
+from server.logic.graph.util import distance
 from server.model.node import Node
 from collections import namedtuple
 from server.logic.graph.util import distance
