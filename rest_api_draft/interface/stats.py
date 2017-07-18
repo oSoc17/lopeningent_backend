@@ -1,19 +1,31 @@
-from django.http import HttpResponse, HttpResponseNotFound, HttpResponseBadRequest
+from django.http import HttpResponse
+from django.http import HttpResponseNotFound
 from django.views.decorators.csrf import csrf_exempt
+import json
+from rest_api_draft.database import get_stats_user,update_stats_user
 
 
-#just a general feel of execution, will update later
+
 @csrf_exempt
 def get_stats_from_id(request):
     if (str(request.POST.get('android_token'))== "1223"):
         userid = request.POST.get('userid')
         print "Hello " + str(userid)
 
-        # acces db and get stats based on id
+        result = get_stats_user(userid)
+        resp ={}
+        resp['message'] = 'no error'
+        json.dumps(resp)
+        resp['values'] = result
+        return HttpResponse(resp, content_type="application/json")
 
         # put the stats in a response
     else:
         print "You don't have access to this api from outside the android app."
+        resp ={}
+        resp['message'] = 'acces denied'
+        resp['values'] = ''
+        return HttpResponse(json.dumps(resp), content_type="application/json")
 
 @csrf_exempt
 def post_stats_from_id(request):
@@ -28,8 +40,7 @@ def post_stats_from_id(request):
         runs = request.POST.get('runs')
 
 
-        # acces db and update stats
-
+        update_stats_user(userid,avg_speed, avg_heartrate, avg_distance,tot_distance,tot_duration,avg_duration,runs)
         # send response saying db is updated
 
 

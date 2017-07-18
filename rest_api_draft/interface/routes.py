@@ -5,7 +5,7 @@ from django.views.decorators.csrf import csrf_exempt
 #just a general feel of execution, will get updated later
 @csrf_exempt
 def generate(request):
-    if (str(request.POST.get('android_token'))== "1223"):
+    if (str(request.POST.get('android_token'))== "1223"): # this should be a method of actually checking with firebase
         lat = request.POST.get('lat')
         lon = request.POST.get('lon')
 
@@ -20,9 +20,7 @@ def generate(request):
 @csrf_exempt
 def return_home(request):
     if (str(request.POST.get('android_token'))== "1223"):
-
-        #go_home method is called
-
+        print "lol"
     else:
         print "You don't have access to this api from outside the android app."
 
