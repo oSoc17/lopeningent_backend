@@ -32,6 +32,7 @@ def get_stats_from_id(request):
 
 @csrf_exempt
 def post_stats_from_id(request):
+
     if (str(request.POST.get('android_token'))== "1223"):
         userid = request.POST.get('userid')
         avg_speed = request.POST.get('avg_speed')
@@ -43,11 +44,18 @@ def post_stats_from_id(request):
         runs = request.POST.get('runs')
 
         requestedUser = User(userid, avg_speed, avg_heartrate, avg_distance, tot_distance, tot_duration, avg_duration, runs)
-        update_stats_user(requestedUser)
-        # send response saying db is updated
+        updated = update_stats_user(requestedUser)
+        if updated:
+            resp = {'message': 'no error', 'values': "updated"}
+
+        else:
+            resp = {'message': 'error', 'values': "something went wrong when updating/inserting"}
 
 
-        print "Hello " + str(userid)
+        return HttpResponse(json.dumps(resp), content_type="application/json")
 
     else:
         print "You don't have access to this api from outside the android app."
+        resp ={'message': 'acces denied','values' : None}
+
+        return HttpResponse(json.dumps(resp), content_type="application/json")

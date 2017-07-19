@@ -1,6 +1,7 @@
 from psycopg2 import pool, InterfaceError
 from model.edge import Edge
 from model.node import Node
+from model.user import User
 from logic.graph.util import distance
 from time import time
 import threading, re, config
@@ -98,28 +99,48 @@ def get_stats_user(uid):
 
 def update_stats_user(user):
     conn = POOL.getconn(key="update-stats")
-    cursor = conn.cursor()
-    cursor.execute("""
-                      UPDATE lopeningent.users
-                      SET
-                      avg_speed     = (%(avg_speed)s),
-                      avg_heartrate = (%(avg_heartrate)s),
-                      avg_distance  = (%(avg_distance)s),
-                      tot_distance  = (%(tot_distance)s),
-                      tot_duration  = (%(tot_duration)s),
-                      avg_duration  = (%(avg_duration)s),
-                      runs          = (%(runs)s)
-                      WHERE uid=%(uid)s;
-                      INSERT INTO lopeningent.users
-                      (uid,avg_speed, avg_heartrate, avg_distance,tot_distance,tot_duration,avg_duration,runs)
-                      SELECT %(uid)s, %(avg_speed)s,%(avg_heartrate)s, %(avg_distance)s, %(tot_distance)s, %(tot_duration)s, %(avg_duration)s, %(runs)s
-                      WHERE NOT EXISTS (SELECT 1 FROM lopeningent.users WHERE uid=%(uid)s);
+    try:
+        cursor = conn.cursor()
+        cursor.execute("""
+                        UPDATE lopeningent.users
+                        SET
+                        avg_speed     = (%(avg_speed)s),
+                        avg_heartrate = (%(avg_heartrate)s),
+                        avg_distance  = (%(avg_distance)s),
+                        tot_distance  = (%(tot_distance)s),
+                        tot_duration  = (%(tot_duration)s),
+                        avg_duration  = (%(avg_duration)s),
+                        runs          = (%(runs)s)
+                        WHERE uid=%(uid)s;
+                        UPDATE lopeningent.users
+                        SET
+                        avg_speed     = (%(avg_speed)s),
+                        avg_heartrate = (%(avg_heartrate)s),
+                        avg_distance  = (%(avg_distance)s),
+                        tot_distance  = (%(tot_distance)s),
+                        tot_duration  = (%(tot_duration)s),
+                        avg_duration  = (%(avg_duration)s),
+                        runs          = (%(runs)s)
+                        WHERE uid=%(uid)s;
+                        INSERT INTO lopeningent.users
+                        (uid,avg_speed, avg_heartrate, avg_distance,tot_distance,tot_duration,avg_duration,runs)
+                        SELECT %(uid)s, %(avg_speed)s,%(avg_heartrate)s, %(avg_distance)s, %(tot_distance)s, %(tot_duration)s, %(avg_duration)s, %(runs)s
+                        WHERE NOT EXISTS (SELECT 1 FROM lopeningent.users WHERE uid=%(uid)s);
 
-                      ;""",{'uid' : user.uid,'avg_speed':user.avg_speed,'avg_heartrate': user.avg_heartrate,'avg_distance': user.avg_distance,'tot_distance': user.tot_distance,'tot_duration':None,'avg_duration':None,'runs' : user.runs})
-    print "inserted/updated users table with id: " + str(user.uid)
-    cursor.close()
-    conn.commit()
-    POOL.putconn(conn, key="get-stats")
+
+                        ;""",{'uid' : user.uid,'avg_speed':user.avg_speed,'avg_heartrate': user.avg_heartrate,'avg_distance': user.avg_distance,'tot_distance': user.tot_distance,'tot_duration':None,'avg_duration':None,'runs' : user.runs})
+        conn.commit()
+        print "inserted/updated users table with id: " + str(user.uid)
+
+        cursor.close()
+        POOL.putconn(conn, key="update-stats")
+        return True
+    except Exception, e:
+        print "something went wrong when updating/inserting stats for id: " + str(user.uid)
+        cursor.close()
+        POOL.putconn(conn, key="update-stats")
+        return False
+
 
 
 def update_edge_in_db(edge):
