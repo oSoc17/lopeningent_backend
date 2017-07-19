@@ -7,24 +7,6 @@ import threading, re, config
 
 POOL = pool.ThreadedConnectionPool(1, 20, config.DB_CONN)
 
-def _get_edge_nodes(edge_nodes):
-    conn = POOL.getconn(key="rel")
-    cursor = conn.cursor()
-
-    cursor.execute("SELECT eid, nid FROM lopeningent.edge_nodes;")
-
-    for relation in cursor.fetchall():
-        eid, nid = relation
-
-        if eid not in edge_nodes:
-            edge_nodes[eid] = list()
-
-        edge_nodes[eid].append(nid)
-
-    cursor.close()
-    POOL.putconn(conn, key="rel")
-
-
 def _get_nodes(nodes):
     conn = POOL.getconn(key="node")
     cursor = conn.cursor()
@@ -51,11 +33,11 @@ def _get_edges(edges):
     conn = POOL.getconn(key="edge")
     cursor = conn.cursor()
 
-    cursor.execute("SELECT eid, rating, tags FROM lopeningent.edges;")
+    cursor.execute("SELECT eid, rating, tags, from_node, to_node FROM lopeningent.edges;")
 
     for edge in cursor.fetchall():
-        eid, rating, tags = edge
-        edges[eid] = (rating, tags)
+        eid, rating, tags, from_node, to_node = edge
+        edges[eid] = (rating, tags, from_node, to_node)
 
     cursor.close()
     POOL.putconn(conn, key="edge")
@@ -65,7 +47,6 @@ def get_graph_data():
     start_time = time()
 
     # Database variables
-    relations = dict()
     nodes = dict()
     edges = dict()
 
@@ -74,7 +55,6 @@ def get_graph_data():
     nodelist = list()
 
     # TODO: Run these in parallel (in a way that doesn't conflict with Django)
-    _get_edge_nodes(relations)
     _get_nodes(nodes)
     _get_edges(edges)
 
@@ -83,28 +63,19 @@ def get_graph_data():
         lat, lon = coord
         nodelist.append(Node(nid, lat, lon))
 
-    # Go through all the edges, create new edges between two nodes instead
-    # of multiple nodes per edge, wrap them into a model class and pass
-    # them off to the result list.
-    for eid, nids in relations.iteritems():
-        for start, end in zip(nids, nids[1:]):
-            rating, tags = edges[eid]
-            dist = distance(nodes[start], nodes[end])
-
-            edgeA = Edge(start, dist, 0.0, 1.0, end)
-            edgeA.set_modifier_data(rating, tags)
-
-            edgeB = Edge(end, dist, 0.0, 1.0, start)
-            edgeB.set_modifier_data(rating, tags)
-
-            edgelist.append(edgeA)
-            edgelist.append(edgeB)
+    # wrap the edges into a model class and save them to the edgelist
+    for edata in edges.values():
+        rating, tags, start, end = edata
+        dist = distance(nodes[start], nodes[end])
+        new_edge = Edge(start, dist, 0.0, 1.0, end)
+        new_edge.set_modifier_data(rating, tags)
+        edgelist.append(new_edge)
 
     end_time = time()
     return nodelist, edgelist
 
 def get_stats_user(uid):
-    conn = POOL.getconn()
+    conn = POOL.getconn(key="get-stats")
     cursor = conn.cursor()
     userFound = []
     cursor.execute("SELECT uid,avg_speed, avg_heartrate, avg_distance,tot_distance,tot_duration,avg_duration,runs FROM lopeningent.users WHERE uid= %s LIMIT 1;",(int(uid),))
@@ -122,10 +93,11 @@ def get_stats_user(uid):
 
     print userFound.toJSON()
     cursor.close()
+    POOL.putconn(conn, key="get-stats")
     return userFound.toJSON()
 
 def update_stats_user(user):
-    conn = POOL.getconn()
+    conn = POOL.getconn(key="update-stats")
     cursor = conn.cursor()
     cursor.execute("""
                       UPDATE lopeningent.users
@@ -145,6 +117,25 @@ def update_stats_user(user):
 
                       ;""",{'uid' : user.uid,'avg_speed':user.avg_speed,'avg_heartrate': user.avg_heartrate,'avg_distance': user.avg_distance,'tot_distance': user.tot_distance,'tot_duration':None,'avg_duration':None,'runs' : user.runs})
     print "inserted/updated users table with id: " + str(user.uid)
+    cursor.close()
+    conn.commit()
+    POOL.putconn(conn, key="get-stats")
+
+
+def update_edge_in_db(edge):
+    conn = POOL.getconn(key="edge-update")
+    cursor = conn.cursor()
+
+    cursor.execute(
+        """
+        UPDATE lopeningent.edges
+        SET
+        rating = %s
+        WHERE eid = %s
+        """,
+        (edge._rating, edge.id)
+    )
 
     cursor.close()
-
+    conn.commit()
+    POOL.putconn(conn, key="edge-update")

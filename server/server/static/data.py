@@ -18,7 +18,7 @@ GRAPH = city.load()
 PROJECTOR = project_city([GRAPH.get(ident) for ident in GRAPH.list_ids()])
 
 # Annotate the graph with xy data
-GRAPH = city.project(GRAPH, PROJECTOR)
+city.project(GRAPH, PROJECTOR)
 
 # The interval containing every projected road and crossroad of the city.
 # Type : Interval<()>
@@ -34,3 +34,4 @@ for startnode in GRAPH.list_ids():
 
 end = time.time()
 print "Graph loaded into memory (took {} seconds).".format(round(end - start, 2))
+store_graph(GRAPH)
