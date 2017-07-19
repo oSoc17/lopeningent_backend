@@ -9,7 +9,6 @@ def load():
     nodelist, edgelist = db.get_graph_data()
     return Graph(nodelist, edgelist)
 
-
 def project(graph, projector):
     """ 
     Creates an enhanced graph with xy coordinates from a graph 

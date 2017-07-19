@@ -13,7 +13,8 @@ class Edge:
         self._tags = None
 
     def __str__(self):
-        return "#{} -> #{} dist({}) mod({}) poison({})".format(self.id, self.to, self.distance, self.modifier, self.poison)
+        return "#{} -> #{} dist({}) mod({}) poison({})".format(self.id, self.to, 
+            self.distance, self.modifier, self.poison)
 
     def set_modifier_data(self, rating, tags):
         self._rating = rating

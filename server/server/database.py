@@ -90,12 +90,15 @@ def get_graph_data():
         for start, end in zip(nids, nids[1:]):
             rating, tags = edges[eid]
             dist = distance(nodes[start], nodes[end])
+
             edgeA = Edge(start, dist, 0.0, 1.0, end)
             edgeA.set_modifier_data(rating, tags)
+
             edgeB = Edge(end, dist, 0.0, 1.0, start)
+            edgeB.set_modifier_data(rating, tags)
+
             edgelist.append(edgeA)
             edgelist.append(edgeB)
 
     end_time = time()
-    print "merging the dataset took {} seconds".format(end_time - start_time)
     return nodelist, edgelist

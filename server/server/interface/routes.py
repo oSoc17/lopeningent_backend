@@ -55,6 +55,20 @@ def route_from_coord(request):
     config = routing_config.from_dict(
         DEFAULT_ROUTING_CONFIG, request.GET.dict())
 
+
+    usertags = ["tourism"]
+
+    def calculate_modifier(edge):
+        #TODO: ADD RATING
+        if edge._tags < 1:
+            return edge
+
+        for tag in edge._tags:
+            if tag in usertags:
+                edge.modifier += (1 / len(usertags))
+
+        return edge
+
     # Calculations
     tpexec = Executor(max_workers=NUM_THREADS)
     routes = []
@@ -63,7 +77,8 @@ def route_from_coord(request):
     # Sometimes, routing gives a bad response. To fix this, the routing algorithm
     # is performed multiple times in an (a)synchronous way.
     for i in xrange(NUM_THREADS):
-        flist.append(tpexec.submit(async_exec, GRAPH, start, end, config))
+        flist.append(tpexec.submit(async_exec, 
+            GRAPH.map_graph(lambda _: _, calculate_modifier), start, end, config))
 
     for _i in xrange(NUM_THREADS * 10):
         sets = wait(flist, return_when=FIRST_COMPLETED)
@@ -78,7 +93,6 @@ def route_from_coord(request):
 
     # Choose a random route from all possible routes.
     shuffle(routes)
-    print path_length(GRAPH, routes[0])
     resp = respond_path(request.GET, routes[0], [routes[0][0]])
     if resp is None:
         return HttpResponseNotFound()
@@ -140,7 +154,6 @@ def go_home(request):
         dist = distance(serialize_node(GRAPH, end), serialize_node(GRAPH, path[0]))
     else:
         dist = dist_arg
-    print dist
 
     # Get index of current location and close rod to return
     if end not in path and start in path:
@@ -165,7 +178,6 @@ def go_home(request):
     nodes = generate_rod(GRAPH, path[0], config)
     # Create new rod that will be used for the poisoning (starting from current position and contains starting pos)
     pois_path.extend(nodes)
-    print "tag =", into_string(GRAPH, nodes)
     # Close the rod on the starting position
     routes = close_rod(GRAPH, end, pois_path, config, nodes)
     # Will result in the shortest route returned
@@ -173,7 +185,6 @@ def go_home(request):
         routes = sorted(routes, key=len)
     else:
         shuffle(routes)
-    print path_length(GRAPH, routes[0])
     # Return the new route, i.e. the completed part + new part
     selected_route = path[0:ind] + routes[0][::-1]
     resp = respond_path(request.GET, selected_route, [selected_route[0]])
@@ -194,7 +205,6 @@ def convert(request):
     else:
         body = {}
     body.update({key: request.GET.get(key) for key in request.GET})
-    print(body)
     resp = respond_path(body, body['data'], [body['data'][0]])
     if resp is None:
         return HttpResponseNotFound()
@@ -232,7 +242,6 @@ def import_json(request):
         The data segment should contain the structure
             (can be done through e.g. curl "<domain>/route/import" --data "@filename")
     """
-    print request.body
     jsonobj = json.loads(request.body)
 
     for key in jsonobj:

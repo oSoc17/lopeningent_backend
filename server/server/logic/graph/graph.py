@@ -12,7 +12,6 @@ from server.logic.graph.util import parse
 ffi = FFI()
 
 lib = ffi.dlopen("target/release/libgraphing.so")
-print('Loaded lib {0}'.format(lib))
 with open("include/graphing.h") as f:
     ffi.cdef(parse(f.read()))
 
