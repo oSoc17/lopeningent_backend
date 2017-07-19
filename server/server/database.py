@@ -4,11 +4,12 @@ from model.node import Node
 from model.user import User
 from logic.graph.util import distance
 from time import time
+from multiprocessing import Process
 import threading, re, config
 
 POOL = pool.ThreadedConnectionPool(1, 20, config.DB_CONN)
 
-def _get_nodes(nodes):
+def get_nodes(nodes):
     conn = POOL.getconn(key="node")
     cursor = conn.cursor()
 
@@ -30,7 +31,7 @@ def _get_nodes(nodes):
     POOL.putconn(conn, key="node")
 
 
-def _get_edges(edges):
+def get_edges(edges):
     conn = POOL.getconn(key="edge")
     cursor = conn.cursor()
 
@@ -55,9 +56,8 @@ def get_graph_data():
     edgelist = list()
     nodelist = list()
 
-    # TODO: Run these in parallel (in a way that doesn't conflict with Django)
-    _get_nodes(nodes)
-    _get_edges(edges)
+    get_nodes(nodes)
+    get_edges(edges)
 
     # Wrap every node into a model class and hand it off to the result list
     for nid, coord in nodes.iteritems():
