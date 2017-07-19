@@ -54,7 +54,7 @@ pub fn distances() -> Result<(), Error>{
     let host = get_host_port()?;
     let (lat, lon) = get_lat_lon()?;
     for (min, max) in (5..51).map(|n| n as usize as f64).map(|f| (0.9*f, f)) {
-        let url = format!("{}/route/generate?min_length={:0.1}&max_length={:0.1}&lat={}&lon={}&type={}", host, min, max, lat, lon, ret_type);
+        let url = format!("{}/route/generate?min_length={:0.1}&max_length={:0.1}&lat={}&lon={}&type=geojson", host, min, max, lat, lon);
         let res = get(&url)?;
         if res > max || res < min {
             Err(format!("Length of {} found, which is not between {} and {}.", res, min, max))?;
