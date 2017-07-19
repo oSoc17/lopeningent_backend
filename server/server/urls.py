@@ -14,25 +14,13 @@ Including another URLconf
     2. Add a URL to urlpatterns:  url(r'^blog/', include('blog.urls'))
 """
 from django.conf.urls import url
-import server.interface.routes as routeview
+import interface.stats as stats
+import interface.routes as route
 
 urlpatterns = [
-    url(r'^route/generate$', routeview.route_from_coord),
-    url(r'^route/return$', routeview.go_home),
-    url(r'^route/rod$', routeview.rod),
-    url(r'^route/convert$', routeview.convert),
-    url(r'^route/parse$', routeview.parse),
-    url(r'^route/rate$', routeview.rate),
-    url(r'^route/import$', routeview.import_json),
-    # get user statistics based on given userid
-
-    # uppdate user statistics based on given userid, if id not in database --> add id
-    # to table and put in the statistics
-
-    # request route ----> return nodes with an id for the route --> with this id
-    # the edges that were used can be found in the database and their ratings get updated.
-
-    # send route id and rating to server, server processes and updates database if needed
-
-
-    ]
+    url(r'^stats/check/', stats.get_stats_from_id ),
+    url(r'^stats/update/', stats.post_stats_from_id),
+    url(r'^route/generate/', route.generate),
+    url(r'^route/return/', route.return_home),
+    url(r'^route/rate/', route.rate_route),
+]

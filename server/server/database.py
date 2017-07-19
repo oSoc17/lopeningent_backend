@@ -102,3 +102,49 @@ def get_graph_data():
 
     end_time = time()
     return nodelist, edgelist
+
+def get_stats_user(uid):
+    conn = POOL.getconn()
+    cursor = conn.cursor()
+    userFound = []
+    cursor.execute("SELECT uid,avg_speed, avg_heartrate, avg_distance,tot_distance,tot_duration,avg_duration,runs FROM lopeningent.users WHERE uid= %s LIMIT 1;",(int(uid),))
+
+    for user in cursor.fetchall():
+        uid,avg_speed, avg_heartrate, avg_distance, tot_distance, tot_duration, avg_duration, runs = user
+        userFound = User(uid,avg_speed, avg_heartrate, avg_distance, tot_distance, tot_duration, avg_duration, runs)
+    try:
+        print  userFound.toJSON()
+        cursor.close()
+        return  userFound.toJSON()
+    except AttributeError:
+        cursor.close()
+        return  None
+
+    print userFound.toJSON()
+    cursor.close()
+    return userFound.toJSON()
+
+def update_stats_user(user):
+    conn = POOL.getconn()
+    cursor = conn.cursor()
+    cursor.execute("""
+                      UPDATE lopeningent.users
+                      SET
+                      avg_speed     = (%(avg_speed)s),
+                      avg_heartrate = (%(avg_heartrate)s),
+                      avg_distance  = (%(avg_distance)s),
+                      tot_distance  = (%(tot_distance)s),
+                      tot_duration  = (%(tot_duration)s),
+                      avg_duration  = (%(avg_duration)s),
+                      runs          = (%(runs)s)
+                      WHERE uid=%(uid)s;
+                      INSERT INTO lopeningent.users
+                      (uid,avg_speed, avg_heartrate, avg_distance,tot_distance,tot_duration,avg_duration,runs)
+                      SELECT %(uid)s, %(avg_speed)s,%(avg_heartrate)s, %(avg_distance)s, %(tot_distance)s, %(tot_duration)s, %(avg_duration)s, %(runs)s
+                      WHERE NOT EXISTS (SELECT 1 FROM lopeningent.users WHERE uid=%(uid)s);
+
+                      ;""",{'uid' : user.uid,'avg_speed':user.avg_speed,'avg_heartrate': user.avg_heartrate,'avg_distance': user.avg_distance,'tot_distance': user.tot_distance,'tot_duration':None,'avg_duration':None,'runs' : user.runs})
+    print "inserted/updated users table with id: " + str(user.uid)
+
+    cursor.close()
+

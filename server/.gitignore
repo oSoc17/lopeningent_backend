@@ -13,3 +13,5 @@ target/
 include/
 out.prof
 .idea/
+target/
+*.sqlite3

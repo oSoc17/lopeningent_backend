@@ -1,1 +1,0 @@
-## This is a placeholder project and will be integrated with the main django server at the end

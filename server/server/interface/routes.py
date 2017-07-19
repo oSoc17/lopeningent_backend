@@ -12,51 +12,37 @@ from server.logic.graph.util import distance
 from server.interface.util import serialize_node
 from random import shuffle
 from django.views.decorators.csrf import csrf_exempt
-import json
-
 from server.logic.routing.compress import into_string
 from server.logic.routing.ratings import add_rating_list
-
 from server.setdebug import NUM_THREADS
-
 from concurrent.futures import ThreadPoolExecutor as Executor, wait, FIRST_COMPLETED
+import json
 
 
-def async_exec(graph, start, end, config):
-    # Create the rod.
-    nodes = generate_rod(graph, start, config)
-
-    # Fix that the rod doesn't pass our position
-    if nodes[1] == end:
-        nodes = nodes[1:]
-        (start, end) = (end, start)
-
-    # Close the rod.
-    return close_rod(graph, end, nodes, config)
-
-
-def route_from_coord(request):
+@csrf_exempt
+def generate(request):
     """
-        Responds with a route starting and ending in a certain coordinate
+    Responds with a route starting and ending in a certain coordinate
 
-        This function uses the lightning rod (Stroobant) algorithm: it generates a
-        rod through the city and then tries different paths going to that rod
-
-        Query args:
-        lat -- coordinate latitude
-        lon -- coordinate longitude
-        type -- the response type. See the geojson.respond_path function for more details
+    Query args:
+    lat -- coordinate latitude
+    lon -- coordinate longitude
+    tags -- the requested POI's
+    type -- the response type. See the geojson.respond_path function for more details
     """
-    edge_tuple = get_edge_tuple(request, request.GET.get('lat'), request.GET.get('lon'))
+
+    tags = request.POST.getlist('tags')
+    lat = float(request.POST.get('lat'))
+    lon = float(request.POST.get('lon'))
+
+    edge_tuple = get_edge_tuple(request, lat, lon)
+        
     if edge_tuple is None:
         # This happens when the requested coordinates are not within the Graph.
         return HttpResponseNotFound()
     (start, end) = edge_tuple
     config = routing_config.from_dict(
-        DEFAULT_ROUTING_CONFIG, request.GET.dict())
-
-
-    usertags = ["tourism"]
+        DEFAULT_ROUTING_CONFIG, request.POST.dict())
 
     def calculate_modifier(edge):
         #TODO: ADD RATING
@@ -69,16 +55,29 @@ def route_from_coord(request):
 
         return edge
 
+    def async_exec(graph, start, end, config):
+        # Create the rod.
+        nodes = generate_rod(graph, start, config)
+
+        # Fix that the rod doesn't pass our position
+        if nodes[1] == end:
+            nodes = nodes[1:]
+            (start, end) = (end, start)
+
+        # Close the rod.
+        return close_rod(graph, end, nodes, config)
+
     # Calculations
     tpexec = Executor(max_workers=NUM_THREADS)
     routes = []
     flist = []
 
+    MOD_GRAPH = GRAPH.map_graph(lambda _: _, calculate_modifier)
+
     # Sometimes, routing gives a bad response. To fix this, the routing algorithm
     # is performed multiple times in an (a)synchronous way.
     for i in xrange(NUM_THREADS):
-        flist.append(tpexec.submit(async_exec, 
-            GRAPH.map_graph(lambda _: _, calculate_modifier), start, end, config))
+        flist.append(tpexec.submit(async_exec, MOD_GRAPH, start, end, config))
 
     for _i in xrange(NUM_THREADS * 10):
         sets = wait(flist, return_when=FIRST_COMPLETED)
@@ -87,69 +86,40 @@ def route_from_coord(request):
             routes = fut.result()
             if len(routes) > 0:
                 break
-            flist.append(tpexec.submit(async_exec, GRAPH, start, end, config))
+            flist.append(tpexec.submit(async_exec, MOD_GRAPH, start, end, config))
 
     tpexec.shutdown(False)
 
     # Choose a random route from all possible routes.
     shuffle(routes)
-    resp = respond_path(request.GET, routes[0], [routes[0][0]])
+    resp = respond_path(request.POST, routes[0], [routes[0][0]])
     if resp is None:
         return HttpResponseNotFound()
     return HttpResponse(into_json(resp))
 
 
-def rod(request):
+@csrf_exempt
+def return_home(request):
     """
-        Responds with a rod starting from an index
+    Responds with a route leading the user back to his starting point.
 
-        This function is mostly useless and should - currently - only be used for
-        testing and/or speed metrics.
+    Query args:
+    rid -- the route that the user used to run.
+    lon, lat -- position of the user.
+    distance -- The preferred distance to the starting point.
     """
-    index = int(request.GET.get('index'))
-    config = routing_config.from_dict(
-        DEFAULT_ROUTING_CONFIG, request.GET.dict())
-    nodes = generate_rod(GRAPH, index, config)
-    resp = respond_path(request.GET, nodes, [])
-    if resp is None:
-        return HttpResponseNotFound()
-    return HttpResponse(into_json(resp))
 
-
-def parse(request):
-    """
-        Convert a tag into another type.
-
-        Query args:
-        tag -- route to be converted.
-
-    """
-    tag = request.GET.get('tag')
-    path = from_string(GRAPH, tag)
-    resp = respond_path(request.GET, path, [path[0]])
-    if resp is None:
-        return HttpResponseNotFound()
-    return HttpResponse(into_json(resp))
-
-
-def go_home(request):
-    """
-        Responds with a route leading the user back to his starting point.
-
-        Query args:
-        tag -- the route that the user used to run.
-        lon, lat -- position of the user.
-        distance -- The preferred distance to the starting point.
-    """
     # Get path from request tag
-    tag = request.GET.get('tag')
+    tag = request.POST.get('tag')
     path = from_string(GRAPH, tag)
+    lat = float(request.POST.get('lat'))
+    lon = float(request.POST.get('lon'))
 
     # Find nearest node
-    (start, end) = get_edge_tuple(request, request.GET.get('lat'), request.GET.get('lon'))
+    (start, end) = get_edge_tuple(request, lat, lon)
 
     # Get the preferred distance to run from this point to starting position (0 means straight home)
-    dist_arg = float(request.GET.get('distance'))
+    dist_arg = float(request.POST.get('distance'))
     if dist_arg == 0:
         dist = distance(serialize_node(GRAPH, end), serialize_node(GRAPH, path[0]))
     else:
@@ -175,7 +145,7 @@ def go_home(request):
     config = routing_config.from_dict(DEFAULT_ROUTING_CONFIG, d)
 
     # Generate new random rod from starting position
-    nodes = generate_rod(GRAPH, path[0], config)
+    nodes = generate(GRAPH, path[0], config)
     # Create new rod that will be used for the poisoning (starting from current position and contains starting pos)
     pois_path.extend(nodes)
     # Close the rod on the starting position
@@ -187,67 +157,22 @@ def go_home(request):
         shuffle(routes)
     # Return the new route, i.e. the completed part + new part
     selected_route = path[0:ind] + routes[0][::-1]
-    resp = respond_path(request.GET, selected_route, [selected_route[0]])
+    resp = respond_path(request.POST, selected_route, [selected_route[0]])
     if resp is None:
         return HttpResponseNotFound()
     return HttpResponse(into_json(resp))
 
 
 @csrf_exempt
-def convert(request):
+def rate_route(request):
     """
-        Converts a route into another type
+    Adds the rating to all edges in a route, and saves it both in the structure and in the database.
 
-        Deprecated and replaced by 'parse'
-    """
-    if len(request.body) > 0:
-        body = json.loads(request.body)
-    else:
-        body = {}
-    body.update({key: request.GET.get(key) for key in request.GET})
-    resp = respond_path(body, body['data'], [body['data'][0]])
-    if resp is None:
-        return HttpResponseNotFound()
-    return HttpResponse(into_json(resp))
-
-
-def rate(request):
-    """
-        Adds the rating to all edges in a route, and saves it both in the structure and in the database.
-
-        Query args:
-        tag -- the tag of the route you want to rate
-        rating -- a float between 0 and 5
+    Query args:
+    rid -- the id for the rated route
+    rating -- a float between 0 and 5
     """
 
-    tag = request.GET.get('tag')
-    rating = float(request.GET.get('rating'))
-    path = from_string(GRAPH, tag)
-    add_rating_list(GRAPH, [(i, j) for i, j in zip(path, path[1:])], rating)
+    tag = request.POST.get('tag')
+    rating = float(request.POST.get('rating'))
     return HttpResponse('')
-
-
-# route/import?file=trimpistes_0.4.json
-# route/import?file=running_routes_tags_0.4.json
-
-@csrf_exempt
-def import_json(request):
-    """
-        Processes a json structure that contains route and applies the score in the MongoDB database.
-        The structure should have the following structure:
-        {
-            'route_id (e.g. 1)' : { 'length': int, 'score': int, 'name': string, 'tags': arrays[string] }
-        }
-
-        The data segment should contain the structure
-            (can be done through e.g. curl "<domain>/route/import" --data "@filename")
-    """
-    jsonobj = json.loads(request.body)
-
-    for key in jsonobj:
-        tags = jsonobj[key]['tags']
-        score = float(jsonobj[key]['score'])
-        for tag in tags:
-            path = from_string(GRAPH, tag)
-            add_rating_list(GRAPH, [(i, j) for i, j in zip(path, path[1:])], score)
-    return HttpResponse('<html><body>Imported ' + file_name + '</body></html>')

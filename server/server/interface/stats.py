@@ -3,9 +3,8 @@ from django.http import HttpResponseNotFound
 from django.views.decorators.csrf import csrf_exempt
 import json
 
-from model.user import User
-from rest_api_draft.database import get_stats_user,update_stats_user
-
+from server.model.user import User
+from server.database import get_stats_user,update_stats_user
 
 
 @csrf_exempt
