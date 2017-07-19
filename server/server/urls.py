@@ -14,22 +14,13 @@ Including another URLconf
     2. Add a URL to urlpatterns:  url(r'^blog/', include('blog.urls'))
 """
 from django.conf.urls import url
-import server.interface.nodes as nodeview
-import server.interface.closest as closestview
 import server.interface.routes as routeview
-from server.interface.readme import readme
 
 urlpatterns = [
-    url(r'^node$', nodeview.get_node),
-    url(r'^node/get-id$', closestview.get_id_from_pos),
-    url(r'^node/get-node$', closestview.get_node_from_pos),
-    url(r'^node/in-city$', nodeview.in_city),
-    #url(r'^route/pathing$', routeview.distance),
     url(r'^route/generate$', routeview.route_from_coord),
     url(r'^route/return$', routeview.go_home),
     url(r'^route/rod$', routeview.rod),
     url(r'^route/convert$', routeview.convert),
-    url(r'^README$', readme),
     url(r'^route/parse$', routeview.parse),
     url(r'^route/rate$', routeview.rate),
     url(r'^route/import$', routeview.import_json),

@@ -1,9 +1,8 @@
 
 from collections import namedtuple
 
-import server.static.city as city
+import server.static.data as data
 from server.logic.distance.util import get_closest_edge
-from server.logic.city.city import Vertex
 
 
 class SerialNode(namedtuple('SerialNode', 'id mapid lat lon connections')):
@@ -30,5 +29,5 @@ def serialize_node(graph, index):
 def get_edge_tuple(_, lat, lon):
     reallat = float(lat)
     reallon = float(lon)
-    location = city.PROJECTOR.map(Vertex(0, 0, reallat, reallon, 0, 0, []))
-    return get_closest_edge(location, city.GRAPH, city.GRID)
+    location = data.PROJECTOR.map(reallat, reallon)
+    return get_closest_edge(location, data.GRAPH, data.GRID)

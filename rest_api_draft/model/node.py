@@ -1,10 +1,14 @@
 class Node:
 
-    def __init__(self, nid, coord):
-        self.id = nid
-        self.lat, self.lon = coord
-        self.x = 0.0
-        self.y = 0.0
+    def __init__(self, id, lat, lon, x=0.0, y=0.0):
+        self.id = id
+        self.lat = lat
+        self.lon = lon
+        self.x = x
+        self.y = y
 
-    def __str(self):
-        return "#{} ({}, {})".format(self.nid, self.coord[0], self.coord[1])
+    def __str__(self):
+        return "#{} ({}, {})".format(self.id, self.lat, self.lon)
+
+    def into_c(self):
+        return (self.id, self.lat, self.lon, self.x, self.y)
