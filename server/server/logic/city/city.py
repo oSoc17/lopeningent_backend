@@ -19,8 +19,10 @@ class Vertex(namedtuple('node', 'id mapid lat lon x y meta')):
 class Edge(namedtuple('edge', 'id distance highway rating_sum rating_count water park to')):
     pass
 
+def load():
+    
 
-def load(dirname):
+def load_legacy(dirname):
     """Factory method for creating a graph.
 
     Function args:

@@ -271,20 +271,30 @@ def db_close(connection):
 
 if __name__ == "__main__":
     start = time()
+    print "Please be patient, this could take a while..."
 
     nodes, edges = load_osm(C.OSM_FILE)
     pois = load_pois(C.POI_DIR)
+    end = time()
+    print "Loaded coordinates into memory... ({})".format(end - start)
 
     conn = db_connect(C.DB_CONN)
-
     db_truncate(conn)
+    end = time()
+    print "Cleared database... ({})".format(end - start)
+
     osm_nid_dict = db_write_nodes(conn, nodes)
+
     edges = map_pois(update_edge_nodes(edges, nodes, osm_nid_dict), pois)
+    end = time()
+    print "Mapped POIs to edges... ({})".format(end - start)
 
     db_write_edges(conn, edges)
     db_write_pois(conn, pois)
 
     db_close(conn)
+    end = time()
+    "Wrote changes to the database... ({})".format(end -start)
 
     end = time()
-    print "Migration took {:.3}s".format(end - start)
+    print "Migration finished ({})".format(end - start)
