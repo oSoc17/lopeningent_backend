@@ -8,10 +8,10 @@ def generate(request):
     if (str(request.POST.get('android_token'))== "1223"): # this should be a method of actually checking with firebase
         lat = request.POST.get('lat')
         lon = request.POST.get('lon')
+        tags = request.POST.get('tags')
+        tags = request.POST.getlist('tags')
 
-        # also get parameters like POI
-
-        #route_from_coord method called
+        #route_from_coord method called - similar to current situation
 
 
     else:

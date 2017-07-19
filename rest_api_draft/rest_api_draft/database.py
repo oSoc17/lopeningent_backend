@@ -118,15 +118,35 @@ def get_stats_user(uid):
     for user in cursor.fetchall():
         uid,avg_speed, avg_heartrate, avg_distance, tot_distance, tot_duration, avg_duration, runs = user
         userFound = User(uid,avg_speed, avg_heartrate, avg_distance, tot_distance, tot_duration, avg_duration, runs)
+    try:
+        print  userFound.toJSON()
+        cursor.close()
+        return  userFound.toJSON()
+    except AttributeError:
+        cursor.close()
+        return  None
+
     print userFound.toJSON()
     cursor.close()
     return userFound.toJSON()
 
-def update_stats_user(uid,avg_speed, avg_heartrate, avg_distance,tot_distance,tot_duration,avg_duration,runs):
+def update_stats_user(user):
     conn = POOL.getconn()
     cursor = conn.cursor()
-    #cursor.execute("SELECT uid,avg_speed, avg_heartrate, avg_distance,tot_distance,tot_duration,avg_duration,runs FROM lopeningent.edges WHERE uid=%s LIMIT BY 1;",(uid))
-    # needs to be update cursor
-
+    cursor.execute("""INSERT INTO lopeningent.users
+                      (uid,avg_speed, avg_heartrate, avg_distance,tot_distance,tot_duration,avg_duration,runs)
+                      VALUES
+                      (%s, %s, %s,%s,%s,%s,%s,%s)
+                      ON DUPLICATE KEY UPDATE
+                      avg_speed     = VALUES(avg_speed),
+                      avg_heartrate = VALUES(avg_heartrate)
+                      avg_distance  = VALUES(avg_distance)
+                      tot_distance  = VALUES(tot_distance)
+                      tot_duration  = VALUES(tot_duration)
+                      avg_duration  = VALUES(avg_duration)
+                      runs          = VALUES(users)
+                      ;""",(user.uid,user.avg_speed,user.avg_heartrate,user.avg_distance,user.tot_distance,None,None,user.runs))
+    print "inserted/updated users table with id: " + user.uid
 
     cursor.close()
+

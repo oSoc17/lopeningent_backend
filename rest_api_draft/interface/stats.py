@@ -2,6 +2,8 @@ from django.http import HttpResponse
 from django.http import HttpResponseNotFound
 from django.views.decorators.csrf import csrf_exempt
 import json
+
+from model.user import User
 from rest_api_draft.database import get_stats_user,update_stats_user
 
 
@@ -13,18 +15,20 @@ def get_stats_from_id(request):
         print "Hello " + str(userid)
 
         result = get_stats_user(userid)
-        resp ={}
-        resp['message'] = 'no error'
-        json.dumps(resp)
-        resp['values'] = result
-        return HttpResponse(resp, content_type="application/json")
+        if  result==None:
+            resp = {'message': 'error', 'values': object}
+            resp['values'] = ''
+        else:
+            resp = {'message': 'no error', 'values': object}
+            resp['values'] = (result)
+
+        return HttpResponse(json.dumps(resp), content_type="application/json")
 
         # put the stats in a response
     else:
         print "You don't have access to this api from outside the android app."
-        resp ={}
-        resp['message'] = 'acces denied'
-        resp['values'] = ''
+        resp ={'message': 'acces denied','values' : None}
+
         return HttpResponse(json.dumps(resp), content_type="application/json")
 
 @csrf_exempt
@@ -39,8 +43,8 @@ def post_stats_from_id(request):
         avg_duration = request.POST.get('avg_duration')
         runs = request.POST.get('runs')
 
-
-        update_stats_user(userid,avg_speed, avg_heartrate, avg_distance,tot_distance,tot_duration,avg_duration,runs)
+        requestedUser = User(userid, avg_speed, avg_heartrate, avg_distance, tot_distance, tot_duration, avg_duration, runs)
+        update_stats_user(requestedUser)
         # send response saying db is updated
 
 
