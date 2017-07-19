@@ -133,20 +133,24 @@ def get_stats_user(uid):
 def update_stats_user(user):
     conn = POOL.getconn()
     cursor = conn.cursor()
-    cursor.execute("""INSERT INTO lopeningent.users
+    cursor.execute("""
+                      UPDATE lopeningent.users
+                      SET
+                      avg_speed     = (%(avg_speed)s),
+                      avg_heartrate = (%(avg_heartrate)s),
+                      avg_distance  = (%(avg_distance)s),
+                      tot_distance  = (%(tot_distance)s),
+                      tot_duration  = (%(tot_duration)s),
+                      avg_duration  = (%(avg_duration)s),
+                      runs          = (%(runs)s)
+                      WHERE uid=%(uid)s;
+                      INSERT INTO lopeningent.users
                       (uid,avg_speed, avg_heartrate, avg_distance,tot_distance,tot_duration,avg_duration,runs)
-                      VALUES
-                      (%s, %s, %s,%s,%s,%s,%s,%s)
-                      ON DUPLICATE KEY UPDATE
-                      avg_speed     = VALUES(avg_speed),
-                      avg_heartrate = VALUES(avg_heartrate)
-                      avg_distance  = VALUES(avg_distance)
-                      tot_distance  = VALUES(tot_distance)
-                      tot_duration  = VALUES(tot_duration)
-                      avg_duration  = VALUES(avg_duration)
-                      runs          = VALUES(users)
-                      ;""",(user.uid,user.avg_speed,user.avg_heartrate,user.avg_distance,user.tot_distance,None,None,user.runs))
-    print "inserted/updated users table with id: " + user.uid
+                      SELECT %(uid)s, %(avg_speed)s,%(avg_heartrate)s, %(avg_distance)s, %(tot_distance)s, %(tot_duration)s, %(avg_duration)s, %(runs)s
+                      WHERE NOT EXISTS (SELECT 1 FROM lopeningent.users WHERE uid=%(uid)s);
+
+                      ;""",{'uid' : user.uid,'avg_speed':user.avg_speed,'avg_heartrate': user.avg_heartrate,'avg_distance': user.avg_distance,'tot_distance': user.tot_distance,'tot_duration':None,'avg_duration':None,'runs' : user.runs})
+    print "inserted/updated users table with id: " + str(user.uid)
 
     cursor.close()
 
