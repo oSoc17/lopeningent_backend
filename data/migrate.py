@@ -221,25 +221,23 @@ def db_write_edges(connection, edges):
         list = str(map(str, list))
         return list.replace('[', '{').replace(']', '}').replace('\'', '\"')
 
+    one_to_one_edges = list()
+
     for edge in edges:
+        edge.nodes = map(lambda node: node['nid'], edge.nodes)
+        for start, end in zip(edge.nodes, edge.nodes[1:]):
+            one_to_one_edges.append((start, end, edge.tags))
+            one_to_one_edges.append((end, start, edge.tags))
+
+    for e in one_to_one_edges:
+        fr, to, tags = e
         cursor.execute(
             """
-            INSERT INTO lopeningent.edges (rating, tags)
-                VALUES (%s, %s) RETURNING eid
+            INSERT INTO lopeningent.edges (rating, tags, from_node, to_node)
+                VALUES (%s, %s, %s, %s)
             """
-            , (2.5, list_into_pg(edge.tags))
+            , (2.5, list_into_pg(tags), fr, to)
         )
-
-        eid = cursor.fetchone()[0]
-
-        for node in edge.nodes:
-            cursor.execute(
-                """
-                INSERT INTO lopeningent.edge_nodes (eid, nid)
-                    VALUES (%s, %s)
-                """
-                , (eid, node["nid"])
-            )
 
     cursor.close()
 

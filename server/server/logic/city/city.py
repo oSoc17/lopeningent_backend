@@ -13,7 +13,7 @@ def project(graph, projector):
     """ 
     Creates an enhanced graph with xy coordinates from a graph 
     """
-    return graph.map_graph(Mapper(projector), lambda x: x)
+    graph.map_graph(Mapper(projector), lambda x: x)
 
 
 class Mapper(namedtuple("Mapper", "projector")):

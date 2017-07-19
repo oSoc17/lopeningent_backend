@@ -12,8 +12,7 @@ from server.logic.graph.util import distance
 from server.interface.util import serialize_node
 from random import shuffle
 from django.views.decorators.csrf import csrf_exempt
-from server.logic.routing.compress import into_string
-from server.logic.routing.ratings import add_rating_list
+from server.database import update_edge_in_db
 from server.setdebug import NUM_THREADS
 from concurrent.futures import ThreadPoolExecutor as Executor, wait, FIRST_COMPLETED
 import json
@@ -31,7 +30,7 @@ def generate(request):
     type -- the response type. See the geojson.respond_path function for more details
     """
 
-    tags = request.POST.getlist('tags')
+    usertags = request.POST.getlist('tags')
     lat = float(request.POST.get('lat'))
     lon = float(request.POST.get('lon'))
 
@@ -45,13 +44,12 @@ def generate(request):
         DEFAULT_ROUTING_CONFIG, request.POST.dict())
 
     def calculate_modifier(edge):
-        #TODO: ADD RATING
         if edge._tags < 1:
             return edge
 
         for tag in edge._tags:
             if tag in usertags:
-                edge.modifier += (1 / len(usertags))
+                edge.modifier += (1 / (len(usertags) + 1)) + ((edge.rating / 5) / 6)
 
         return edge
 
@@ -72,12 +70,12 @@ def generate(request):
     routes = []
     flist = []
 
-    MOD_GRAPH = GRAPH.map_graph(lambda _: _, calculate_modifier)
+    GRAPH.map_graph(lambda _: _, calculate_modifier)
 
     # Sometimes, routing gives a bad response. To fix this, the routing algorithm
     # is performed multiple times in an (a)synchronous way.
     for i in xrange(NUM_THREADS):
-        flist.append(tpexec.submit(async_exec, MOD_GRAPH, start, end, config))
+        flist.append(tpexec.submit(async_exec, GRAPH, start, end, config))
 
     for _i in xrange(NUM_THREADS * 10):
         sets = wait(flist, return_when=FIRST_COMPLETED)
@@ -86,7 +84,7 @@ def generate(request):
             routes = fut.result()
             if len(routes) > 0:
                 break
-            flist.append(tpexec.submit(async_exec, MOD_GRAPH, start, end, config))
+            flist.append(tpexec.submit(async_exec, GRAPH, start, end, config))
 
     tpexec.shutdown(False)
 
@@ -110,7 +108,7 @@ def return_home(request):
     """
 
     # Get path from request tag
-    tag = request.POST.get('tag')
+    tag = request.POST.get('visited_path')
     path = from_string(GRAPH, tag)
     lat = float(request.POST.get('lat'))
     lon = float(request.POST.get('lon'))
@@ -139,7 +137,7 @@ def return_home(request):
     pois_path = path[ind:0:-1]
     dist = dist - path_length(GRAPH, pois_path)
 
-    d = {k: v for k, v in request.GET.dict().items()}
+    d = {k: v for k, v in request.POST.dict().items()}
     d['min_length'] = str(dist)
     d['max_length'] = str(dist + 1.0)
     config = routing_config.from_dict(DEFAULT_ROUTING_CONFIG, d)
@@ -173,6 +171,19 @@ def rate_route(request):
     rating -- a float between 0 and 5
     """
 
-    tag = request.POST.get('tag')
-    rating = float(request.POST.get('rating'))
+    tag = request.POST.get('visited_path')
+    new_rating = float(request.POST.get('rating'))
+    path = from_string(GRAPH, tag)
+    edgecoords = [(s, e) for s, e in zip(path, path[1:])]
+
+    def update_rating(edge):
+        for edge in GRAPH.get_edges():
+            for s, e in edgecoords:
+                if s == edge.id and e == edge.to:
+                    edge._rating = (edge._rating + new_rating) / 2
+                    update_edge_in_db(edge)
+
+        return edge
+
+    GRAPH.map_graph(lambda _: _, update_rating)
     return HttpResponse('')
