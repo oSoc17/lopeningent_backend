@@ -163,7 +163,8 @@ CREATE TABLE users (
     tot_distance integer,
     tot_duration abstime,
     avg_duration abstime,
-    runs integer
+    runs integer,
+    edit_time bigint
 );
 
 
