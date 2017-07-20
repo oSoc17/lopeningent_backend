@@ -161,8 +161,8 @@ CREATE TABLE users (
     avg_heartrate integer,
     avg_distance integer,
     tot_distance integer,
-    tot_duration abstime,
-    avg_duration abstime,
+    tot_duration integer,
+    avg_duration integer,
     runs integer,
     edit_time bigint
 );

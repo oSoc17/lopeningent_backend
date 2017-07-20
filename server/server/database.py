@@ -130,7 +130,7 @@ def update_stats_user(user):
                         WHERE NOT EXISTS (SELECT 1 FROM lopeningent.users WHERE uid=%(uid)s);
 
 
-                        ;""",{'uid' : user.uid,'avg_speed':user.avg_speed,'avg_heartrate': user.avg_heartrate,'avg_distance': user.avg_distance,'tot_distance': user.tot_distance,'tot_duration':None,'avg_duration':None,'runs' : user.runs,'edit_time' : user.edit_time})
+                        ;""",{'uid' : user.uid,'avg_speed':user.avg_speed,'avg_heartrate': user.avg_heartrate,'avg_distance': user.avg_distance,'tot_distance': user.tot_distance,'tot_duration':user.tot_duration,'avg_duration':user.avg_duration,'runs' : user.runs,'edit_time' : user.edit_time})
         conn.commit()
         print "inserted/updated users table with id: " + str(user.uid)
 
