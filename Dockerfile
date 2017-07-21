@@ -37,6 +37,9 @@ WORKDIR /opt/lig-server
 # Install the python dependencies.
 RUN pip install -r requirements.txt
 
+# Compile the algorithm's shared object file libgraphing.so 
+RUN cargo build --release
+
 # Now we can start running the server.
 # This could be changed to an nginx+letsencrypt configuration later.
 EXPOSE 8000
