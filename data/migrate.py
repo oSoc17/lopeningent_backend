@@ -1,9 +1,8 @@
 #!/usr/bin/env python
-import psycopg2
+import psycopg2, os
 from xml.etree.cElementTree import iterparse
 from rtree import index
 from time import time
-from os import listdir
 from json import loads
 import migrate_config as C
 
@@ -90,7 +89,7 @@ def load_pois(poi_dir):
     pois = list()
 
     # load all the poi sets from JSON into a dictionary.
-    for filename in listdir(poi_dir):
+    for filename in os.listdir(poi_dir):
         with open(poi_dir + "/" + filename, 'r') as file:
             pois.append(loads(file.read()))
 
@@ -269,10 +268,12 @@ def db_close(connection):
 
 if __name__ == "__main__":
     start = time()
+
+    fullpath = os.path.dirname(os.path.realpath(__file__)) + "/"
     print "Please be patient, this could take a while..."
 
-    nodes, edges = load_osm(C.OSM_FILE)
-    pois = load_pois(C.POI_DIR)
+    nodes, edges = load_osm(fullpath + C.OSM_FILE)
+    pois = load_pois(fullpath + C.POI_DIR)
     end = time()
     print "Loaded coordinates into memory... ({})".format(end - start)
 
