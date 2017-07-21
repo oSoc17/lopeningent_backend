@@ -20,7 +20,7 @@ RUN apt-get install -yqq \
 	curl
 
 # Install the Rust programming language environment
-ENV RUST_VERSION stable
+ENV RUST_VERSION 1.18.0 
 ENV CARGO_HOME /cargo
 ENV PATH $CARGO_HOME/bin:/root/.cargo/bin:$PATH
 ENV SRC_PATH /src
