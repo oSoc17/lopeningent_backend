@@ -156,7 +156,7 @@ ALTER SEQUENCE pois_pid_seq OWNED BY pois.pid;
 --
 
 CREATE TABLE users (
-    uid integer NOT NULL,
+    uid TEXT NOT NULL,
     avg_speed real,
     avg_heartrate integer,
     avg_distance integer,

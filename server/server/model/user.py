@@ -4,7 +4,7 @@ import json
 class User:
 
     def __init__(self, uid, avg_speed, avg_heartrate, avg_distance,tot_distance,tot_duration,avg_duration,runs,edit_time ):
-        self.uid = int(uid)
+        self.uid = str(uid)
         self.avg_speed = float(avg_speed)
         self.avg_heartrate = int(avg_heartrate)
         self.avg_distance = int(avg_distance)
@@ -20,4 +20,4 @@ class User:
 
     def toJSON(self):
         return json.dumps(self, default=lambda o: o.__dict__,
-            sort_keys=True, indent=8)
+            sort_keys=True, indent=9)
