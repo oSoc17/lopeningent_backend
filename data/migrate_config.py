@@ -1,7 +1,7 @@
 # Configuration File for the migrate tool
 
 # Connection info to the PostgreSQL database
-DB_CONN = "dbname=lopeningent host=localhost user=postgres password=Q4a'30h=3*7hyg&ZKdR(4(6oQhFK>f6'`>L)UqhiZ$&aCvRGWlXoN*0o@M?IiDO"
+DB_CONN = "dbname=lopeningent host=db user=postgres"
 
 # File containing the OSM data in .osm (XML) format (see update.sh)
 OSM_FILE =  "ghent.osm"
