@@ -79,7 +79,7 @@ def get_stats_user(uid):
     conn = POOL.getconn(key="get-stats")
     cursor = conn.cursor()
     userFound = []
-    cursor.execute("SELECT uid,avg_speed, avg_heartrate, avg_distance,tot_distance,tot_duration,avg_duration,runs,edit_time FROM lopeningent.users WHERE uid= %s LIMIT 1;",(int(uid),))
+    cursor.execute("SELECT uid,avg_speed, avg_heartrate, avg_distance,tot_distance,tot_duration,avg_duration,runs,edit_time FROM lopeningent.users WHERE uid= %s LIMIT 1;",(str(uid),))
 
     for user in cursor.fetchall():
         uid,avg_speed, avg_heartrate, avg_distance, tot_distance, tot_duration, avg_duration, runs,edit_time  = user
@@ -101,36 +101,40 @@ def update_stats_user(user):
     conn = POOL.getconn(key="update-stats")
     try:
         cursor = conn.cursor()
+
         cursor.execute("""
-                        UPDATE lopeningent.users
-                        SET
-                        avg_speed     = (%(avg_speed)s),
-                        avg_heartrate = (%(avg_heartrate)s),
-                        avg_distance  = (%(avg_distance)s),
-                        tot_distance  = (%(tot_distance)s),
-                        tot_duration  = (%(tot_duration)s),
-                        avg_duration  = (%(avg_duration)s),
-                        runs          = (%(runs)s),
-                        edit_time     = (%(edit_time)s)
-                        WHERE uid=%(uid)s;
-                        UPDATE lopeningent.users
-                        SET
-                        avg_speed     = (%(avg_speed)s),
-                        avg_heartrate = (%(avg_heartrate)s),
-                        avg_distance  = (%(avg_distance)s),
-                        tot_distance  = (%(tot_distance)s),
-                        tot_duration  = (%(tot_duration)s),
-                        avg_duration  = (%(avg_duration)s),
-                        runs          = (%(runs)s)
-                        edit_time     = (%(edit_time)s)
-                        WHERE uid=%(uid)s;
-                        INSERT INTO lopeningent.users
-                        (uid,avg_speed, avg_heartrate, avg_distance,tot_distance,tot_duration,avg_duration,runs,edit_time)
-                        SELECT %(uid)s, %(avg_speed)s,%(avg_heartrate)s, %(avg_distance)s, %(tot_distance)s, %(tot_duration)s, %(avg_duration)s, %(runs)s,%(edit_time)s
-                        WHERE NOT EXISTS (SELECT 1 FROM lopeningent.users WHERE uid=%(uid)s);
+                           UPDATE lopeningent.users
+                           SET
+                           avg_speed     = (%(avg_speed)s),
+                           avg_heartrate = (%(avg_heartrate)s),
+                           avg_distance  = (%(avg_distance)s),
+                           tot_distance  = (%(tot_distance)s),
+                           tot_duration  = (%(tot_duration)s),
+                           avg_duration  = (%(avg_duration)s),
+                           runs          = (%(runs)s),
+                           edit_time     = (%(edit_time)s)
+                           WHERE uid=%(uid)s;
+                           UPDATE lopeningent.users
+                           SET
+                           avg_speed     = (%(avg_speed)s),
+                           avg_heartrate = (%(avg_heartrate)s),
+                           avg_distance  = (%(avg_distance)s),
+                           tot_distance  = (%(tot_distance)s),
+                           tot_duration  = (%(tot_duration)s),
+                           avg_duration  = (%(avg_duration)s),
+                           runs          = (%(runs)s),
+                           edit_time     = (%(edit_time)s)
+                           WHERE uid=%(uid)s;
+                           INSERT INTO lopeningent.users
+                           (uid,avg_speed, avg_heartrate, avg_distance,tot_distance,tot_duration,avg_duration,runs,edit_time)
+                           SELECT %(uid)s, %(avg_speed)s,%(avg_heartrate)s, %(avg_distance)s, %(tot_distance)s, %(tot_duration)s, %(avg_duration)s, %(runs)s,%(edit_time)s
+                           WHERE NOT EXISTS (SELECT 1 FROM lopeningent.users WHERE uid=%(uid)s);
+                           ;""", {'uid': user.uid, 'avg_speed': user.avg_speed, 'avg_heartrate': user.avg_heartrate,
+                                  'avg_distance': user.avg_distance, 'tot_distance': user.tot_distance,
+                                  'tot_duration': user.tot_duration, 'avg_duration': user.avg_duration,
+                                  'runs': user.runs, 'edit_time': user.edit_time})
+        print "status" + str(conn.status)
 
-
-                        ;""",{'uid' : user.uid,'avg_speed':user.avg_speed,'avg_heartrate': user.avg_heartrate,'avg_distance': user.avg_distance,'tot_distance': user.tot_distance,'tot_duration':user.tot_duration,'avg_duration':user.avg_duration,'runs' : user.runs,'edit_time' : user.edit_time})
         conn.commit()
         print "inserted/updated users table with id: " + str(user.uid)
 
@@ -142,7 +146,6 @@ def update_stats_user(user):
         cursor.close()
         POOL.putconn(conn, key="update-stats")
         return False
-
 
 
 def update_edge_in_db(edge):

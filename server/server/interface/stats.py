@@ -16,7 +16,7 @@ def get_stats_from_id(request):
         result = get_stats_user(userid)
         if  result==None:
             resp = {'message': 'error', 'values': object}
-            resp['values'] = ''
+            resp['values'] = {'edit_time' : 0}
         else:
             resp = {'message': 'no error', 'values': object}
             resp['values'] = (result)
@@ -42,8 +42,10 @@ def post_stats_from_id(request):
         tot_duration = request.POST.get('tot_duration')
         avg_duration = request.POST.get('avg_duration')
         runs = request.POST.get('runs')
+        edit_time = request.POST.get('edit_time')
+        requestedUser = User(userid, avg_speed, avg_heartrate, avg_distance, tot_distance, tot_duration, avg_duration, runs,edit_time)
+        print "json: " + requestedUser.toJSON()
 
-        requestedUser = User(userid, avg_speed, avg_heartrate, avg_distance, tot_distance, tot_duration, avg_duration, runs)
         updated = update_stats_user(requestedUser)
         if updated:
             resp = {'message': 'no error', 'values': "updated"}
