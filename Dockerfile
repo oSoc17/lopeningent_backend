@@ -29,6 +29,7 @@ RUN curl -sSf https://sh.rustup.rs | env -u CARGO_HOME sh \
 	&& rustc --version && cargo --version \
 	&& mkdir -p "$CARGO_HOME" "$SRC_PATH"
 
+
 # Just putting our application into the proper directories.
 ADD server /opt/lig-server
 ADD data /opt/lig-data
