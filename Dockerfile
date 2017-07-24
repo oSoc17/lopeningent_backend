@@ -44,3 +44,6 @@ RUN cargo build --release
 # Now we can start running the server.
 # This could be changed to an nginx+letsencrypt configuration later.
 EXPOSE 8000
+
+# Command that gets executed when you start the container
+CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
