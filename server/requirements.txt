@@ -31,3 +31,4 @@ Shapely==1.5.17
 singledispatch==3.4.0.3
 six==1.10.0
 wrapt==1.10.10
+firebase-admin==2.0.0
