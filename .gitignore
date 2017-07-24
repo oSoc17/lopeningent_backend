@@ -1,3 +1,4 @@
 *.pyc
 .vscode/
 .idea/
+**/drig-56997-firebase-adminsdk-eglqc-bf5f962ada.json
