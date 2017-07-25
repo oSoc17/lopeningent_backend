@@ -58,7 +58,7 @@ def generate(request):
 
             for tag in edge._tags:
                 if tag in usertags:
-                    edge.modifier += (1 / (len(usertags) + 1)) + ((edge.rating / 5) / 6)
+                    edge.modifier -= (1 / len(usertags)) + (edge.rating / 5) 
 
             return edge
 
