@@ -9,19 +9,19 @@ import threading, re, config
 
 POOL = pool.ThreadedConnectionPool(1, 20, config.DB_CONN)
 
+def cast_into_point(value):
+    match = re.match(r"\(([^)]+),([^)]+)\)", value)
+
+    if match:
+        return (float(match.group(1)), float(match.group(2)))
+
+    raise InterfaceError("bad point representation: %r" % value)
+
 def get_nodes(nodes):
     conn = POOL.getconn(key="node")
     cursor = conn.cursor()
 
     cursor.execute("SELECT nid, coord FROM lopeningent.nodes;")
-
-    def cast_into_point(value):
-        match = re.match(r"\(([^)]+),([^)]+)\)", value)
-
-        if match:
-            return (float(match.group(1)), float(match.group(2)))
-
-        raise InterfaceError("bad point representation: %r" % value)
 
     for node in cursor.fetchall():
         nid, coord = node
@@ -165,3 +165,41 @@ def update_edge_in_db(edge):
     cursor.close()
     conn.commit()
     POOL.putconn(conn, key="edge-update")
+
+
+def get_poi_coords(types):
+    conn = POOL.getconn(key="get-poi-coords")
+    cursor = conn.cursor()
+
+    coords = list()
+
+    for type in types:
+        cursor.execute(
+            """
+            SELECT name, description, coord 
+            FROM lopeningent.pois WHERE type = %s
+            """,
+            (type, )
+        )
+
+        for row in cursor.fetchall():
+            lat, lon = cast_into_point(row[2])
+            coords.append({
+                "name": row[0],
+                "description": row[1],
+                "lat": lat,
+                "lon": lon,
+                "type": type
+            })
+    
+    return coords
+    cursor.close()
+    POOL.putconn(conn, key="get-poi-types")
+
+def get_poi_types():
+    conn = POOL.getconn(key="get-poi-types")
+    cursor = conn.cursor()
+    cursor.execute("SELECT DISTINCT type FROM lopeningent.pois;")
+    return [row[0] for row in cursor.fetchall()]
+    cursor.close()
+    POOL.putconn(conn, key="get-poi-types")
