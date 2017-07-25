@@ -102,7 +102,7 @@ def return_home(request):
     Responds with a route leading the user back to his starting point.
 
     Query args:
-    rid -- the route that the user used to run.
+    visited_path -- the route that the user used to run.
     lon, lat -- position of the user.
     distance -- The preferred distance to the starting point.
     """
