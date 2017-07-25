@@ -3,7 +3,7 @@ import os
 from django.http import HttpResponse
 from django.http import HttpResponseNotFound
 from django.views.decorators.csrf import csrf_exempt
-import json
+import json, logging
 
 from server.model.user import User
 from server.database import get_stats_user,update_stats_user
@@ -18,12 +18,13 @@ default_app = firebase_admin.initialize_app(cred)
 
 @csrf_exempt
 def get_stats_from_id(request):
-
+    logging.info("STATS: received get_stats_from_id request")
     uid = ''
     try:
+        logging.debug("STATS: get_stats_from_id request header was: %s", request)
         decoded_token = auth.verify_id_token(str(request.POST.get('android_token')))
         userid = decoded_token['uid']
-        print "Hello " + str(userid)
+        logging.info("STATS: user with uid %s authenticated", str(userid))
         result = get_stats_user(userid)
         if result == None:
             resp = {'message': 'error', 'values': object}
@@ -32,19 +33,19 @@ def get_stats_from_id(request):
             resp = {'message': 'no error', 'values': object}
             resp['values'] = (result)
 
+        logging.debug("STATS: response was %s:", json.dumps(resp))
         return HttpResponse(json.dumps(resp), content_type="application/json")
     except ValueError:
-
-        print "You don't have access to this api from outside the android app/Wrong Firebase token"
+        logging.error("STATS: You don't have access to this api from outside the android app/Wrong Firebase token")
         resp ={'message': 'acces denied','values' : None}
-
+        logging.error("STATS: response that caused error was: %s", json.dumps(res))
         return HttpResponse(json.dumps(resp), content_type="application/json")
-    print "uid: " + str(uid)
 
 
 
 @csrf_exempt
 def post_stats_from_id(request):
+    logging.info("STATS: received post_stats_from_id request")
     uid = ''
     try:
         decoded_token = auth.verify_id_token(str(request.POST.get('android_token')))
@@ -58,7 +59,7 @@ def post_stats_from_id(request):
         runs = request.POST.get('runs')
         edit_time = request.POST.get('edit_time')
         requestedUser = User(userid, avg_speed, avg_heartrate, avg_distance, tot_distance, tot_duration, avg_duration, runs,edit_time)
-        print "json: " + requestedUser.toJSON()
+        logging.debug("STATS: json: %s", requestedUser.toJSON())
 
         updated = update_stats_user(requestedUser)
         if updated:
@@ -67,16 +68,12 @@ def post_stats_from_id(request):
         else:
             resp = {'message': 'error', 'values': "something went wrong when updating/inserting"}
 
-
+        logging.debug("STATS: responded: %s", json.dumps(resp))
         return HttpResponse(json.dumps(resp), content_type="application/json")
 
 
     except ValueError:
-
-        print "You don't have access to this api from outside the android app/Wrong Firebase token"
-
+        logging.error("STATS: You don't have access to this api from outside the android app/Wrong Firebase token")
         resp = {'message': 'acces denied', 'values': None}
-
+        logging.error("STATS: response that caused error was: %s", json.dumps(res))
         return HttpResponse(json.dumps(resp), content_type="application/json")
-
-    print "uid: " + str(uid)
