@@ -14,3 +14,4 @@ out.prof
 .idea/
 target/
 *.sqlite3
+*.log
