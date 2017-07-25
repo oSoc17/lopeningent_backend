@@ -10,7 +10,7 @@ import time, logging
 start = time.time()
 
 # Initialize logging
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(filename="server.log", level=logging.DEBUG)
 
 # A graph containing the roads and crossroads of the city.
 # Type: Graph

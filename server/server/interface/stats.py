@@ -12,7 +12,7 @@ from firebase_admin import credentials
 from firebase_admin import auth
 
 # firebase authentication
-cred = credentials.Certificate(os.path.join(os.path.dirname(__file__), '..\\firebase\\firebase_auth.json'))
+cred = credentials.Certificate(os.path.join(os.path.dirname(__file__), '../firebase/firebase_auth.json'))
 default_app = firebase_admin.initialize_app(cred)
 
 
