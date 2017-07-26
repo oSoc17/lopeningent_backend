@@ -22,7 +22,29 @@ The **#LopenInGent project** is an effort to create an *enjoyable, customizable 
 You can find installation instructions on the repository's [wiki page](https://github.com/oSoc17/lopeningent_backend/wiki/Deployment).
 
 ## Documentation
+
 You can find our documentation on the [wiki page](https://github.com/oSoc17/lopeningent_backend/wiki).
+
+## Developers
+
+This application was developed by students from the University of Ghent and by students at Open Summer of Code.
+
+**University of Ghent**
+Hendrik Depauw
+Lorenz van Herwaarden
+Nick Aelterman
+Olivier Cammaert
+Maxim Deweirdt
+Gerwin Dox
+Simon Neuville
+Stiaan Uyttersprot
+
+**Open Summer of Code 2017**
+Redouane Arroubai
+Tim Baccaert
+Gregory De Crock
+Krishna Kumar Thirukokaranam Chandrasekar
+
 
 ## MIT License
 This project is released as an open-source project under the [MIT License](https://github.com/oSoc17/lopeningent_backend/blob/develop/LICENSE).
