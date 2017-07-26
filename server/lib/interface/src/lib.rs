@@ -272,7 +272,7 @@ pub unsafe extern "C" fn graph_conn_idval_new(graph : *const Graph, index : libc
 pub unsafe extern "C" fn graph_conn_idval_next(conn_idval : *mut ConnIdVal) -> IdVal {
     (&mut *conn_idval).0.next()
         .map(|(id, e)| IdVal{id : id, e : e})
-        .unwrap_or(IdVal{id : 0, e : ptr::null()}) //here's exactly where shit hits the fan
+        .unwrap_or(IdVal{id : 0, e : ptr::null()})
 }
 
 /// Delete the iterator

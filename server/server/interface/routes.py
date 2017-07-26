@@ -211,19 +211,12 @@ def rate_route(request):
         tag = request.POST.get('visited_path')
         new_rating = float(request.POST.get('rating'))
         path = from_string(GRAPH, tag)
-        edgecoords = [(s, e) for s, e in zip(path, path[1:])]
-        print "rating edgecoords: {}".format(edgecoords)
+        edgeids = [(f, t) for f, t in zip(path, path[1:])]
 
         def update_rating(edge):
-            print "inside update rating"
-            for edge in GRAPH.get_edges():
-                print "edge: {}".format(edge)
-                for coord in edgecoords:
-                    if coord[0] == edge.id and coord[1] == edge.to:
-                        print "edge rating: {}".format(edge._rating)
-                        edge._rating = (edge._rating + new_rating) / 2
-                        print "new edge: {}".format(edge)
-                        update_edge_in_db(edge)
+            for from_id, to_id in edgeids:
+                if edge.id == from_id and edge.to == to_id:
+                    update_edge_in_db(edge, new_rating)
 
             return edge
 
@@ -231,5 +224,5 @@ def rate_route(request):
         GRAPH.map_graph(lambda _:_, update_rating)
         return HttpResponse('')
     except:
-        logging.error("RATE: this is the error: %s", e)
+        logging.error("RATE: we've run into an error while rating a route", exc_info=True)
         return HttpResponseNotFound("Something went wrong while rating your route.")

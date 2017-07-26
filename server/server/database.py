@@ -144,10 +144,19 @@ def update_stats_user(user):
         return False
 
 
-def update_edge_in_db(edge):
+def update_edge_in_db(edge, new_rating):
     conn = POOL.getconn(key="edge-update")
     logging.info("update edge rating in db")
     cursor = conn.cursor()
+
+    cursor.execute(
+        """
+        SELECT * FROM lopeningent.edges WHERE from_node = %s AND to_node = %s;
+        """, (edge.id, edge.to)
+    )
+
+    eid, rating, _, _, _ = cursor.fetchone()
+    new_rating = (rating + new_rating) / 2    
 
     cursor.execute(
         """
@@ -155,8 +164,7 @@ def update_edge_in_db(edge):
         SET
         rating = %s
         WHERE eid = %s
-        """,
-        (edge._rating, edge.id)
+        """, (new_rating, eid)
     )
 
     cursor.close()
