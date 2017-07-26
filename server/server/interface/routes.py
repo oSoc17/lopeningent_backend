@@ -31,7 +31,7 @@ def generate(request):
     """
     try:
         logging.info("static route generator: incoming request")
-
+        badtags = request.POST.getlist('neg_tags')
         usertags = request.POST.getlist('tags')
         lat = float(request.POST.get('lat'))
         lon = float(request.POST.get('lon'))
@@ -46,11 +46,12 @@ def generate(request):
 
         logging.debug("""static route generator: parameters: 
             lat/lon(%s, %s),
-            tags(%s),
+            ptags(%s),
+            ntags(%s)
             minlen(%s), 
             maxlen(%s), 
             type(%s")""", 
-            lat, lon, usertags, config.min_length, config.max_length, request.POST.get('type'))
+            lat, lon, usertags, badtags, config.min_length, config.max_length, request.POST.get('type'))
 
         def calculate_modifier(edge):
             if edge._tags < 1:
@@ -59,6 +60,8 @@ def generate(request):
             for tag in edge._tags:
                 if tag in usertags:
                     edge.modifier -= (1 / len(usertags)) + (edge.rating / 5) 
+                elif tag in badtags:
+                    edge.modifier += (1 / len(badtags)) + (edge.rating / 5)
 
             return edge
 
