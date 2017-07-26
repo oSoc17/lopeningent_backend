@@ -107,13 +107,13 @@ def generate(request):
         shuffle(routes)
         resp = respond_path(request.POST, routes[0], [routes[0][0]])
         if resp is None:
-            logging.error('static route generator: no route available', exc_info=true)
+            logging.error('static route generator: no route available', exc_info=True)
             return HttpResponseNotFound("No routes found for this parameter set.")
         logging.debug("static route generator: generated route: %s", into_json(resp))
         logging.info("static route generator: sending a response with a route")
         return HttpResponse(into_json(resp))
     except:
-        logging.error('static route generator: failed to generate a static route', exc_info=true)
+        logging.error('static route generator: failed to generate a static route', exc_info=True)
         return HttpResponseNotFound("Something went wrong with your request.")
 
 
@@ -187,13 +187,13 @@ def return_home(request):
         selected_route = path[0:ind] + routes[0][::-1]
         resp = respond_path(request.POST, selected_route, [selected_route[0]])
         if resp is None:
-            logging.error('dynamic route generator: no route available', exc_info=true)
+            logging.error('dynamic route generator: no route available', exc_info=True)
             return HttpResponseNotFound("No routes found for this parameter set.")
         logging.debug("dynamic route generator: generated route: %s", into_json(resp))
         logging.info("dynamic route generator: sending a response with a route")
         return HttpResponse(into_json(resp))
     except:
-        logging.error('dynamic route generator: failed to generate a static route', exc_info=true)
+        logging.error('dynamic route generator: failed to generate a static route', exc_info=True)
         return HttpResponseNotFound("Something went wrong with your request.")
 
 
