@@ -1,4 +1,4 @@
 *.pyc
-target/
 .vscode/
 .idea/
+**/firebase_auth.json

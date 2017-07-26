@@ -212,7 +212,15 @@ class Graph:
         """
         nodelist = [node_fn(node) for node in self.iter_nodes()]
         edgelist = [edge_fn(edge) for edge in self.iter_edges()]
-        return Graph(nodelist, edgelist)
+
+        self.largest = max(node.id for node in nodelist)
+        nodes = [node.into_c() for node in nodelist]
+        edges = [edge.into_c() for edge in edgelist]
+        
+        self.graph = lib.graph_new(
+            ffi.new("Node[]", nodes), len(nodes),
+            ffi.new("Edge[]", edges), len(edges)
+        )
 
     def generate_dijkstra(self, start_node, config):
         class DijkstraIteratorPath(DijkstraIterator):
@@ -225,7 +233,3 @@ class Graph:
                 lib.graph_dijkstra_delete(self.dijkstra)
 
         return DijkstraIteratorPath(self.graph, start_node, config)
-
-    def add_rating(self, start_node, end_node, rating):
-        #lib.graph_update_rating(self.graph, start_node, end_node, rating)
-        pass

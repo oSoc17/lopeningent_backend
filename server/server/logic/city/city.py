@@ -4,16 +4,20 @@ from server.model.node import Node
 from collections import namedtuple
 from server.logic.graph.util import distance
 import server.database as db
+import logging
 
 def load():
+    logging.info("requesting nodes and edges from the database")
     nodelist, edgelist = db.get_graph_data()
+    logging.debug("nodes: %s", nodelist)
+    logging.debug("edges: %s", edgelist)
     return Graph(nodelist, edgelist)
 
 def project(graph, projector):
     """ 
     Creates an enhanced graph with xy coordinates from a graph 
     """
-    return graph.map_graph(Mapper(projector), lambda x: x)
+    graph.map_graph(Mapper(projector), lambda x: x)
 
 
 class Mapper(namedtuple("Mapper", "projector")):

@@ -13,23 +13,17 @@ lat2=51.1100
 
 # This downloads the latest map data from OSM,
 # the result is stored inside the raw_ghent.osm xml file.
-curl -sSf "$url=$lon1,$lat1,$lon2,$lat2" -o $fullpath/raw_ghent.osm
+#curl "$url=$lon1,$lat1,$lon2,$lat2" -o $fullpath/raw_set.osm
 
 # We're filtering out the ways which are suitable for pedestrians.
 # https://wiki.openstreetmap.org/wiki/Pedestrian
-highway_tags="motorway,motorway_link"
+
+# Put your tags under --tag-filter accept-ways
 
 osmosis \
-	--read-xml $fullpath/raw_ghent.osm \
-	--tag-filter accept-ways highway=* \
-	--tag-filter reject-ways highway=$highway_tags \
-	--tag-filter reject-relations \
+	--read-xml $fullpath/raw_set.osm \
+	--tag-filter accept-ways landuse=forest \
+	--tag-filter accept-ways leisure=garden,park \
+    --tag-filter reject-relations \
 	--used-node \
-	--write-xml $fullpath/ghent.osm
-
-# Delete the raw file
-rm -f $fullpath/raw_ghent.osm
-
-# Run the migration script to update the,
-# data inside the postgresql database.
-$fullpath/migrate.py
+	--write-xml $fullpath/set.osm

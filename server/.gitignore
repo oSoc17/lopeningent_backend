@@ -9,9 +9,9 @@ ghent.svg
 test.sh
 server.*html
 manage.html
-target/
 include/
 out.prof
 .idea/
 target/
 *.sqlite3
+*.log
