@@ -207,6 +207,7 @@ def rate_route(request):
     rating -- a float between 0 and 5
     """
     try:
+        logging.info("RATING: received rating call")
         tag = request.POST.get('visited_path')
         new_rating = float(request.POST.get('rating'))
         path = from_string(GRAPH, tag)
@@ -221,6 +222,7 @@ def rate_route(request):
 
             return edge
 
+        logging.info("RATING: mapping ratings to the graph edges")
         GRAPH.map_graph(lambda _: _, update_rating)
         return HttpResponse('')
     except:

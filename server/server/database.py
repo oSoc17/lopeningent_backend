@@ -5,7 +5,7 @@ from model.user import User
 from logic.graph.util import distance
 from time import time
 from multiprocessing import Process
-import threading, re, config
+import threading, re, config, logging
 
 POOL = pool.ThreadedConnectionPool(1, 20, config.DB_CONN)
 
@@ -146,6 +146,7 @@ def update_stats_user(user):
 
 def update_edge_in_db(edge):
     conn = POOL.getconn(key="edge-update")
+    logging.info("update edge rating in db")
     cursor = conn.cursor()
 
     cursor.execute(
