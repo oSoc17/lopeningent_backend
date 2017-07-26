@@ -226,7 +226,7 @@ def rate_route(request):
             return edge
 
         logging.info("RATING: mapping ratings to the graph edges")
-        GRAPH.map_graph(lambda _, e: update_rating)
+        GRAPH.map_graph(update_rating)
         return HttpResponse('')
     except:
         logging.error("RATE: this is the error: %s", e)
