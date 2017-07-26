@@ -129,20 +129,16 @@ def update_stats_user(user):
                            (uid,avg_speed, avg_heartrate, avg_distance,tot_distance,tot_duration,avg_duration,runs,edit_time)
                            SELECT %(uid)s, %(avg_speed)s,%(avg_heartrate)s, %(avg_distance)s, %(tot_distance)s, %(tot_duration)s, %(avg_duration)s, %(runs)s,%(edit_time)s
                            WHERE NOT EXISTS (SELECT 1 FROM lopeningent.users WHERE uid=%(uid)s);
-                           ;""", {'uid': user.uid, 'avg_speed': user.avg_speed, 'avg_heartrate': user.avg_heartrate,
-                                  'avg_distance': user.avg_distance, 'tot_distance': user.tot_distance,
-                                  'tot_duration': user.tot_duration, 'avg_duration': user.avg_duration,
-                                  'runs': user.runs, 'edit_time': user.edit_time})
-        print "status" + str(conn.status)
+                        """, {'uid': user.uid, 'avg_speed': user.avg_speed, 'avg_heartrate': user.avg_heartrate, 'avg_distance': user.avg_distance, 'tot_distance': user.tot_distance, 'tot_duration': user.tot_duration, 'avg_duration': user.avg_duration, 'runs': user.runs, 'edit_time': user.edit_time })
+        logging.debug("STATS DB:" + str(conn.status))
 
         conn.commit()
-        print "inserted/updated users table with id: " + str(user.uid)
-
+        logging.info("inserted/updated users table with id: " + str(user.uid))
         cursor.close()
         POOL.putconn(conn, key="update-stats")
         return True
     except Exception, e:
-        print "something went wrong when updating/inserting stats for id: " + str(user.uid)
+        logging.error("something went wrong when updating/inserting stats for id: " + str(user.uid))
         cursor.close()
         POOL.putconn(conn, key="update-stats")
         return False
