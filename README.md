@@ -30,21 +30,20 @@ You can find our documentation on the [wiki page](https://github.com/oSoc17/lope
 This application was developed by students from the University of Ghent and by students at Open Summer of Code.
 
 **University of Ghent**
-Hendrik Depauw
-Lorenz van Herwaarden
-Nick Aelterman
-Olivier Cammaert
-Maxim Deweirdt
-Gerwin Dox
-Simon Neuville
-Stiaan Uyttersprot
+- Hendrik Depauw
+- Lorenz van Herwaarden
+- Nick Aelterman
+- Olivier Cammaert
+- Maxim Deweirdt
+- Gerwin Dox
+- Simon Neuville
+- Stiaan Uyttersprot
 
 **Open Summer of Code 2017**
-Redouane Arroubai
-Tim Baccaert
-Gregory De Crock
-Krishna Kumar Thirukokaranam Chandrasekar
-
+- Redouane Arroubai
+- Tim Baccaert
+- Gregory De Crock
+- Krishna Kumar Thirukokaranam Chandrasekar
 
 ## MIT License
 This project is released as an open-source project under the [MIT License](https://github.com/oSoc17/lopeningent_backend/blob/develop/LICENSE).
