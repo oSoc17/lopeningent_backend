@@ -19,7 +19,7 @@ The **#LopenInGent project** is an effort to create an *enjoyable, customizable 
 
 ## Installation
 
-You can find installation instructions on the repository's [wiki page](https://github.com/oSoc17/lopeningent_backend/wiki).
+You can find installation instructions on the repository's [wiki page](https://github.com/oSoc17/lopeningent_backend/wiki/Deployment).
 
 ## Documentation
 You can find our documentation on the [wiki page](https://github.com/oSoc17/lopeningent_backend/wiki).
