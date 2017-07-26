@@ -27,9 +27,9 @@ You can find our documentation on the [wiki page](https://github.com/oSoc17/lope
 
 ## Developers
 
-This application was developed by students from the University of Ghent and by students at Open Summer of Code.
+This application was developed by students from Ghent University and by students at Open Summer of Code.
 
-**University of Ghent**
+**Ghent University**
 - Hendrik Depauw
 - Lorenz van Herwaarden
 - Nick Aelterman
