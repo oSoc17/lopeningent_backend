@@ -203,7 +203,7 @@ def rate_route(request):
     Adds the rating to all edges in a route, and saves it both in the structure and in the database.
 
     Query args:
-    rid -- the id for the rated route
+    visited_path -- the route's tag
     rating -- a float between 0 and 5
     """
     try:
@@ -212,12 +212,15 @@ def rate_route(request):
         new_rating = float(request.POST.get('rating'))
         path = from_string(GRAPH, tag)
         edgecoords = [(s, e) for s, e in zip(path, path[1:])]
+        print "rating edgecoords: {}".format(edgecoords)
 
         def update_rating(edge):
             for edge in GRAPH.get_edges():
                 for s, e in edgecoords:
                     if s == edge.id and e == edge.to:
+                        print "edge rating: {}".format(edge._rating)
                         edge._rating = (edge._rating + new_rating) / 2
+                        print "new edge: {}".format(edge)
                         update_edge_in_db(edge)
 
             return edge
@@ -226,4 +229,5 @@ def rate_route(request):
         GRAPH.map_graph(lambda _: _, update_rating)
         return HttpResponse('')
     except:
+        logging.error("RATE: this is the error: %s", e)
         return HttpResponseNotFound("Something went wrong while rating your route.")
