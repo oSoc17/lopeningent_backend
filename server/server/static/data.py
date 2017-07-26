@@ -17,6 +17,8 @@ logging.basicConfig(filename="server.log", level=logging.DEBUG)
 logging.info("loading the graph structure into memory")
 GRAPH = city.load()
 
+DATABASE_EDGES = city.get_edges()
+
 # A projector that maps crossroads on a plane.
 # Type : Projector
 logging.info("setting up the x/y projector")

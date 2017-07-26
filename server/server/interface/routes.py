@@ -1,4 +1,4 @@
-from server.static.data import GRAPH
+from server.static.data import GRAPH, DATABASE_EDGES
 from django.http import HttpResponse, HttpResponseNotFound
 from server.logic.server_util import into_json
 from server.logic.routing import config as routing_config
@@ -54,14 +54,19 @@ def generate(request):
             lat, lon, usertags, badtags, config.min_length, config.max_length, request.POST.get('type'))
 
         def calculate_modifier(edge):
-            if edge._tags < 1:
-                return edge
+            dbe = DATABASE_EDGES[edge.id]
+            edge.modifier += (dbe.rating / 10)
 
-            for tag in edge._tags:
+            for tag in dbe.tags:
                 if tag in usertags:
-                    edge.modifier -= (1 / len(usertags)) + (edge.rating / 5) 
+                    edge.modifier += (1 / (len(usertags) * 2))
                 elif tag in badtags:
-                    edge.modifier += (1 / len(badtags)) + (edge.rating / 5)
+                    new_mod = (1 / (len(badtags) * 2))
+
+                    if new_mod < 0: 
+                        new_mod = 0
+
+                    edge.modifier -= new_mod
 
             return edge
 

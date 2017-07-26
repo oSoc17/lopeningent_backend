@@ -13,6 +13,15 @@ def load():
     logging.debug("edges: %s", edgelist)
     return Graph(nodelist, edgelist)
 
+def get_edges():
+    _, edgelist = db.get_graph_data()
+    edges = dict()
+
+    for edge in edgelist:
+        edges[edge.id] = edge
+
+    return edges
+
 def project(graph, projector):
     """ 
     Creates an enhanced graph with xy coordinates from a graph 
