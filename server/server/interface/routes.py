@@ -214,10 +214,12 @@ def rate_route(request):
         edgecoords = [(s, e) for s, e in zip(path, path[1:])]
         print "rating edgecoords: {}".format(edgecoords)
 
-        def update_rating(_, edge):
+        def update_rating(edge):
+            print "inside update rating"
             for edge in GRAPH.get_edges():
-                for s, e in edgecoords:
-                    if s == edge.id and e == edge.to:
+                print "edge: {}".format(edge)
+                for coord in edgecoords:
+                    if coord[0] == edge.id and coord[1] == edge.to:
                         print "edge rating: {}".format(edge._rating)
                         edge._rating = (edge._rating + new_rating) / 2
                         print "new edge: {}".format(edge)
@@ -226,7 +228,7 @@ def rate_route(request):
             return edge
 
         logging.info("RATING: mapping ratings to the graph edges")
-        GRAPH.map_graph(update_rating)
+        GRAPH.map_graph(lambda _:_, update_rating)
         return HttpResponse('')
     except:
         logging.error("RATE: this is the error: %s", e)
