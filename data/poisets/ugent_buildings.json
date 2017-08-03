@@ -1,6 +1,6 @@
 {
-   "name":"UgentMemorie"
-   "elements":[
+	"name":"ugent buildings",
+	"elements" : [
       {
          "lat":51.043729,
          "lon":3.718888,
@@ -143,6 +143,5 @@
          "name":"Windturbines",
          "description":"http://www.ugentmemorie.be/plaatsen"
       }
-   ],
-   
+   ]
 }
