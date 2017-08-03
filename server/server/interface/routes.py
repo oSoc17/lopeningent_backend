@@ -39,7 +39,7 @@ def generate(request):
 
         if edge_tuple is None:
             # This happens when the requested coordinates are not within the Graph.
-            return HttpResponseNotFound("Can't find a starting point near to your location.")
+            return HttpResponseNotFound("Can't find a starting point near to your location. The app currently works within the region of Gent only.")
         (start, end) = edge_tuple
         config = routing_config.from_dict(
             DEFAULT_ROUTING_CONFIG, request.POST.dict())
@@ -119,7 +119,7 @@ def generate(request):
         return HttpResponse(into_json(resp))
     except:
         logging.error('static route generator: failed to generate a static route', exc_info=True)
-        return HttpResponseNotFound("Something went wrong with your request.")
+        return HttpResponseNotFound("Something went wrong with your request. Kindly try again.")
 
 
 @csrf_exempt
@@ -199,7 +199,7 @@ def return_home(request):
         return HttpResponse(into_json(resp))
     except:
         logging.error('dynamic route generator: failed to generate a static route', exc_info=True)
-        return HttpResponseNotFound("Something went wrong with your request.")
+        return HttpResponseNotFound("Something went wrong with your request. Try again now.")
 
 
 @csrf_exempt
