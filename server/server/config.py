@@ -21,3 +21,6 @@ DEFAULT_ROUTING_CONFIG = {
 }
 
 RETURN_ROUTING_CONFIG = DEFAULT_ROUTING_CONFIG
+
+#  Save the route
+route_poi = set()

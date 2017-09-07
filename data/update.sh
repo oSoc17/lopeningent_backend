@@ -17,7 +17,7 @@ curl -sSf "$url=$lon1,$lat1,$lon2,$lat2" -o $fullpath/raw_ghent.osm
 
 # We're filtering out the ways which are suitable for pedestrians.
 # https://wiki.openstreetmap.org/wiki/Pedestrian
-highway_tags="motorway,motorway_link"
+highway_tags="motorway,motorway_link,trunk,primary,secondary,trunk_link,primary_link"
 
 osmosis \
 	--read-xml $fullpath/raw_ghent.osm \

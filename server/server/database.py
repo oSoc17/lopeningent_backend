@@ -44,6 +44,20 @@ def get_edges(edges):
     cursor.close()
     POOL.putconn(conn, key="edge")
 
+def get_route_poi(node_list):
+    conn = POOL.getconn(key="poi_coords")
+    cursor = conn.cursor()
+    poi_id =list()
+    for node in node_list:
+        cursor.execute("SELECT poi_id FROM lopeningent.nodes WHERE nid = %s;",(str(node),))
+        pid = cursor.fetchone()
+        poi_id.append(pid[0])
+
+    poi_coords = [item for sublist in poi_id for item in sublist]
+
+    cursor.close()
+    POOL.putconn(conn, key="poi_coords")
+    return poi_coords
 
 def get_graph_data():
     start_time = time()
@@ -172,34 +186,36 @@ def update_edge_in_db(edge, new_rating):
     POOL.putconn(conn, key="edge-update")
 
 
-def get_poi_coords(types):
+def get_poi_coords(types,route_poi):
     conn = POOL.getconn(key="get-poi-coords")
     cursor = conn.cursor()
 
     coords = list()
 
+
     for type in types:
         cursor.execute(
             """
-            SELECT name, description, coord 
+            SELECT pid, name, description, coord 
             FROM lopeningent.pois WHERE type = %s
             """,
             (type, )
         )
 
         for row in cursor.fetchall():
-            lat, lon = cast_into_point(row[2])
-            coords.append({
-                "name": row[0],
-                "description": row[1],
-                "lat": lat,
-                "lon": lon,
-                "type": type
-            })
+            if row[0] in route_poi:
+                lat, lon = cast_into_point(row[3])
+                coords.append({
+                    "name": row[1],
+                    "description": row[2],
+                    "lat": lat,
+                    "lon": lon,
+                    "type": type
+                })
     
     return coords
     cursor.close()
-    POOL.putconn(conn, key="get-poi-types")
+    POOL.putconn(conn, key="get-poi-coords")
 
 def get_poi_types():
     conn = POOL.getconn(key="get-poi-types")

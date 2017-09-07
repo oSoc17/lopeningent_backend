@@ -80,7 +80,8 @@ ALTER SEQUENCE edges_eid_seq OWNED BY edges.eid;
 
 CREATE TABLE nodes (
     nid integer NOT NULL,
-    coord point
+    coord point,
+    poi_id integer[]
 );
 
 

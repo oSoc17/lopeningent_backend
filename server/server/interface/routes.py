@@ -5,6 +5,7 @@ from server.logic.routing import config as routing_config
 from server.logic.routing.routing import generate_rod, close_rod
 from server.logic.routing.compress import from_string
 from server.config import DEFAULT_ROUTING_CONFIG
+from server.config import route_poi
 from server.interface.geojson import respond_path
 from server.logic.city.city import path_length
 from server.interface.util import get_edge_tuple
@@ -12,11 +13,10 @@ from server.logic.graph.util import distance
 from server.interface.util import serialize_node
 from random import shuffle
 from django.views.decorators.csrf import csrf_exempt
-from server.database import update_edge_in_db
+from server.database import update_edge_in_db, get_route_poi
 from server.setdebug import NUM_THREADS
 from concurrent.futures import ThreadPoolExecutor as Executor, wait, FIRST_COMPLETED
 import json, logging
-
 
 @csrf_exempt
 def generate(request):
@@ -55,16 +55,16 @@ def generate(request):
 
         def calculate_modifier(edge):
             dbe = DATABASE_EDGES[edge.id]
-            edge.modifier += (dbe.rating / 10)
+	    edge.modifier += (dbe.rating /20)
 
             for tag in dbe.tags:
                 if tag in usertags:
-                    edge.modifier += (1 / (len(usertags) * 2))
+                    edge.modifier += 1* (3 / (len(usertags)*4))
                 elif tag in badtags:
-                    new_mod = (1 / (len(badtags) * 2))
+                    new_mod = (3 / (len(badtags)*4))
 
-                    if new_mod < 0: 
-                        new_mod = 0
+                    if edge.modifier - new_mod < 0: 
+                        edge.modifier = 0
 
                     edge.modifier -= new_mod
 
@@ -109,8 +109,30 @@ def generate(request):
 
         # Choose a random route from all possible routes.
         logging.info("static route generator: choosing a random route out of all posibilities")
-        shuffle(routes)
-        resp = respond_path(request.POST, routes[0], [routes[0][0]])
+        #shuffle(routes)
+      	#route_nodes = set()
+      	final_routes = sorted(routes, key=lambda x: x[:][2], reverse = True)
+      	#final_routes = routes
+      	
+      	# Route Evaluation -- Elimination of repeating edges
+      	route_nodes = final_routes[0][0]
+      	for i in xrange(20,len(route_nodes)):
+      		for j in xrange(i+1, len(route_nodes)):
+      			if ((route_nodes[i] ==route_nodes[j]) and (j-i) < 40):
+      				del route_nodes[i:j]
+      				break
+              
+          
+        resp = respond_path(request.POST, route_nodes, [route_nodes[0]])
+        route_poi = get_route_poi(route_nodes)
+        open('server/poi_coord_route.py', 'w').close()
+        f=open ('server/poi_coord_route.py', 'w')
+        for poi in route_poi:
+          f.write(str(poi))
+          f.write('\n')
+        f.close()
+        
+
         if resp is None:
             logging.error('static route generator: no route available', exc_info=True)
             return HttpResponseNotFound("No routes found for this parameter set.")
@@ -178,18 +200,28 @@ def return_home(request):
         config = routing_config.from_dict(DEFAULT_ROUTING_CONFIG, d)
 
         # Generate new random rod from starting position
-        nodes = generate(GRAPH, path[0], config)
+        nodes = generate_rod(GRAPH, path[0], config)
         # Create new rod that will be used for the poisoning (starting from current position and contains starting pos)
         pois_path.extend(nodes)
         # Close the rod on the starting position
         routes = close_rod(GRAPH, end, pois_path, config, nodes)
         # Will result in the shortest route returned
         if dist_arg == 0:
-            routes = sorted(routes, key=len)
+            final_routes = sorted(routes, key=len)
         else:
-            shuffle(routes)
+            final_routes = sorted(routes, key=lambda x: x[:][2], reverse = True)
         # Return the new route, i.e. the completed part + new part
-        selected_route = path[0:ind] + routes[0][::-1]
+      	route_nodes = final_routes[0][0]
+      	# Route pruning
+      	for i in xrange(20,len(route_nodes)):
+          for j in xrange(i+1, len(route_nodes)):
+      			if ((route_nodes[i] ==route_nodes[j]) and (j-i) < 25 ):
+              			del route_nodes[i:j]
+      				break
+	      
+        selected_route = path[0:ind] + route_nodes[0][::-1]
+        
+        route_poi = get_route_poi(selected_route)
         resp = respond_path(request.POST, selected_route, [selected_route[0]])
         if resp is None:
             logging.error('dynamic route generator: no route available', exc_info=True)
