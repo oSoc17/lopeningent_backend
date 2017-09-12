@@ -44,13 +44,13 @@ def generate(request):
         config = routing_config.from_dict(
             DEFAULT_ROUTING_CONFIG, request.POST.dict())
 
-        logging.debug("""static route generator: parameters: 
+        logging.debug("""static route generator: parameters:
             lat/lon(%s, %s),
             ptags(%s),
             ntags(%s)
-            minlen(%s), 
-            maxlen(%s), 
-            type(%s")""", 
+            minlen(%s),
+            maxlen(%s),
+            type(%s")""",
             lat, lon, usertags, badtags, config.min_length, config.max_length, request.POST.get('type'))
 
         def calculate_modifier(edge):
@@ -63,7 +63,7 @@ def generate(request):
                 elif tag in badtags:
                     new_mod = (1 / (len(badtags) * 2))
 
-                    if new_mod < 0: 
+                    if new_mod < 0:
                         new_mod = 0
 
                     edge.modifier -= new_mod
@@ -154,8 +154,8 @@ def return_home(request):
             tag (%s),
             path (%s),
             lat/lon(%s, %s),
-            distance(%s), 
-            """, 
+            distance(%s),
+            """,
             tag, path, lat, lon, distance)
 
         # Get index of current location and close rod to return

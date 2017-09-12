@@ -1,0 +1,11 @@
+[package]
+name = "database_derive"
+version = "0.1.0"
+authors = ["gedox <gerwin.dox@ugent.be>"]
+
+[dependencies]
+syn = "*"
+quote = "*"
+
+[lib]
+proc-macro = true

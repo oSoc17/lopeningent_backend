@@ -1,0 +1,8 @@
+[package]
+name = "logic"
+version = "0.1.0"
+authors = ["gedox <gerwin.dox@ugent.be>"]
+
+[dependencies]
+graph = {path = "../graph"}
+database = {path = "../database"}

@@ -10,6 +10,9 @@ use std::cell::Ref;
 use graph::graph::Element;
 use vec_map::Keys;
 
+use graph::graph::NodeID;
+use graph::graph::EdgeID;
+
 macro_rules! iter_impl {
     (
         $name:ident < $($typaram:ident),* >,
@@ -56,7 +59,7 @@ impl<'a> Root<'a> {
 }
 
 impl<'a, E : 'a> Iterator for ConnIdVal<'a, E> {
-    type Item = (usize, &'a E);
+    type Item = (EdgeID, &'a E);
     fn next(&mut self) -> Option<(usize, &'a E)> {
         self.element.next().map(|(&n, e)| (n, e))
     }
@@ -70,14 +73,14 @@ impl<'a, E : 'a> Iterator for IterEdges<'a, E> {
 }
 
 impl<'a, E : 'a> Iterator for IterConnIds<'a, E> {
-    type Item = usize;
+    type Item = EdgeID;
     fn next(&mut self) -> Option<usize> {
         self.element.next().map(|x| x.0)
     }
 }
 
 impl<'a, V : 'a, E : 'a> Iterator for ListIds<'a, V, E> {
-    type Item = usize;
+    type Item = NodeID;
     fn next(&mut self) -> Option<usize> {
         self.element.next()
     }

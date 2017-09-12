@@ -1,161 +1,150 @@
-//! Main class for performing Dijkstra's algorithm.
-//!
-//! The idea of this class is to process a graph and yield all its elements in
-//! order of distance.
-//!
-//! # Examples
-//! ```
-//! use graph::Graph;
-//! //The actual way to create such an iterator is through the 'GraphTrait' trait;
-//! use graph::GraphTrait;
-//! let graph = Graph::new(
-//!             vec![(0, "A"), (5, "B")],
-//!             vec![(0, "Edge from A to B", 5)]
-//!     ).expect("This does not happen");
-//!
-//! let mut iter = graph.gen_limited_dijkstra_vec(&vec![0], |edge| edge.len(), |_, _| true);
-//!
-//! // Node 0 is at distance 0 (obviously)
-//! assert_eq!(iter.next(), Some((0, 0)));
-//! // Node 5 is at distance "Edge from A to B".len() = 16
-//! assert_eq!(iter.next(), Some((5, 16)));
-//! ```
-//!
-//! Additionally the route to the source can be queried using the "Visited" field:
-//!
-//! ```
-//! # use graph::Graph;
-//! # use graph::GraphTrait;
-//! # let graph = Graph::new(
-//! #             vec![(0, "A"), (5, "B"), (3, "C")],
-//! #             vec![(0, "Edge from A to B", 5)]
-//! #     ).expect("This does not happen");
-//!
-//! # let mut iter = graph.gen_limited_dijkstra_vec(&vec![0], |edge| edge.len(), |_, _| true);
-//! # iter.next();
-//! # iter.next();
-//! // Lock the structure on the stack
-//! let visited = iter.visited();
-//! // Borrow the structure
-//! let visited = visited.borrow();
-//!
-//! // The node 5 is visited via 0, so the shortest path from 0 to 5 is through 0.
-//! assert_eq!(visited.get(&5), Some(&Some(0)));
-//! // 0 is the origin, so it has no previous node.
-//! assert_eq!(visited.get(&0), Some(&None));
-//! // 3 is not visited.
-//! assert_eq!(visited.get(&3), None);
-//! ```
-
 
 use std::collections::BinaryHeap;
 use std::rc::Rc;
 use std::cell::RefCell;
 use std::collections::HashMap;
+use std::collections::HashSet;
 use std::ops::Add;
 
-use num::Zero;
+use vec_map::VecMap;
 
+use graph::Graph;
 use graph::HeapData;
-use graph::graphtrait::GraphTrait;
+use graph::Majorising;
+use graph::NodeID;
 
-/// Shared linked hashmap for a path.
-///
-/// This type is a representation of a shared linked hashmap: The hashmap contains links:
-///
-/// `Visited == ID -> Option<ID>`
-///
-/// Consider, for example, the hashmap with the contents:
-/// ```text
-///     0 -> None,
-///     1 -> Some(0),
-///     2 -> Some(0),
-///     3 -> Some(1),
-///     4 -> Some(1),
-/// ```
-/// The following paths can be found in this map:
-/// ```text
-///     [0]
-///     [1, 0]
-///     [2, 0]
-///     [3, 1, 0]
-///     [4, 1, 0]
-/// ```
-
-pub type Visited = Rc<RefCell<HashMap<usize, Option<usize>>>>;
-
-/// Iterator for generating all edges and nodes in a graph, in a Dijkstra's fashion.
-///
-/// See [the module level documentation](index.html) for an example.
-pub struct DijkstraGenerator<'a, V : 'a, E : 'a, O, MF, FF, G>
-    where O : Eq + Ord + Zero,
-          for<'p, 'q> &'p O : Add<&'q O, Output = O>,
-          MF : Fn(&E) -> O,
-          FF : Fn(usize, &O) -> bool,
-           G : GraphTrait<V=V, E=E> + 'a
-{
-    graph : &'a G,
-    heap : BinaryHeap<HeapData<O>>,
-    visited : Visited,
-    mf : MF,
-    ff : FF,
+#[derive(Debug)]
+pub struct SingleAction<M : Majorising> {
+    pub previous_index : usize,
+    pub major : M,
+    pub node_handle : NodeID,
+    pub disabled : bool,
 }
 
-impl<'a, V : 'a, E : 'a, O, MF, FF, G>
-    DijkstraGenerator<'a, V, E, O, MF, FF, G>
-    where O : Eq + Ord + Zero,
-          for<'p, 'q> &'p O : Add<&'q O, Output = O>,
-          MF : Fn(&E) -> O,
-          FF : Fn(usize, &O) -> bool,
-           G : GraphTrait<V=V, E=E> + 'a
+impl<M : Majorising> SingleAction<M> {
+    pub fn new(previous_index : usize, node_handle : NodeID, major : M) -> SingleAction<M> {
+        SingleAction {
+            previous_index : previous_index,
+            node_handle : node_handle,
+            major : major,
+            disabled : false,
+        }
+    }
+}
+
+
+
+pub trait DijkstraControl {
+    type V;
+    type E;
+    type M : Majorising;
+    fn add_edge(&self, m : &Self::M, e : &Self::E) -> Self::M;
+    fn filter(&self, m : &Self::M) -> bool {
+        true
+    }
+    fn hint(&self, m : &Self::M) -> u64;
+    fn is_ending(&self, v : &Self::V, m : &Self::M) -> bool {
+        false
+    }
+    fn yield_on_empty(&self) -> bool {
+        false
+    }
+}
+
+pub struct DijkstraBuilder<C : DijkstraControl> {
+    start_node : NodeID,
+    start_value : C::M,
+}
+
+use std::fmt::Debug;
+impl<C : DijkstraControl> DijkstraBuilder<C>
+where C::M : Debug, C::V : Debug, C::E : Debug
 {
-    /// Create a new iterator
-    pub fn new(graph : &'a G, heap : BinaryHeap<HeapData<O>>, visited : Visited, mf : MF, ff : FF) -> Self {
-        DijkstraGenerator {
-            graph : graph,
-            heap : heap,
-            visited : visited,
-            mf : mf,
-            ff : ff,
+    pub fn new(start_node : NodeID, start_value : C::M) -> DijkstraBuilder<C> {
+        DijkstraBuilder {
+            start_node : start_node,
+            start_value : start_value,
         }
     }
 
-    /// Return a linked hashmap containing the shortest paths.
-    pub fn visited(&self) -> Visited {
-        self.visited.clone()
-    }
-}
-
-
-impl<'a, V : 'a, E : 'a, O, MF, FF, G> Iterator for DijkstraGenerator<'a, V, E, O, MF, FF, G>
-    where O : Eq + Ord + Zero,
-          for<'p, 'q> &'p O : Add<&'q O, Output = O>,
-          MF : Fn(&E) -> O,
-          FF : Fn(usize, &O) -> bool,
-           G : GraphTrait<V=V, E=E> + 'a
-{
-    type Item = (usize, O);
-    fn next(&mut self) -> Option<Self::Item> {
-        let mut visited = self.visited.borrow_mut();
-        loop {
-            match self.heap.pop() {
-                None => return None,
-                Some(hdata) => {
-                    if let Some(_) = visited.get(&hdata.node)
-                        {continue;}
-                    visited.insert(hdata.node, hdata.from);
-                    if let Some(connidvaliter) = self.graph.get_conn_idval(hdata.node) {
-                        for (next_id, edge) in connidvaliter {
-                            let next_length = (self.mf)(edge);
-                            let next_hdata = hdata.update(&next_length, next_id);
-                            if (self.ff)(next_hdata.node, &next_hdata.val) {
-                                self.heap.push(next_hdata);
-                            }
+    pub fn generate_dijkstra(self, graph : &Graph<C::V, C::E>, control : &C)
+         -> (Vec<SingleAction<C::M>>, Vec<usize>)
+    {
+        let mut progress : VecMap<Vec<usize>> = VecMap::new();
+        progress.insert(0, vec![0]);
+        let mut heap = BinaryHeap::new();
+        let mut res_chain : Vec<SingleAction<C::M>>= Vec::new();
+        let mut res_endpoints : Vec<usize> = Vec::new();
+        heap.push(HeapData::new(0, self.start_node, &self.start_value, control));
+        res_chain.push(SingleAction::new(0, self.start_node, self.start_value));
+        while let Some(data) = heap.pop() {
+            if res_chain[data.index].disabled {
+                continue;
+            }
+            if let Some(iter) = graph.get_conn_idval(data.node) {
+                for (next_node, next_edge) in iter {
+                    let next_major = control.add_edge(&res_chain[data.index].major, &next_edge);
+                    if ! control.filter(&next_major) {
+                        continue;
+                    }
+                    let mut h_vec = progress.entry(next_node).or_insert_with(Vec::new);
+                    println!("Inserting {:?} into {:?}... (from {} to {}) ", next_major, h_vec.iter().map(|&c| &res_chain[c].major).collect::<Vec<_>>(), data.node , next_node);
+                    for &e in h_vec.iter() {
+                        if res_chain[e].major.majorises_strict(&next_major) {
+                            res_chain[e].disabled = true;
                         }
                     }
-                    return Some((hdata.node, hdata.val))
+                    h_vec.retain(|&e| ! res_chain[e].disabled);
+                    if h_vec.iter().filter(|&&e| next_major.majorises(&res_chain[e].major)).next() == None {
+                        //print!("Replacement. ");
+                        let index = res_chain.len();
+                        heap.push(HeapData::new(index, next_node, &next_major, control));
+                        h_vec.push(index);
+                        res_chain.push(SingleAction::new(data.index, next_node, next_major) )
+                    }
+                    //println!("Got {:?}", h_vec.iter().map(|&c| &res_chain[c].major).collect::<Vec<_>>());
                 }
             }
         }
+        for &index in progress.iter().flat_map(|(n, v)| v.iter()) {
+            let action : &SingleAction<C::M> = &res_chain[index];
+            if control.is_ending(graph.get(action.node_handle).unwrap(), &action.major) {
+                res_endpoints.push(index);
+            }
+        }
+        // TODO yield_on_empty
+        if control.yield_on_empty() {
+            for index in 0..res_chain.len() {
+                if ! res_chain[index].disabled {
+                    let previous_index = res_chain[index].previous_index;
+                    res_chain[previous_index].disabled = true;
+                }
+            }
+            for index in 0..res_chain.len() {
+                if ! res_chain[index].disabled {
+                    res_endpoints.push(index)
+                }
+            }
+        }
+        (res_chain, res_endpoints)
     }
+}
+
+use graph::Path;
+
+pub fn into_nodes<M : Majorising>(res_chain : &Vec<SingleAction<M>>, start : usize) -> Path {
+    let mut res = Vec::new();
+    let mut index = start;
+    loop {
+
+        res.push(res_chain[index].node_handle);
+        if index != res_chain[index].previous_index {
+            index = res_chain[index].previous_index;
+        }
+        else {
+            break;
+        }
+    }
+    res.reverse();
+    return Path::new(res);
 }

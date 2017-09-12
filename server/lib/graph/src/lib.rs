@@ -4,9 +4,8 @@
 
 extern crate num;
 extern crate libc;
-extern crate newtypes;
+
 extern crate rand;
-extern crate util;
 extern crate vec_map;
 
 mod graph;

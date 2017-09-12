@@ -36,7 +36,6 @@ pub enum Error {
     ///
     /// ```
     /// # use graph::Graph;
-    /// # use graph::GraphTrait;
     /// # let graph = Graph::new(
     /// #             vec![(0, "A"), (5, "B")],
     /// #             vec![(0, "Edge from A to _", 2)]

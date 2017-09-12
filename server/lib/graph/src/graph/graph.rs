@@ -8,9 +8,10 @@ use std::collections::BTreeMap;
 use error::Error;
 
 use graph::iter;
-
-use graph::graphtrait::GraphTrait;
 use vec_map::VecMap;
+
+pub type NodeID = usize;
+pub type EdgeID = usize;
 
 /// Element in a graph
 #[derive(Debug)]
@@ -73,8 +74,51 @@ impl<'a, V : 'a, E : 'a> Graph<V, E> {
     /// assert_eq!(graph.contains(0), true); // The vertex with index 0 has data "A".
     /// assert_eq!(graph.contains(2), false);
     /// ```
-    pub fn contains(&self, index : usize) -> bool {
+    pub fn contains(&self, index : NodeID) -> bool {
         self.data.contains_key(index)
+    }
+
+    /// Retrieve a single node given the index.
+    ///
+    /// # Examples
+    /// ```
+    /// use graph::Graph;
+    /// let graph = Graph::new(
+    ///             vec![(0, "A"), (5, "B")],
+    ///             vec![(0, "Edge from A to B", 5)]
+    ///     ).expect("This does not happen");
+    ///
+    /// assert_eq!(graph.get(0), Some(&"A"));
+    /// assert_eq!(graph.get(1), None);
+    /// ```
+    pub fn get(&self, index : NodeID) -> Option<&V> {
+        return self.data.get(index).map(|e| &e.v)
+    }
+
+    /// Retrieve all connections to a node
+    ///
+    /// This function returns an iterator, iterating over all edges that are connected
+    /// to this node, in a (node\_id, edge\_data) fashion.
+    ///
+    /// No guarantees need to be made about the order in which the nodes or edges appear.
+    ///
+    /// # Examples
+    /// ```
+    /// use graph::Graph;
+    /// let graph = Graph::new(
+    ///             vec![(0, "A"), (5, "B")],
+    ///             vec![(0, "Edge from A to B", 5)]
+    ///     ).expect("This does not happen");
+    ///
+    /// let mut connections = graph.get_conn_idval(0).expect("This does not happen");
+    ///
+    /// assert_eq!(connections.next(), Some((5, &"Edge from A to B")));
+    /// assert_eq!(connections.next(), None);
+    /// ```
+    pub fn get_conn_idval<'b>(&'b self, index : NodeID) -> Option<iter::ConnIdVal<'b, E>> {
+        self.data.get(index)
+            .map(|e| e.links.iter())
+            .map(iter::ConnIdVal::new)
     }
 
 
@@ -92,7 +136,7 @@ impl<'a, V : 'a, E : 'a> Graph<V, E> {
     /// assert_eq!(edges.next(), Some(&"Edge from A to B"));
     /// assert_eq!(edges.next(), None);
     /// ```
-    pub fn get_edges(&'a self, index : usize) -> Option<iter::IterEdges<'a, E>> {
+    pub fn get_edges(&'a self, index : NodeID) -> Option<iter::IterEdges<'a, E>> {
         self.get_conn_idval(index).map(iter::IterEdges::new)
     }
 
@@ -110,7 +154,7 @@ impl<'a, V : 'a, E : 'a> Graph<V, E> {
     /// assert_eq!(edges.next(), Some(5));
     /// assert_eq!(edges.next(), None);
     /// ```
-    pub fn get_connids(&'a self, index : usize) -> Option<iter::IterConnIds<'a, E>> {
+    pub fn get_connids(&'a self, index : NodeID) -> Option<iter::IterConnIds<'a, E>> {
         self.get_conn_idval(index).map(iter::IterConnIds::new)
     }
 
@@ -152,21 +196,20 @@ impl<'a, V : 'a, E : 'a> Graph<V, E> {
     /// assert_eq!(edges.next(), Some(&"Hello"));
     /// assert_eq!(edges.next(), None);
     /// ```
-    pub fn get_edge_mut(&'a mut self, from : usize, to : usize) -> Option<&'a mut E> {
+    pub fn get_edge_mut(&'a mut self, from : NodeID, to : NodeID) -> Option<&'a mut E> {
         self.data.get_mut(from).and_then(|el| el.links.get_mut(&to))
+    }
+
+    pub fn get_edge(&'a self, from : NodeID, to : NodeID) -> Option<&'a E> {
+        self.data.get(from).and_then(|el| el.links.get(&to))
     }
 }
 
-impl<'a, V : 'a, E : 'a> GraphTrait for Graph<V, E> {
-    type V = V;
-    type E = E;
-    fn get(&self, index : usize) -> Option<&V> {
-        return self.data.get(index).map(|e| &e.v)
+use std::fmt::Debug;
+impl<V : Debug, E : Debug> Graph<V, E> {
+    pub fn debug(&self) {
+        for id in self.list_ids() {
+            println!("{:?} -> {:?}", self.get(id).unwrap(), self.get_conn_idval(id).unwrap().map(|(id, val)| (val, self.get(id).unwrap())).collect::<Vec<_>>());
+        }
     }
-    fn get_conn_idval<'b>(&'b self, index : usize) -> Option<iter::ConnIdVal<'b, E>> {
-        self.data.get(index)
-            .map(|e| e.links.iter())
-            .map(iter::ConnIdVal::new)
-    }
-
 }

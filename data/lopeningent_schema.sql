@@ -80,7 +80,8 @@ ALTER SEQUENCE edges_eid_seq OWNED BY edges.eid;
 
 CREATE TABLE nodes (
     nid integer NOT NULL,
-    coord point
+    lon double precision,
+    lat double precision
 );
 
 
@@ -119,8 +120,9 @@ CREATE TABLE pois (
     pid integer NOT NULL,
     name character varying(128),
     description text,
-    coord point,
-    type character varying(128)
+    lon double precision,
+    lat double precision,
+    tag character varying(128)
 );
 
 
@@ -253,4 +255,3 @@ ALTER TABLE ONLY edges
 --
 -- PostgreSQL database dump complete
 --
-

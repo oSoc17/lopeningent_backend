@@ -13,6 +13,16 @@ newtypes = {path = "lib/newtypes"}
 graph = {path = "lib/graph"}
 interface = {path = "lib/interface"}
 util = {path = "lib/util"}
+diesel = { version = "*", features = ["postgres"] }
+diesel_codegen = { version = "*", features = ["postgres"] }
+serde = "*"
+serde_derive = "*"
+serde_json = "*"
+iron = "*"
+static = "*"
+mount = "*"
+bit_set = "*"
+
 
 [build-dependencies]
 rusty-cheddar = "0.3.3"

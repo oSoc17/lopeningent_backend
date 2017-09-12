@@ -45,7 +45,7 @@ class Edge:
 
 def load_osm(osm_file):
     """
-    loads all edges and nodes from the .osm (XML) file 
+    loads all edges and nodes from the .osm (XML) file
     and wraps them into objects.
 
     :param osm_file: filename of the .osm file containing the map data.
@@ -79,8 +79,8 @@ def load_osm(osm_file):
 
 def load_pois(poi_dir):
     """
-    Converts each poi_set in the poi_sets/ directory 
-    into a list of dictionaries containing 
+    Converts each poi_set in the poi_sets/ directory
+    into a list of dictionaries containing
     the latitudes and longtitudes of each point.
 
     :param poi_dir: directory name containing poi files in JSON. (string)
@@ -95,7 +95,7 @@ def load_pois(poi_dir):
 
     # helper function to extract coords out of an element
     def extract_relevant(element):
-        name = "" if "name" not in element else element["name"]    
+        name = "" if "name" not in element else element["name"]
         descr = "" if "description" not in element else element["description"]
 
         return {
@@ -127,11 +127,11 @@ def update_edge_nodes(edges, nodes, osm_nid_dict):
 
 def map_pois(edges, pois):
     """
-    An R-tree is a datastructure which allows us to 
-    quickly find the intersection between 
+    An R-tree is a datastructure which allows us to
+    quickly find the intersection between
     two polygons on a spatial plane. In this case
-    we're trying to find all of the edges 
-    that intersect with POIs. After that, 
+    we're trying to find all of the edges
+    that intersect with POIs. After that,
     we update the edges with this info.
 
     https://en.wikipedia.org/wiki/R-tree
@@ -185,7 +185,7 @@ def db_truncate(connection):
     cursor = connection.cursor()
     cursor.execute(
         """
-        TRUNCATE lopeningent.edges, lopeningent.nodes, lopeningent.pois 
+        TRUNCATE lopeningent.edges, lopeningent.nodes, lopeningent.pois
             RESTART IDENTITY CASCADE
         """
     )
@@ -197,15 +197,15 @@ def db_write_nodes(connection, nodes):
     osm_nid_dict = dict()
 
     def convert_node(node):
-        return "({}, {})".format(node[0], node[1])
+        return ("{}".format(node[0]), "{}".format(node[1]))
 
     for osm_id, node in nodes.iteritems():
         cursor.execute(
             """
-            INSERT INTO lopeningent.nodes (coord) 
-                VALUES (%s) RETURNING nid
+            INSERT INTO lopeningent.nodes (lat, lon)
+                VALUES (%s, %s) RETURNING nid
             """
-            , (convert_node(node), )
+            , convert_node(node)
         )
         osm_nid_dict[osm_id] = cursor.fetchone()[0]
 
@@ -245,17 +245,18 @@ def db_write_pois(connection, pois):
     cursor = connection.cursor()
 
     def convert_poi_coord(poi):
-        return "({}, {})".format(poi["coord"][0], poi["coord"][1])
+        return ("{}".format(poi["coord"][0]), "{}".format(poi["coord"][1]))
 
     for pset in pois:
         for poi in pset["elements"]:
+            coords = convert_poi_coord(poi);
             cursor.execute(
                 """
-                INSERT INTO lopeningent.pois (name, description, coord, type)
-                    VALUES(%s, %s, %s, %s)
+                INSERT INTO lopeningent.pois (name, description, lat, lon, tag)
+                    VALUES(%s, %s, %s, %s, %s)
                 """
-                , (poi["name"], poi["description"], 
-                    convert_poi_coord(poi), pset["name"])
+                , (poi["name"], poi["description"],
+                    coords[0], coords[1], pset["name"])
             )
 
     cursor.close()

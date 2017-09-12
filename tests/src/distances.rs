@@ -10,7 +10,7 @@ use parse_link;
 use serde_json;
 use std::time;
 use std::io;
-use std::io::Write;
+use std::io::{Read, Write};
 
 /**
     Some serialisation boilerplate.
@@ -54,8 +54,8 @@ pub fn distances() -> Result<(), Error>{
     let host = get_host_port()?;
     let (lat, lon) = get_lat_lon()?;
     for (min, max) in (5..51).map(|n| n as usize as f64).map(|f| (0.9*f, f)) {
-        let url = format!("{}/route/generate?min_length={:0.1}&max_length={:0.1}&lat={}&lon={}&type=geojson", host, min, max, lat, lon);
-        let res = get(&url)?;
+        let url = format!("min_length={:0.1}&max_length={:0.1}&lat={}&lon={}&type=geojson", min, max, lat, lon);
+        let res = get(&host, &url)?;
         if res > max || res < min {
             Err(format!("Length of {} found, which is not between {} and {}.", res, min, max))?;
         }
@@ -70,21 +70,26 @@ pub fn length(linestring : &LineString<f64>) -> f64 {
     ).fold(0.0, |a, b| a + b)
 }
 
-fn get<'a>(link : &'a str) -> Result<f64, Error> {
+fn get<'a>(link : &'a str, data : &'a str) -> Result<f64, Error> {
+    print!("Loading..... {}", data);
+    let mut data = data.as_bytes();
     let now = time::Instant::now();
     let mut easy = Easy::new();
-    print!("Loading..... {}", parse_link(link));
     io::stdout().flush();
-    easy.url(link)?;
+    easy.url(&format!("{}/route/generate/", link))?;
+    easy.post(true)?;
+    easy.post_field_size(data.len() as u64)?;
     let (sx, rx) = channel();
-    easy.write_function(move |data|
+    let mut transfer = easy.transfer();
+    transfer.write_function(move |data|
         {
             data.iter().map(|&b| sx.send(b)).collect::<Result<Vec<()>, _>>().unwrap();
             Ok(data.len())
         })?;
-    easy.perform()?;
+    transfer.read_function(|buf| Ok(data.read(buf).unwrap_or(0)))?;
+    transfer.perform()?;
     use std::mem;
-    mem::drop(easy);
+    mem::drop(transfer);
     let dur = (time::Instant::now() - now);
     println!("\rTook {:7.04}", dur.as_secs() as f64 + dur.subsec_nanos() as f64 /1e9);
     let buf : Vec<_> = rx.into_iter().collect();
