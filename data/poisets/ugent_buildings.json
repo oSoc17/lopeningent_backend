@@ -1,0 +1,147 @@
+{
+	"name":"ugent buildings",
+	"elements" : [
+      {
+         "lat":51.043729,
+         "lon":3.718888,
+         "name":"Anatomisch instituut",
+         "description":"http://www.ugentmemorie.be/plaatsen"
+      },
+      {
+         "lat":51.052098,
+         "lon":3.723521,
+         "name":"Aula Academica",
+         "description":"http://www.ugentmemorie.be/plaatsen"
+      },
+      {
+         "lat":51.044620,
+         "lon":3.719183,
+         "name":"Bijloke",
+         "description":"http://www.ugentmemorie.be/plaatsen"
+      },
+      {
+         "lat":51.044362,
+         "lon":3.725500,
+         "name":"Blandijn",
+         "description":"http://www.ugentmemorie.be/plaatsen"
+      },
+      {
+         "lat":51.045173,
+         "lon":3.725922,
+         "name":"Boekentoren",
+         "description":"http://www.ugentmemorie.be/plaatsen"
+      },
+      {
+         "lat":51.053422,
+         "lon":3.708347,
+         "name":"Boerenkot",
+         "description":"http://www.ugentmemorie.be/plaatsen"
+      },{
+         "lat":51.051298,
+         "lon":3.722739,
+         "name":"Burgerhuizen Korte Meer",
+         "description":"http://www.ugentmemorie.be/plaatsen"
+      },
+      {
+         "lat":51.045748,
+         "lon":3.727005,
+         "name":"De Brug",
+         "description":"http://www.ugentmemorie.be/plaatsen"
+      },
+      {
+         "lat":51.049811,
+         "lon":3.710951,
+         "name":"De Coupure",
+         "description":"http://www.ugentmemorie.be/plaatsen"
+      },
+      {
+         "lat":51.024255,
+         "lon":3.710659,
+         "name":"De Sterre",
+         "description":"http://www.ugentmemorie.be/plaatsen"
+      },
+      {
+         "lat":51.044706,
+         "lon":3.728006,
+         "name":"De Therminal",
+         "description":"http://www.ugentmemorie.be/plaatsen"
+      },
+      {
+         "lat":51.052335,
+         "lon":3.724180,
+         "name":"Emile Braunschool",
+         "description":"http://www.ugentmemorie.be/plaatsen"
+      },
+      {
+         "lat":51.053122,
+         "lon":3.719900,
+         "name":"Het Pand",
+         "description":"http://www.ugentmemorie.be/plaatsen"
+      },
+      {
+         "lat":51.039615,
+         "lon":3.728714,
+         "name":"Home Heymans",
+         "description":"http://www.ugentmemorie.be/plaatsen"
+      },
+      {
+         "lat":51.040115,
+         "lon":3.725615,
+         "name":"Overpoortstraat",
+         "description":"http://www.ugentmemorie.be/plaatsen"
+      },
+      {
+         "lat":51.036432,
+         "lon":3.722541,
+         "name":"Plantentuin",
+         "description":"http://www.ugentmemorie.be/plaatsen"
+      },
+      {
+         "lat":51.045698,
+         "lon":3.724789,
+         "name":"Plateaugebouw",
+         "description":"http://www.ugentmemorie.be/plaatsen"
+      },
+      {
+         "lat":50.983643,
+         "lon":3.797323,
+         "name":"Proefbos Aelmoeseneie",
+         "description":"http://www.ugentmemorie.be/plaatsen"
+      },{
+         "lat":51.047469,
+         "lon":3.728185,
+         "name":"Rectoraat",
+         "description":"http://www.ugentmemorie.be/plaatsen"
+      },
+      {
+         "lat":51.045690,
+         "lon":3.718908,
+         "name":"Rommelaerecomplex",
+         "description":"http://www.ugentmemorie.be/plaatsen"
+      },
+      {
+         "lat":51.046388,
+         "lon":3.727851,
+         "name":"Technicum",
+         "description":"http://www.ugentmemorie.be/plaatsen"
+      },
+      {
+         "lat":51.044148,
+         "lon":3.725201,
+         "name":"Trappen van de Blandijn",
+         "description":"http://www.ugentmemorie.be/plaatsen"
+      },
+      {
+         "lat":51.048251,
+         "lon":3.702723,
+         "name":"Watersportbaan en GUSB",
+         "description":"http://www.ugentmemorie.be/plaatsen"
+      },
+      {
+         "lat":50.985630,
+         "lon":3.812472,
+         "name":"Windturbines",
+         "description":"http://www.ugentmemorie.be/plaatsen"
+      }
+   ]
+}
