@@ -16,13 +16,13 @@ pub fn query(input: TokenStream) -> TokenStream {
     let ast = syn::parse_derive_input(&s).unwrap();
 
     // Build the impl
-    let gen = impl_hello_world(&ast);
+    let gen = impl_query(&ast);
 
     // Return the generated impl
     gen.parse().unwrap()
 }
 
-fn impl_hello_world(ast: &syn::DeriveInput) -> quote::Tokens {
+fn impl_query(ast: &syn::DeriveInput) -> quote::Tokens {
     let name = &ast.ident;
 
     // get a list of all fields in this struct.
@@ -52,8 +52,13 @@ fn impl_hello_world(ast: &syn::DeriveInput) -> quote::Tokens {
 
     // create a bunch of field initialisers for the constructor.
     let fields = field_vec.iter()
-        .filter_map(|field| field.ident.as_ref()).enumerate()
-        .map(|(n, ident)| quote! { #ident: row.get(#n) })
+        .filter_map(|field| {
+            match field.ident.as_ref() {
+                Some(x) => {println!("{:?}", field.ty); Some((&field.ty, x))},
+                None => None
+            }
+        }).enumerate()
+        .map(|(n, (ty, ident))| quote! { #ident: <#ty>::convert(row.get(#n)) })
         .collect::<Vec<_>>();
 
     // output

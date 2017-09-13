@@ -113,3 +113,18 @@ impl fmt::Display for Km {
         fmt.write_str(" Km")
     }
 }
+
+pub struct Location {
+    pub lon : f64,
+    pub lat : f64
+}
+
+impl Location {
+    fn new(lon : f64, lat : f64) -> Location {
+        Location{lon:lon,lat:lat}
+    }
+}
+
+pub trait Located {
+    fn located(&self) -> Location;
+}

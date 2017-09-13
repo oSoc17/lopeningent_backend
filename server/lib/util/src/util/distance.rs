@@ -2,6 +2,7 @@
 
 use newtypes::Km;
 use newtypes::ToF64;
+use newtypes::Located;
 
 /// Return the distance between two points.
 ///
@@ -25,4 +26,8 @@ pub fn distance<I : Into<(Km, Km)>>(a : I, b : I) -> Km {
     let dx = a.0.to_f64() - b.0.to_f64();
     let dy = a.1.to_f64() - b.1.to_f64();
     Km::from_f64((dx*dx + dy*dy).sqrt())
+}
+
+pub fn distance(a : &Located, b: &Located, radius : Km) -> Km {
+    
 }
