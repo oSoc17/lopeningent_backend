@@ -16,7 +16,7 @@ pub type EdgeID = usize;
 /// Element in a graph
 #[derive(Debug)]
 pub struct Element<V, E> {
-    v : V,
+    pub v : V,
     links : BTreeMap<usize, E>,
 }
 
@@ -202,6 +202,10 @@ impl<'a, V : 'a, E : 'a> Graph<V, E> {
 
     pub fn get_edge(&'a self, from : NodeID, to : NodeID) -> Option<&'a E> {
         self.data.get(from).and_then(|el| el.links.get(&to))
+    }
+
+    pub fn get_all_nodes(&'a self) -> iter::ListAllNodes<'a, V, E> {
+        iter::ListAllNodes::new(self.data.values())
     }
 }
 

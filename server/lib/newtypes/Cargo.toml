@@ -5,3 +5,4 @@ authors = ["gedox <gerwin.dox@ugent.be>"]
 
 [dependencies]
 num = "*"
+nalgebra = "*"

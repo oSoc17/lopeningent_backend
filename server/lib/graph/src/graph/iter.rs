@@ -9,6 +9,7 @@ use std::cell::Ref;
 
 use graph::graph::Element;
 use vec_map::Keys;
+use vec_map::Values;
 
 use graph::graph::NodeID;
 use graph::graph::EdgeID;
@@ -42,6 +43,7 @@ iter_impl!(ConnIdVal<E>, BTreeIter<usize, E>);
 iter_impl!(IterEdges<E>, ConnIdVal<E>);
 iter_impl!(IterConnIds<E>, ConnIdVal<E>);
 iter_impl!(ListIds<V, E>, Keys<Element<V, E>>);
+iter_impl!(ListAllNodes<V, E>,  Values<Element<V, E>>);
 
 /// Iterator for a root structure.
 ///
@@ -83,6 +85,13 @@ impl<'a, V : 'a, E : 'a> Iterator for ListIds<'a, V, E> {
     type Item = NodeID;
     fn next(&mut self) -> Option<usize> {
         self.element.next()
+    }
+}
+
+impl<'a, V : 'a, E : 'a> Iterator for ListAllNodes<'a, V, E> {
+    type Item = &'a V;
+    fn next(&mut self) -> Option<&'a V> {
+        self.element.next().map(|el| &el.v)
     }
 }
 

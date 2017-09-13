@@ -5,10 +5,13 @@
 use std::ops::{Add, Sub, Mul, Div};
 use num::Zero;
 use std::f64;
+use nalgebra::Vector3;
+
+use std::f64::consts::PI;
 
 /// Distance measure in kilometers
 #[derive(Clone, Copy, PartialEq, Debug, Eq, PartialOrd, Ord)]
-pub struct Km(u64);
+pub struct Km(i64);
 
 const POINT : usize = 32;
 
@@ -21,7 +24,7 @@ pub trait ToF64 {
 impl Km {
     /// Create a new Km struct, or Km::zero if something goes wrong (NaN, Out of Bounds).
     pub fn from_f64(f: f64) -> Km {
-        Km((f * (1u64<<POINT) as f64) as u64)
+        Km((f * (1u64<<POINT) as f64) as i64)
     }
 
     /// Create a new Km struct, or None if something goes wrong (NaN, Out of Bounds).
@@ -39,9 +42,9 @@ impl Km {
     /// ```
     pub fn from_f64_checked(f : f64) -> Option<Km> {
         // Beware rounding errors!
-        if f >= Km(u64::max_value()).to_f64() {
+        if f >= Km(i64::max_value()).to_f64() {
             None
-        } else if f < Km(u64::min_value()).to_f64() {
+        } else if f < Km(i64::min_value()).to_f64() {
             None
         } else {Some(Km::from_f64(f))}
     }
@@ -114,14 +117,37 @@ impl fmt::Display for Km {
     }
 }
 
+#[derive(PartialEq, PartialOrd, Debug, Clone)]
 pub struct Location {
     pub lon : f64,
     pub lat : f64
 }
 
 impl Location {
-    fn new(lon : f64, lat : f64) -> Location {
-        Location{lon:lon,lat:lat}
+    pub fn new(lon : f64, lat : f64) -> Location {
+        Location { lon : lon, lat : lat }
+    }
+    pub fn into_radians(self) -> (f64, f64) {
+        (self.lat * PI / 180.0,
+         self.lon * PI / 180.0)
+    }
+
+    pub fn into_3d(&self) -> Vector3<f64> {
+        let rlon = self.lon * PI / 180.0;
+        let rlat = self.lat * PI / 180.0;
+        Vector3::new(rlon.sin() * rlat.cos(), rlon.cos() * rlat.cos(), rlat.sin())
+    }
+}
+
+use std::cmp::Eq;
+impl Eq for Location {}
+
+use std::hash::{Hash, Hasher};
+impl Hash for Location {
+    fn hash<H>(&self, state: &mut H) where H: Hasher {
+        use std::mem;
+        let c : [u64; 2] = unsafe {mem::transmute_copy(self)};
+        c.hash(state)
     }
 }
 

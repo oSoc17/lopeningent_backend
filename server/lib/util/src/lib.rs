@@ -4,6 +4,7 @@
 extern crate newtypes;
 extern crate num;
 extern crate rand;
+extern crate nalgebra as na;
 
 mod util;
 

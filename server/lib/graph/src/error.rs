@@ -52,6 +52,21 @@ pub enum Error {
     Variant(String),
 }
 
+use std::fmt;
+
+impl fmt::Display for Error {
+    fn fmt(&self, f: &mut fmt::Formatter) -> Result<(), fmt::Error> {
+        <Self as fmt::Debug>::fmt(self, f)
+    }
+}
+
+use std::error as stderr;
+impl stderr::Error for Error {
+    fn description(&self) -> &str {
+        "Graph error"
+    }
+}
+
 macro_rules! impl_from {
     ($from:ty, $into:expr) => {
         impl From<$from> for Error {

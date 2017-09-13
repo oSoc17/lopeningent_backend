@@ -131,6 +131,7 @@ where C::M : Debug, C::V : Debug, C::E : Debug
 }
 
 use graph::Path;
+use graph::AnnotatedPath;
 
 pub fn into_nodes<M : Majorising>(res_chain : &Vec<SingleAction<M>>, start : usize) -> Path {
     let mut res = Vec::new();
@@ -147,4 +148,22 @@ pub fn into_nodes<M : Majorising>(res_chain : &Vec<SingleAction<M>>, start : usi
     }
     res.reverse();
     return Path::new(res);
+}
+
+// TODO remove code duplication.
+pub fn into_annotated_nodes<M : Majorising>(res_chain : &Vec<SingleAction<M>>, start : usize) -> AnnotatedPath<&M> {
+    let mut res = Vec::new();
+    let mut index = start;
+    loop {
+
+        res.push((res_chain[index].node_handle, &res_chain[index].major));
+        if index != res_chain[index].previous_index {
+            index = res_chain[index].previous_index;
+        }
+        else {
+            break;
+        }
+    }
+    res.reverse();
+    return AnnotatedPath::new(res);
 }

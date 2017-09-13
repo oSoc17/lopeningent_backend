@@ -1,9 +1,8 @@
 [package]
-name = "database"
+name = "buckets"
 version = "0.1.0"
 authors = ["gedox <gerwin.dox@ugent.be>"]
 
 [dependencies]
-postgres = "*"
-database_derive = {path = "../database_derive"}
+num = "*"
 newtypes = {path = "../newtypes"}

@@ -6,3 +6,8 @@ authors = ["gedox <gerwin.dox@ugent.be>"]
 [dependencies]
 graph = {path = "../graph"}
 database = {path = "../database"}
+newtypes = {path = "../newtypes"}
+util = {path = "../util"}
+transform = {path = "../transform"}
+buckets = {path = "../buckets"}
+nalgebra = "*"

@@ -5,6 +5,7 @@ extern crate newtypes;
 use postgres::TlsMode;
 use postgres::Connection;
 use std::error::Error;
+use newtypes::{Located, Location};
 
 pub trait Convert {
     type From;
@@ -82,30 +83,42 @@ pub trait Query : Sized {
 #[derive(Query, Debug)]
 #[table_name = "lopeningent.nodes"]
 pub struct Node {
-    pub nid : i32,
+    pub nid : usize,
     pub lon : f64,
     pub lat : f64,
+}
+
+impl Located for Node {
+    fn located(&self) -> Location {
+        Location::new(self.lon, self.lat)
+    }
 }
 
 #[derive(Query, Debug)]
 #[table_name = "lopeningent.edges"]
 pub struct Edge {
-    pub eid : i32,
+    pub eid : usize,
     pub rating : f32,
     pub tags : Tags,
-    pub from_node : i32,
-    pub to_node : i32,
+    pub from_node : usize,
+    pub to_node : usize,
 }
 
 #[derive(Query, Debug)]
 #[table_name = "lopeningent.pois"]
 pub struct Poi {
-    pub pid : i32,
+    pub pid : usize,
     pub name : String,
     pub description : Option<String>,
     pub lon : f64,
     pub lat : f64,
     pub tag : Option<String>,
+}
+
+impl Located for Poi {
+    fn located(&self) -> Location {
+        Location::new(self.lon, self.lat)
+    }
 }
 
 pub struct Scheme {
