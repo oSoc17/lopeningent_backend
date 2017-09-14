@@ -11,3 +11,4 @@ util = {path = "../util"}
 transform = {path = "../transform"}
 buckets = {path = "../buckets"}
 nalgebra = "*"
+vec_map = "*"

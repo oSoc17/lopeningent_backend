@@ -127,6 +127,11 @@ impl Location {
     pub fn new(lon : f64, lat : f64) -> Location {
         Location { lon : lon, lat : lat }
     }
+
+    pub fn average(a : &Location, b : &Location) -> Location {
+        Location::new((a.lon + b.lon) / 2.0, (a.lat + b.lat) / 2.0)
+    }
+
     pub fn into_radians(self) -> (f64, f64) {
         (self.lat * PI / 180.0,
          self.lon * PI / 180.0)
@@ -153,4 +158,8 @@ impl Hash for Location {
 
 pub trait Located {
     fn located(&self) -> Location;
+}
+
+impl Located for Location {
+    fn located(&self) -> Location {self.clone()}
 }

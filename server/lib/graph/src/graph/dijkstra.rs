@@ -88,7 +88,7 @@ where C::M : Debug, C::V : Debug, C::E : Debug
                         continue;
                     }
                     let mut h_vec = progress.entry(next_node).or_insert_with(Vec::new);
-                    println!("Inserting {:?} into {:?}... (from {} to {}) ", next_major, h_vec.iter().map(|&c| &res_chain[c].major).collect::<Vec<_>>(), data.node , next_node);
+                    //println!("Inserting {:?} into {:?}... (from {} to {}) ", next_major, h_vec.iter().map(|&c| &res_chain[c].major).collect::<Vec<_>>(), data.node , next_node);
                     for &e in h_vec.iter() {
                         if res_chain[e].major.majorises_strict(&next_major) {
                             res_chain[e].disabled = true;
@@ -151,12 +151,12 @@ pub fn into_nodes<M : Majorising>(res_chain : &Vec<SingleAction<M>>, start : usi
 }
 
 // TODO remove code duplication.
-pub fn into_annotated_nodes<M : Majorising>(res_chain : &Vec<SingleAction<M>>, start : usize) -> AnnotatedPath<&M> {
+pub fn into_annotated_nodes<M : Majorising + Clone>(res_chain : &Vec<SingleAction<M>>, start : usize) -> AnnotatedPath<M> {
     let mut res = Vec::new();
     let mut index = start;
     loop {
 
-        res.push((res_chain[index].node_handle, &res_chain[index].major));
+        res.push((res_chain[index].node_handle, res_chain[index].major.clone()));
         if index != res_chain[index].previous_index {
             index = res_chain[index].previous_index;
         }

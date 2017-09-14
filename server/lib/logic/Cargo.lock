@@ -9,6 +9,7 @@ dependencies = [
  "newtypes 0.1.0",
  "transform 0.1.0",
  "util 0.1.0",
+ "vec_map 0.8.0 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
