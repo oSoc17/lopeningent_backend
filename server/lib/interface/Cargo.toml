@@ -4,9 +4,10 @@ version = "0.1.0"
 authors = ["gedox <gerwin.dox@ugent.be>", "timaert <tim.baccaert@student.howest.be>"]
 
 [dependencies]
-graph = { path = "../graph"}
-newtypes = { path = "../newtypes"}
-util = { path = "../util"}
-libc = "*"
-num = "*"
-rand = "*"
+graph = {path = "../graph"}
+database = {path = "../database"}
+newtypes = {path = "../newtypes"}
+logic = {path = "../logic"}
+serde = "*"
+serde_derive = "*"
+serde_json = "*"

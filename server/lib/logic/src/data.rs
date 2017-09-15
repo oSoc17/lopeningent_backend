@@ -7,6 +7,7 @@ use std::collections::HashMap as Map;
 use buckets::{Grid, Interval};
 use transform::Projector;
 use newtypes::Km;
+use newtypes::ToF64;
 use annotated::PoiNode;
 use annotated::AnnotatedEdge;
 use vec_map::VecMap;
@@ -104,5 +105,28 @@ impl<'a> Conversion<'a> {
                 _ => Some((dist, edge))
             }
         }).map(|(_, edge)| edge)
+    }
+
+    pub fn debug(&self) -> String {
+        let start_string = "<svg xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\">\n".to_string();
+        let mut res = self.graph.list_ids().flat_map(move |f| self.graph.get_connids(f).unwrap().map(move |t| (f, t)))
+        .map(|(from, to)| (&self.graph.get(from).unwrap().node, &self.graph.get(to).unwrap().node))
+        .map(|(from_node, to_node)| (
+            self.projector.map(&from_node.located().into_3d()).into(),
+            self.projector.map(&to_node.located().into_3d()).into()
+        )).map(|((fx, fy), (tx, ty))|
+            ((self.grid.get_max_x() - fx, self.grid.get_max_y() - fy),
+            (self.grid.get_max_x() - tx, self.grid.get_max_y() - ty))
+        )
+        .map(|((from_x, from_y), (to_x, to_y))| format!(
+            "<line x1=\"{}\" y1=\"{}\" x2=\"{}\" y2=\"{}\" style=\"stroke:#000000;\"/>\n",
+            from_x.to_f64() * 100.0,
+            from_y.to_f64() * 100.0,
+            to_x.to_f64() * 100.0,
+            to_y.to_f64() * 100.0))
+        .fold(start_string, |mut s, t| {s.push_str(&t); s})
+        ;
+        res.push_str("</svg>");
+        res
     }
 }

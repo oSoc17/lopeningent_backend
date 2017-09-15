@@ -131,10 +131,11 @@ pub struct Scheme {
 
 pub fn load(database_url : &str) -> Result<Scheme, Box<Error>> {
     let connection = Connection::connect(database_url, TlsMode::None)?;
-
-    println!("{}", Node::debug());
-    println!("{}", Edge::debug());
-    println!("{}", Poi::debug());
+    use std::io;
+    use std::io::Write;
+    writeln!(io::stderr(), "{}", Node::debug());
+    writeln!(io::stderr(), "{}", Edge::debug());
+    writeln!(io::stderr(), "{}", Poi::debug());
 
     Ok(Scheme {
         nodes : Node::load(&connection)?,

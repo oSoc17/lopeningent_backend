@@ -107,12 +107,15 @@ where C::M : Debug, C::V : Debug, C::E : Debug
             }
         }
         for &index in progress.iter().flat_map(|(n, v)| v.iter()) {
-            let action : &SingleAction<C::M> = &res_chain[index];
+            let action = &res_chain[index];
             if control.is_ending(graph.get(action.node_handle).unwrap(), &action.major) {
-                res_endpoints.push(index);
+                let prev_action = &res_chain[action.previous_index];
+                if !control.is_ending(graph.get(prev_action.node_handle).unwrap(), &prev_action.major)  {
+                    res_endpoints.push(index);
+                }
             }
         }
-        // TODO yield_on_empty
+
         if control.yield_on_empty() {
             for index in 0..res_chain.len() {
                 if ! res_chain[index].disabled {

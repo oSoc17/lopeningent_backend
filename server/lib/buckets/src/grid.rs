@@ -27,6 +27,14 @@ impl<T> Grid<T> {
         }
     }
 
+    pub fn get_max_x(&self) -> Km {
+        self.x + self.binsize * self.width as f64
+    }
+
+    pub fn get_max_y(&self) -> Km {
+        self.y + self.binsize * self.height as f64
+    }
+
     fn clamp(x: Km, min: Km, binsize: Km, max: usize) -> usize {
         let x = if x < min { Km::zero() } else { x };
         let x = (x / binsize) as usize;
