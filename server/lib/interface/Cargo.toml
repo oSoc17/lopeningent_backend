@@ -8,6 +8,8 @@ graph = {path = "../graph"}
 database = {path = "../database"}
 newtypes = {path = "../newtypes"}
 logic = {path = "../logic"}
+nalgebra = "*"
+base64 = "*"
 serde = "*"
 serde_derive = "*"
 serde_json = "*"

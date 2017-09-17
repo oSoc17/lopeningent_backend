@@ -36,8 +36,24 @@ impl Majorising for Distance {
     }
 }
 
+pub trait TagModifier {
+    fn tag_modifier(&self, tag : &Tags) -> f64;
+}
+
 pub struct Metadata {
     pub requested_length : Km,
+    pub water : f64,
+    pub tourism : f64,
+    pub park : f64,
+}
+
+impl<'a> TagModifier for &'a Metadata {
+    fn tag_modifier(&self, tag : &Tags) -> f64 {
+        ( if tag.park {self.park} else {0.0}
+        + if tag.tourism {self.tourism} else {0.0}
+        + if tag.water {self.water} else {0.0}
+        ).exp()
+    }
 }
 
 trait Poisoned {
@@ -80,15 +96,17 @@ pub struct PoisonLine {
     end : na::Vector3<f64>,
     radius : f64,
     size : f64,
+    factor : f64,
 }
 
 impl PoisonLine {
-    pub fn new(start : &Location, end : &Location) -> PoisonLine {
+    pub fn new(start : &Location, end : &Location, factor : f64) -> PoisonLine {
         PoisonLine {
             start : start.into_3d(),
             end : end.into_3d(),
             radius : EARTH_RADIUS,
-            size : util::distance::distance_lon_lat(start, end, Km::from_f64(EARTH_RADIUS)).to_f64(),
+            size : util::distance::distance_lon_lat(start, end, Km::from_f64(EARTH_RADIUS)).to_f64() * factor,
+            factor : factor,
         }
     }
 }
@@ -106,27 +124,30 @@ impl Poisoned for PoisonLine {
     }
 }
 
-struct RodController<P : Poisoned> {
+struct RodController<P : Poisoned, M : TagModifier> {
     max_length : f64,
-    poisoner : P,
+    poisoner_large : P,
+    poisoner_small : P,
     endings : VecMap<Distance>,
     closing : bool,
+    modifier : M,
 }
 
-impl<P : Poisoned> RodController<P> {
-    fn enjoyment(&self, tag : &Tags) -> f64 {
-        1.0
+impl<P : Poisoned, M : TagModifier> RodController<P, M> {
+    fn enjoyment(&self, tags : &Tags) -> f64 {
+        self.modifier.tag_modifier(tags)
     }
 
     fn annotate(&self, edge : &AnnotatedEdge) -> Distance {
         let t = edge.dist.to_f64();
-        let p = self.poisoner.poison(&edge.average);
+        let p_l = self.poisoner_large.poison(&edge.average);
+        let p_s = self.poisoner_small.poison(&edge.average);
         let e = self.enjoyment(&edge.edge.tags);
-        Distance(t * e * (1.0 + p / 5.0),  t * p * e, t)
+        Distance(t * e * p_l,  t * e * p_s, t)
     }
 }
 
-impl<P : Poisoned> DijkstraControl for RodController<P> {
+impl<P : Poisoned, TM : TagModifier> DijkstraControl for RodController<P, TM> {
     type V = PoiNode;
     type E = AnnotatedEdge;
     type M = Distance;
@@ -138,7 +159,7 @@ impl<P : Poisoned> DijkstraControl for RodController<P> {
         m.2 < self.max_length
     }
     fn hint(&self, m : &Self::M) -> u64 {
-        (m.2 * 1000000.0) as u64
+        (m.0 * 1000000.0) as u64
     }
     fn is_ending(&self, v : &Self::V, m : &Self::M) -> bool {
         self.endings.get(v.node.nid).is_some()
@@ -154,9 +175,11 @@ pub fn create_rod<'a>(conversion : &Conversion<'a>, pos : &Location, metadata : 
     let builder = DijkstraBuilder::new(starting_node, Distance(0.0, 0.0, 0.0));
     let rod_controller = RodController{
         max_length : metadata.requested_length.to_f64(),
-        poisoner : (),
+        poisoner_large : (),
+        poisoner_small : (),
         endings : VecMap::new(),
         closing : false,
+        modifier : metadata,
     };
     let (actions, endings) = builder.generate_dijkstra(conversion.graph, &rod_controller);
 
@@ -183,9 +206,11 @@ pub fn close_rod<'a>(conversion : &Conversion<'a>, pos : &Location, metadata : &
     let builder = DijkstraBuilder::new(starting_node, Distance(0.0, 0.0, 0.0));
     let rod_controller = RodController {
         max_length : metadata.requested_length.to_f64(),
-        poisoner : PoisonLine::new(&conversion.graph.get(path.first().0).unwrap().located(), &conversion.graph.get(path.last().0).unwrap().located()),
+        poisoner_large : PoisonLine::new(&conversion.graph.get(path.first().0).unwrap().located(), &conversion.graph.get(path.last().0).unwrap().located(), 1.0),
+        poisoner_small : PoisonLine::new(&conversion.graph.get(path.first().0).unwrap().located(), &conversion.graph.get(path.last().0).unwrap().located(), 0.5),
         endings : map,
         closing : true,
+        modifier : metadata,
     };
     let (actions, endings) = builder.generate_dijkstra(conversion.graph, &rod_controller);
 

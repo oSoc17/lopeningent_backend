@@ -52,9 +52,9 @@ impl Convert for Tags {
 
 #[derive(Debug, Default)]
 pub struct Tags {
-    tourism : bool,
-    water : bool,
-    park : bool,
+    pub tourism : bool,
+    pub water : bool,
+    pub park : bool,
 }
 
 /*impl Convert<Vec<String>> for Tags {

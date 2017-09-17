@@ -30,6 +30,10 @@ impl Path {
         let last = other.last();
         Path::new((self.0).into_iter().take_while(|&n| n != last).chain((other.0).into_iter().rev()).collect())
     }
+
+    pub fn get_indices(&self) -> &[NodeID] {
+        &self.0
+    }
 }
 
 #[derive(Debug)]

@@ -1,0 +1,6 @@
+[package]
+name = "iron_frontend"
+version = "0.1.0"
+authors = ["gedox <gerwin.dox@ugent.be>"]
+
+[dependencies]

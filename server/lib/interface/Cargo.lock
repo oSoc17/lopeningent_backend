@@ -2,9 +2,11 @@
 name = "interface"
 version = "0.1.0"
 dependencies = [
+ "base64 0.6.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "database 0.1.0",
  "graph 0.1.0",
  "logic 0.1.0",
+ "nalgebra 0.13.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "newtypes 0.1.0",
  "serde 1.0.14 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde_derive 1.0.14 (registry+https://github.com/rust-lang/crates.io-index)",
