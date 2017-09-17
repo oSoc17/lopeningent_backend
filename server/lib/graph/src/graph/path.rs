@@ -53,7 +53,7 @@ impl<D> AnnotatedPath<D> {
     }
 
     pub fn into_map(&self) -> VecMap<&D> {
-        self.0.iter().map(|tuple| (tuple.0, &tuple.1)).collect()
+        self.0.iter().map(|tuple| (tuple.0 as usize, &tuple.1)).collect()
     }
 
     pub fn into_path(&self) -> Path {

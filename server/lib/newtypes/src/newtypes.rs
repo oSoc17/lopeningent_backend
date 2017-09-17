@@ -10,7 +10,7 @@ use nalgebra::Vector3;
 use std::f64::consts::PI;
 
 /// Distance measure in kilometers
-#[derive(Clone, Copy, PartialEq, Debug, Eq, PartialOrd, Ord)]
+#[derive(Clone, Copy, PartialEq, Debug, Eq, PartialOrd, Ord, Default)]
 pub struct Km(i64);
 
 const POINT : usize = 32;

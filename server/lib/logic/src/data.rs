@@ -1,4 +1,4 @@
-use graph::Graph;
+use graph::{Graph, NodeID};
 use database::{Scheme, Node, Edge, Poi};
 use database::load;
 use newtypes::{Located, Location};
@@ -35,11 +35,11 @@ pub fn get_graph(scheme : Scheme) -> Result<Graph<PoiNode, AnnotatedEdge>, Box<E
         node : node
         }).collect();
     let edges_collected : Vec<_> = {
-        let indexed_nodes : VecMap<_> = poinodes.iter().map(|n| (n.node.nid, &n.node)).collect();
+        let indexed_nodes : VecMap<_> = poinodes.iter().map(|n| (n.node.nid as usize, &n.node)).collect();
         edges.into_iter().map(|edge| {
         let (from, to) = (edge.from_node, edge.to_node);
-        let from_loc = indexed_nodes[from];
-        let to_loc = indexed_nodes[to];
+        let from_loc = indexed_nodes[from as usize];
+        let to_loc = indexed_nodes[to as usize];
         let dist = util::distance::distance_lon_lat(&from_loc.located(), &to_loc.located(), Km::from_f64(EARTH_RADIUS));
             (from, AnnotatedEdge{edge : edge, dist : dist, average : Location::average(&from_loc.located(), &to_loc.located())}, to)
         }).collect()
@@ -47,10 +47,10 @@ pub fn get_graph(scheme : Scheme) -> Result<Graph<PoiNode, AnnotatedEdge>, Box<E
     Ok(Graph::new(poinodes.into_iter().map(|node| (node.node.nid, node)), edges_collected)?)
 }
 
-pub struct Conversion<'a> {
-    pub graph : &'a Graph<PoiNode, AnnotatedEdge>,
+pub struct Conversion {
+    pub graph : Graph<PoiNode, AnnotatedEdge>,
     pub projector : Projector,
-    pub grid : Grid<&'a AnnotatedEdge>,
+    pub grid : Grid<(NodeID, NodeID)>,
 }
 
 pub fn get_projector(graph : &Graph<PoiNode, AnnotatedEdge>) -> Projector {
@@ -61,24 +61,28 @@ pub fn get_projector(graph : &Graph<PoiNode, AnnotatedEdge>) -> Projector {
     Projector::new(avg, na::Vector3::new(0.0, 0.0, 1.0), Km::from_f64(EARTH_RADIUS))
 }
 
-impl<'a> Conversion<'a> {
-    pub fn get_conversion(graph : &'a Graph<PoiNode, AnnotatedEdge>, projector : Projector) -> Conversion<'a> {
-        let edges : Vec<_> =  graph.list_ids().flat_map(|id| graph.get_edges(id).unwrap()).collect();
+impl Conversion {
+    pub fn get_conversion(graph : Graph<PoiNode, AnnotatedEdge>, projector : Projector) -> Conversion {
         let z = Km::from_f64(0.0);
         let interval = graph.get_all_nodes()
-            .map(|node| node.located())
-            .map(|location| projector.map(&location.into_3d()).into())
-            .map(|tuple| Interval::from(tuple,tuple, Km::from_f64(TOLERANCE)))
-            .fold(Interval::from((z, z), (z, z), z), |a, b| &a + &b);
-        let mut grid : Grid<&AnnotatedEdge> = Grid::from(interval, Km::from_f64(BIN_SIZE));
-        for edge in edges {
-            let (from, to) = (graph.get(edge.edge.from_node).unwrap(), graph.get(edge.edge.to_node).unwrap());
-            let interval = Interval::from(
-                projector.map(&from.located().into_3d()).into(),
-                projector.map(&to.located().into_3d()).into(),
-                Km::from_f64(TOLERANCE)
-            );
-            grid.add(interval, &edge);
+        .map(|node| node.located())
+        .map(|location| projector.map(&location.into_3d()).into())
+        .map(|tuple| Interval::from(tuple,tuple, Km::from_f64(TOLERANCE)))
+        .fold(Interval::from((z, z), (z, z), z), |a, b| &a + &b);
+
+        let mut grid : Grid<(NodeID, NodeID)> = Grid::from(interval, Km::from_f64(BIN_SIZE));
+
+        {
+            let edges : Vec<_> = graph.list_ids().flat_map(|id| graph.get_edges(id).unwrap()).collect();
+            for edge in edges {
+                let (from, to) = (graph.get(edge.edge.from_node).unwrap(), graph.get(edge.edge.to_node).unwrap());
+                let interval = Interval::from(
+                    projector.map(&from.located().into_3d()).into(),
+                    projector.map(&to.located().into_3d()).into(),
+                    Km::from_f64(TOLERANCE)
+                );
+                grid.add(interval, &(edge.edge.from_node, edge.edge.to_node));
+            }
         }
         Conversion {
             graph : graph,
@@ -87,15 +91,17 @@ impl<'a> Conversion<'a> {
         }
     }
 
-    pub fn get_default_conversion(graph : &'a Graph<PoiNode, AnnotatedEdge>) -> Conversion<'a> {
-        Self::get_conversion(graph, get_projector(graph))
+    pub fn get_default_conversion(graph : Graph<PoiNode, AnnotatedEdge>) -> Conversion {
+        let projector = get_projector(&graph);
+        Self::get_conversion(graph, projector)
     }
 
-    pub fn get_edge(&self, location : &Location) -> Option<&'a AnnotatedEdge> {
+    pub fn get_edge(&self, location : &Location) -> Option<&AnnotatedEdge> {
         let pos = self.projector.map(&location.into_3d()).into();
         let choices = self.grid.get(pos);
         choices.iter()
         .fold(None, |sum, edge| {
+            let edge = self.graph.get_edge(edge.0, edge.1).unwrap();
             let from = self.projector.map(&self.graph.get(edge.edge.from_node).unwrap().node.located().into_3d()).into();
             let to = self.projector.map(&self.graph.get(edge.edge.to_node).unwrap().node.located().into_3d()).into();
             let dist = util::distance::distance_to_edge(pos, from, to);

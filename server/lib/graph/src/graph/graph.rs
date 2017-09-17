@@ -10,14 +10,14 @@ use error::Error;
 use graph::iter;
 use vec_map::VecMap;
 
-pub type NodeID = usize;
-pub type EdgeID = usize;
+pub type NodeID = u64;
+pub type EdgeID = u64;
 
 /// Element in a graph
 #[derive(Debug)]
 pub struct Element<V, E> {
     pub v : V,
-    links : BTreeMap<usize, E>,
+    links : BTreeMap<NodeID, E>,
 }
 
 /// Graph structure.
@@ -46,15 +46,15 @@ impl<'a, V : 'a, E : 'a> Graph<V, E> {
     ///
     /// ```
     pub fn new<NI, EI>(vertices : NI, edges : EI) -> Result<Graph<V, E>, Error>
-        where NI : IntoIterator<Item=(usize, V)>,
-              EI : IntoIterator<Item=(usize, E, usize)>
+        where NI : IntoIterator<Item=(NodeID, V)>,
+              EI : IntoIterator<Item=(NodeID, E, NodeID)>
     {
         let mut data = VecMap::new();
         for (id, vertex) in vertices {
-            data.insert(id, Element {v : vertex, links : BTreeMap::new()});
+            data.insert(id as usize, Element {v : vertex, links : BTreeMap::new()});
         }
         for (id, edge, to) in edges {
-            try!(data.get_mut(id).ok_or(Error::MissingID)).links.insert(to, edge);
+            try!(data.get_mut(id as usize).ok_or(Error::MissingID)).links.insert(to, edge);
         }
         Ok(Graph {
             data : data,
@@ -75,7 +75,7 @@ impl<'a, V : 'a, E : 'a> Graph<V, E> {
     /// assert_eq!(graph.contains(2), false);
     /// ```
     pub fn contains(&self, index : NodeID) -> bool {
-        self.data.contains_key(index)
+        self.data.contains_key(index as usize)
     }
 
     /// Retrieve a single node given the index.
@@ -92,7 +92,7 @@ impl<'a, V : 'a, E : 'a> Graph<V, E> {
     /// assert_eq!(graph.get(1), None);
     /// ```
     pub fn get(&self, index : NodeID) -> Option<&V> {
-        return self.data.get(index).map(|e| &e.v)
+        return self.data.get(index as usize).map(|e| &e.v)
     }
 
     /// Retrieve all connections to a node
@@ -116,7 +116,7 @@ impl<'a, V : 'a, E : 'a> Graph<V, E> {
     /// assert_eq!(connections.next(), None);
     /// ```
     pub fn get_conn_idval<'b>(&'b self, index : NodeID) -> Option<iter::ConnIdVal<'b, E>> {
-        self.data.get(index)
+        self.data.get(index as usize)
             .map(|e| e.links.iter())
             .map(iter::ConnIdVal::new)
     }
@@ -197,11 +197,11 @@ impl<'a, V : 'a, E : 'a> Graph<V, E> {
     /// assert_eq!(edges.next(), None);
     /// ```
     pub fn get_edge_mut(&'a mut self, from : NodeID, to : NodeID) -> Option<&'a mut E> {
-        self.data.get_mut(from).and_then(|el| el.links.get_mut(&to))
+        self.data.get_mut(from as usize).and_then(|el| el.links.get_mut(&to))
     }
 
     pub fn get_edge(&'a self, from : NodeID, to : NodeID) -> Option<&'a E> {
-        self.data.get(from).and_then(|el| el.links.get(&to))
+        self.data.get(from as usize).and_then(|el| el.links.get(&to))
     }
 
     pub fn get_all_nodes(&'a self) -> iter::ListAllNodes<'a, V, E> {

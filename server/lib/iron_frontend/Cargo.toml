@@ -4,3 +4,16 @@ version = "0.1.0"
 authors = ["gedox <gerwin.dox@ugent.be>"]
 
 [dependencies]
+iron = "*"
+mount = "*"
+graph = {path = "../graph"}
+database = {path = "../database"}
+newtypes = {path = "../newtypes"}
+logic = {path = "../logic"}
+interface = {path = "../interface"}
+serde = "*"
+serde_derive = "*"
+serde_qs = "*"
+
+[profile.release]
+debug = true

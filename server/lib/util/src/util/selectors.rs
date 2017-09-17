@@ -20,6 +20,8 @@
 //! ```
 
 use rand::Rng;
+use rand;
+use rand::distributions::IndependentSample;
 use std::mem;
 
 /// Selector struct
@@ -78,4 +80,10 @@ impl<T, R : Rng> Selector<T, R> {
     pub fn decompose(self) -> Option<T> {
         self.value
     }
+}
+
+pub fn get_random(min : f64, max : f64) -> f64 {
+    let mut rng = rand::thread_rng();
+    let distribution = rand::distributions::Range::new(min, max);
+    distribution.ind_sample(&mut rng)
 }

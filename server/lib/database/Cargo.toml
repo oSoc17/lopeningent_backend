@@ -7,3 +7,4 @@ authors = ["gedox <gerwin.dox@ugent.be>"]
 postgres = "*"
 database_derive = {path = "../database_derive"}
 newtypes = {path = "../newtypes"}
+graph = {path = "../graph"}

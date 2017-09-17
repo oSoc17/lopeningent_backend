@@ -16,7 +16,7 @@ use std::io::Write;
 fn main() {
     let graph = get_graph(load("postgresql://postgres:0987654321@localhost").unwrap()).unwrap();
     //graph.debug();
-    let conversion = logic::Conversion::get_default_conversion(&graph);
+    let conversion = logic::Conversion::get_default_conversion(graph);
     use std::fs;
     /*
     let mut file = fs::File::create("/home/gerwin/debug.svg").unwrap();

@@ -92,6 +92,7 @@ name = "database"
 version = "0.1.0"
 dependencies = [
  "database_derive 0.1.0",
+ "graph 0.1.0",
  "newtypes 0.1.0",
  "postgres 0.15.1 (registry+https://github.com/rust-lang/crates.io-index)",
 ]

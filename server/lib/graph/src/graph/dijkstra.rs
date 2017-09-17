@@ -49,6 +49,9 @@ pub trait DijkstraControl {
     fn yield_on_empty(&self) -> bool {
         false
     }
+    fn force_finish(&self) -> bool {
+        false
+    }
 }
 
 pub struct DijkstraBuilder<C : DijkstraControl> {
@@ -81,13 +84,17 @@ where C::M : Debug, C::V : Debug, C::E : Debug
             if res_chain[data.index].disabled {
                 continue;
             }
+            if control.force_finish()
+                && control.is_ending(graph.get(data.node).unwrap(), &res_chain[data.index].major) {
+                break;
+            }
             if let Some(iter) = graph.get_conn_idval(data.node) {
                 for (next_node, next_edge) in iter {
                     let next_major = control.add_edge(&res_chain[data.index].major, &next_edge);
                     if ! control.filter(&next_major) {
                         continue;
                     }
-                    let mut h_vec = progress.entry(next_node).or_insert_with(Vec::new);
+                    let mut h_vec = progress.entry(next_node as usize).or_insert_with(Vec::new);
                     //println!("Inserting {:?} into {:?}... (from {} to {}) ", next_major, h_vec.iter().map(|&c| &res_chain[c].major).collect::<Vec<_>>(), data.node , next_node);
                     for &e in h_vec.iter() {
                         if res_chain[e].major.majorises_strict(&next_major) {

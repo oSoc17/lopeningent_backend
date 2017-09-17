@@ -2,10 +2,13 @@ extern crate postgres;
 #[macro_use]
 extern crate database_derive;
 extern crate newtypes;
+extern crate graph;
+
 use postgres::TlsMode;
 use postgres::Connection;
 use std::error::Error;
 use newtypes::{Located, Location};
+use graph::{NodeID, EdgeID};
 
 pub trait Convert {
     type From;
@@ -25,7 +28,7 @@ macro_rules! default_impl {
     };
 }
 
-default_impl!(i32, i32; i64, i64; usize, i32; String, String; f32, f32; f64, f64);
+default_impl!(i32, i32; i64, i64; u64, i32; usize, i32; String, String; f32, f32; f64, f64);
 
 impl<T : Convert> Convert for Option<T> {
     type From = Option<T>;
@@ -83,7 +86,7 @@ pub trait Query : Sized {
 #[derive(Query, Debug)]
 #[table_name = "lopeningent.nodes"]
 pub struct Node {
-    pub nid : usize,
+    pub nid : NodeID,
     pub lon : f64,
     pub lat : f64,
 }
@@ -97,11 +100,11 @@ impl Located for Node {
 #[derive(Query, Debug)]
 #[table_name = "lopeningent.edges"]
 pub struct Edge {
-    pub eid : usize,
+    pub eid : EdgeID,
     pub rating : f32,
     pub tags : Tags,
-    pub from_node : usize,
-    pub to_node : usize,
+    pub from_node : NodeID,
+    pub to_node : NodeID,
 }
 
 #[derive(Query, Debug)]
