@@ -7,4 +7,4 @@ authors = ["gedox <gerwin.dox@ugent.be>"]
 iron_frontend = {path = "./iron_frontend"}
 
 [profile.release]
-debug = true
+lto = true
