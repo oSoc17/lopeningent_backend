@@ -5,6 +5,7 @@ use graph::dijkstra::DijkstraBuilder;
 use graph::dijkstra::DijkstraControl;
 use graph::dijkstra::into_annotated_nodes;
 use graph::Majorising;
+use graph::NodeID;
 
 use database::{Node, Edge, Poi, Tags};
 use annotated::{PoiNode, AnnotatedEdge};
@@ -13,10 +14,11 @@ use newtypes;
 use newtypes::{Location, Located};
 use newtypes::ToF64;
 use newtypes::Km;
-use std::f64;
 
+use std::f64;
 use std::io;
 use std::io::Write;
+use std::collections::HashSet;
 
 use vec_map::VecMap;
 
@@ -32,7 +34,7 @@ pub struct Distance(f64, f64, f64, f64);
 
 impl Majorising for Distance {
     fn majorises(&self, other : &Self) -> bool {
-        (self.0, self.1).majorises(&(other.0, other.1))
+        (self.0, self.1, self.3).majorises(&(other.0, other.1, other.3))
     }
 }
 
@@ -46,6 +48,7 @@ pub struct Metadata {
     pub water : f64,
     pub tourism : f64,
     pub park : f64,
+    pub original_route : Option<Path>,
 }
 
 impl Metadata {
@@ -145,6 +148,7 @@ struct RodController<P : Poisoned, M : TagModifier> {
     endings : VecMap<Distance>,
     closing : bool,
     modifier : M,
+    point_to_skip : Option<NodeID>,
 }
 
 impl<P : Poisoned, M : TagModifier> RodController<P, M> {
@@ -167,7 +171,7 @@ impl<P : Poisoned, TM : TagModifier> DijkstraControl for RodController<P, TM> {
     type M = Distance;
     fn add_edge(&self, m : &Self::M, e : &Self::E) -> Self::M {
         let added = self.annotate(e);
-        Distance(m.0 + added.0, m.1 + added.1, m.2 + added.2, 0.0)
+        Distance(m.0 + added.0, m.1 + added.1, m.2 + added.2, m.3 + added.3)
     }
     fn filter(&self, m : &Self::M) -> bool {
         m.2 < self.max_length
@@ -191,7 +195,18 @@ impl<P : Poisoned, TM : TagModifier> DijkstraControl for RodController<P, TM> {
 
 pub fn create_rod(conversion : &Conversion, pos : &Location, metadata : &Metadata) -> Option<AnnotatedPath<Distance>> {
     let edge = match conversion.get_edge(pos) {Some(x) => x, _ => return None};
-    let starting_node = edge.edge.from_node;
+    let (starting_node, skip_node) = match metadata.original_route {
+        Some(ref route) => {
+            let q : HashSet<_> = route.get_indices().iter().collect();
+            if let Some(_) = q.get(&edge.edge.to_node) {
+                (edge.edge.from_node, Some(edge.edge.to_node))
+            } else {
+                (edge.edge.to_node, Some(edge.edge.from_node))
+            }
+
+        },
+        None => (edge.edge.from_node, None),
+    };
     let builder = DijkstraBuilder::new(starting_node, Distance(0.0, 0.0, 0.0, 0.0));
     let rod_controller = RodController{
         max_length : metadata.requested_length.to_f64(),
@@ -200,6 +215,7 @@ pub fn create_rod(conversion : &Conversion, pos : &Location, metadata : &Metadat
         endings : VecMap::new(),
         closing : false,
         modifier : metadata,
+        point_to_skip : skip_node,
     };
     let (actions, endings) = builder.generate_dijkstra(&conversion.graph, &rod_controller);
 
@@ -238,6 +254,7 @@ pub fn close_rod(conversion : &Conversion, pos : &Location, metadata : &Metadata
         endings : map,
         closing : true,
         modifier : metadata,
+        point_to_skip : None,
     };
     let (actions, endings) = builder.generate_dijkstra(&conversion.graph, &rod_controller);
 

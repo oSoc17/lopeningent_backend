@@ -8,3 +8,5 @@ postgres = "*"
 database_derive = {path = "../database_derive"}
 newtypes = {path = "../newtypes"}
 graph = {path = "../graph"}
+serde = "*"
+serde_derive = "*"

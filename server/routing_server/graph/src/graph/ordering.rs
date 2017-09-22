@@ -51,6 +51,7 @@ macro_rules! implTupleMajorising {
 
 implTupleMajorising!(A ; 0);
 implTupleMajorising!(A, B ; 1, 0);
+implTupleMajorising!(A, B, C ; 2, 1, 0);
 
 #[test]
 fn test_majorisation() {

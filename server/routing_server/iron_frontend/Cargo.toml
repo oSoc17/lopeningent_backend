@@ -13,4 +13,4 @@ logic = {path = "../logic"}
 interface = {path = "../interface"}
 serde = "*"
 serde_derive = "*"
-serde_qs = "*"
+serde_urlencoded = "*"

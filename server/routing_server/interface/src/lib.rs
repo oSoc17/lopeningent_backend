@@ -6,6 +6,7 @@ extern crate serde_derive;
 extern crate serde_json;
 extern crate newtypes;
 extern crate base64;
+extern crate database;
 
 use newtypes::Location;
 use std::error::Error;
@@ -15,7 +16,7 @@ pub use logic::Metadata;
 
 mod geojson;
 mod directions;
-mod serialize;
+pub mod serialize;
 
 pub enum RoutingType {
     GeoJson,

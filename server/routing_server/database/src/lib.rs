@@ -3,6 +3,9 @@ extern crate postgres;
 extern crate database_derive;
 extern crate newtypes;
 extern crate graph;
+extern crate serde;
+#[macro_use]
+extern crate serde_derive;
 
 use postgres::TlsMode;
 use postgres::Connection;
@@ -107,7 +110,7 @@ pub struct Edge {
     pub to_node : NodeID,
 }
 
-#[derive(Query, Debug)]
+#[derive(Query, Debug, Serialize)]
 #[table_name = "lopeningent.pois"]
 pub struct Poi {
     pub pid : usize,

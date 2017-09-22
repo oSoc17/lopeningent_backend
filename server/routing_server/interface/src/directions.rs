@@ -1,23 +1,28 @@
 use graph::Path;
 use graph::Graph;
+use std::sync::Arc;
+use database::Poi;
 use logic::{PoiNode, AnnotatedEdge};
 use newtypes::{Location, Located};
 use serialize;
 
 #[derive(Serialize)]
-pub struct DirectionalNode {
+pub struct DirectionalNode<'a> {
     pub lon : f64,
     pub lat : f64,
     pub dir : &'static str,
+    pub pois : Option<&'a Vec<Poi>>,
 }
 
-impl  DirectionalNode {
-    pub fn new<L : Located>(l : &L, dir : &'static str) -> DirectionalNode {
-        let q = l.located();
+impl<'a>  DirectionalNode<'a> {
+    pub fn new(poinode : &'a PoiNode, dir : &'static str) -> DirectionalNode<'a> {
+        let q = poinode.node.located();
+        use std::ops::Deref;
         DirectionalNode {
             lon : q.lon,
             lat : q.lat,
-            dir : dir
+            dir : dir,
+            pois : poinode.poi.as_ref().map(|arc| arc.deref())
         }
     }
 }
@@ -31,29 +36,30 @@ fn dir_left() -> &'static str {"left"}
 fn dir_right() -> &'static str {"right"}
 
 #[derive(Serialize)]
-pub struct Directions {
-    pub coordinates : Vec<DirectionalNode>,
+pub struct Directions<'a> {
+    pub coordinates : Vec<DirectionalNode<'a>>,
     pub tag : String,
 }
 
-pub fn into_directions(path : Path, graph : &Graph<PoiNode, AnnotatedEdge>) -> Directions {
+pub fn into_directions<'a>(path : Path, graph : &'a Graph<PoiNode, AnnotatedEdge>) -> Directions<'a> {
     let nodes = path.get_elements(graph).0;
     let threshold = 0.7;
-    let mut res = vec![DirectionalNode::new(&nodes[0].node, dir_none())];
+    let mut res = vec![DirectionalNode::new(&nodes[0], dir_none())];
     for ((a, b), c) in nodes.iter().zip(nodes[1..].iter()).zip(nodes[2..].iter()) {
         if a.node.nid == c.node.nid {
-            res.push(DirectionalNode::new(&b.node, dir_turn()));
+            res.push(DirectionalNode::new(&b, dir_turn()));
             continue;
         }
         let value = angle(a, b, c);
         if value < -threshold {
-            res.push(DirectionalNode::new(&b.node, dir_left()));
+            res.push(DirectionalNode::new(&b, dir_left()));
         } else if value > threshold {
-            res.push(DirectionalNode::new(&b.node, dir_right()));
+            res.push(DirectionalNode::new(&b, dir_right()));
         } else {
-            res.push(DirectionalNode::new(&b.node, dir_forward()));
+            res.push(DirectionalNode::new(&b, dir_forward()));
         }
     }
+    res.push(DirectionalNode::new(&nodes[nodes.len() - 1], dir_none()));
     Directions {
         coordinates : res,
         tag : serialize::to_string(&path),
