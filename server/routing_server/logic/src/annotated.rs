@@ -5,6 +5,10 @@ use database::Poi;
 use newtypes::{Located, Location, Km};
 use na;
 
+use graph::Graph;
+
+pub type ApplicationGraph = Graph<PoiNode, AnnotatedEdge>;
+
 #[derive(Debug)]
 pub struct PoiNode {
     pub node : Node,

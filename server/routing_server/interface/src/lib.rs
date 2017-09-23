@@ -13,6 +13,10 @@ use std::error::Error;
 
 pub use logic::Conversion;
 pub use logic::Metadata;
+pub use logic::ApplicationGraph;
+pub use graph::Path;
+
+use database::Update;
 
 mod geojson;
 mod directions;
@@ -46,4 +50,11 @@ pub fn route(conversion : &Conversion, from : &Location, to : &Location, metadat
         Directions => serde_json::to_string_pretty(&directions::into_directions(route, &conversion.graph))?,
         GeoJson => serde_json::to_string_pretty(&geojson::into_geojson(route, &conversion.graph))?,
     })
+}
+
+pub fn rate(graph : &ApplicationGraph, route : &Path, rating : f64) -> Update {
+    let edges = route.get_elements(graph).1;
+    let edges_ids : Vec<_> = edges.into_iter().map(|edge| edge.edge.eid).collect();
+    let update = Update::new(edges_ids, rating);
+    return update;
 }

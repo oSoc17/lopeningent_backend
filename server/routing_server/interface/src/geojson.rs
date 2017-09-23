@@ -1,8 +1,5 @@
-use logic::AnnotatedEdge;
-use logic::PoiNode;
+use logic::ApplicationGraph;
 use graph::Path;
-use graph::Graph;
-
 /**
     Some serialisation boilerplate.
 **/
@@ -34,7 +31,7 @@ pub enum Geometry {
     Point{coordinates : (f64, f64)}
 }
 
-pub fn into_geojson(path : Path, graph : &Graph<PoiNode, AnnotatedEdge>) -> GeoJson {
+pub fn into_geojson(path : Path, graph : &ApplicationGraph) -> GeoJson {
     let (nodes, edges) = path.get_elements(graph);
     GeoJson {
         type_ : "FeatureCollection".to_string(),

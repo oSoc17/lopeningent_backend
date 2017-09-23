@@ -10,6 +10,7 @@ use newtypes::Km;
 use newtypes::ToF64;
 use annotated::PoiNode;
 use annotated::AnnotatedEdge;
+use annotated::ApplicationGraph;
 use vec_map::VecMap;
 
 use consts::*;
@@ -18,7 +19,7 @@ use util;
 use transform;
 use na;
 
-pub fn get_graph(scheme : Scheme) -> Result<Graph<PoiNode, AnnotatedEdge>, Box<Error>> {
+pub fn get_graph(scheme : Scheme) -> Result<ApplicationGraph, Box<Error>> {
     let nodes = scheme.nodes;
     let edges = scheme.edges;
     let pois = scheme.pois;
@@ -48,12 +49,12 @@ pub fn get_graph(scheme : Scheme) -> Result<Graph<PoiNode, AnnotatedEdge>, Box<E
 }
 
 pub struct Conversion {
-    pub graph : Graph<PoiNode, AnnotatedEdge>,
+    pub graph : ApplicationGraph,
     pub projector : Projector,
     pub grid : Grid<(NodeID, NodeID)>,
 }
 
-pub fn get_projector(graph : &Graph<PoiNode, AnnotatedEdge>) -> Projector {
+pub fn get_projector(graph : &ApplicationGraph) -> Projector {
     let avg = transform::average(graph.get_all_nodes()
         .map(|node| node.located())
         .map(|location| location.into_3d()).collect::<Vec<_>>().iter());
@@ -62,7 +63,7 @@ pub fn get_projector(graph : &Graph<PoiNode, AnnotatedEdge>) -> Projector {
 }
 
 impl Conversion {
-    pub fn get_conversion(graph : Graph<PoiNode, AnnotatedEdge>, projector : Projector) -> Conversion {
+    pub fn get_conversion(graph : ApplicationGraph, projector : Projector) -> Conversion {
         let z = Km::from_f64(0.0);
         let interval = graph.get_all_nodes()
         .map(|node| node.located())
@@ -91,7 +92,7 @@ impl Conversion {
         }
     }
 
-    pub fn get_default_conversion(graph : Graph<PoiNode, AnnotatedEdge>) -> Conversion {
+    pub fn get_default_conversion(graph : ApplicationGraph) -> Conversion {
         let projector = get_projector(&graph);
         Self::get_conversion(graph, projector)
     }

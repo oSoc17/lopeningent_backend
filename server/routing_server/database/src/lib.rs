@@ -58,9 +58,18 @@ impl Convert for Tags {
 
 #[derive(Debug, Default)]
 pub struct Tags {
+    // Okay, this sucks, I admit.
     pub tourism : bool,
     pub water : bool,
     pub park : bool,
+}
+
+impl Tags {
+    pub fn trues(&self) -> usize {
+        (if self.tourism {1} else {0})
+        + (if self.water {1} else {0})
+        + (if self.park {1} else {0})
+    }
 }
 
 /*impl Convert<Vec<String>> for Tags {
@@ -121,6 +130,48 @@ pub struct Poi {
     pub tag : Option<String>,
 }
 
+pub struct Update {
+    edges : Vec<EdgeID>,
+    rating : f64,
+}
+
+impl Update {
+    pub fn new(edges : Vec<EdgeID>, rating : f64) -> Update {
+        Update {
+            edges : edges,
+            rating : rating,
+        }
+    }
+
+    fn print(slice : &[EdgeID]) -> String {
+        if slice.len() == 0 {
+            return "()".to_string();
+        }
+        let mut s = String::new();
+        s.push_str("(");
+        s.push_str(&slice[0].to_string());
+        for id in &slice[1..] {
+            s.push_str(", ");
+            s.push_str(&id.to_string());
+        }
+        s.push_str(")");
+        return s;
+    }
+
+    pub fn apply(&self, connection : &Connection, influence : f64) -> Result<(), Box<Error>> {
+        let query = format!("UPDATE lopeningent.edges SET rating = rating * (1.0 - {1:}) + {2:} * {1:} WHERE eid IN {}", &Update::print(&self.edges), influence, self.rating) ;
+        println!("{}", query);
+        connection.execute(&query, &[])?;
+        Ok(())
+    }
+
+    pub fn store(&self, database_url : &str, influence : f64) -> Result<(), Box<Error>> {
+        let connection = Connection::connect(database_url, TlsMode::None)?;
+        self.apply(&connection, influence)?;
+        Ok(())
+    }
+}
+
 impl Located for Poi {
     fn located(&self) -> Location {
         Location::new(self.lon, self.lat)
@@ -133,7 +184,11 @@ pub struct Scheme {
     pub pois : Vec<Poi>,
 }
 
-
+#[test]
+fn test_slice_print() {
+    let vec = vec![0, 1, 3];
+    assert_eq!(Update::print(&vec), "(0, 1, 3)".to_string());
+}
 
 pub fn load(database_url : &str) -> Result<Scheme, Box<Error>> {
     let connection = Connection::connect(database_url, TlsMode::None)?;

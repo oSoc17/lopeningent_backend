@@ -14,7 +14,7 @@ mod consts;
 
 pub use data::get_graph;
 pub use data::Conversion;
-pub use annotated::{AnnotatedEdge, PoiNode};
+pub use annotated::{AnnotatedEdge, PoiNode, ApplicationGraph};
 pub use consts::*;
 pub use routing::{Distance, Metadata};
 pub use routing::{create_rod, close_rod};

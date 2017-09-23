@@ -1,8 +1,7 @@
 use graph::Path;
-use graph::Graph;
 use std::sync::Arc;
 use database::Poi;
-use logic::{PoiNode, AnnotatedEdge};
+use logic::{ApplicationGraph, PoiNode};
 use newtypes::{Location, Located};
 use serialize;
 
@@ -41,7 +40,7 @@ pub struct Directions<'a> {
     pub tag : String,
 }
 
-pub fn into_directions<'a>(path : Path, graph : &'a Graph<PoiNode, AnnotatedEdge>) -> Directions<'a> {
+pub fn into_directions<'a>(path : Path, graph : &'a ApplicationGraph) -> Directions<'a> {
     let nodes = path.get_elements(graph).0;
     let threshold = 0.7;
     let mut res = vec![DirectionalNode::new(&nodes[0], dir_none())];

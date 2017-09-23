@@ -14,3 +14,4 @@ interface = {path = "../interface"}
 serde = "*"
 serde_derive = "*"
 serde_urlencoded = "*"
+serde_json = "*"
