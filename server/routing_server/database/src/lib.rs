@@ -6,12 +6,15 @@ extern crate graph;
 extern crate serde;
 #[macro_use]
 extern crate serde_derive;
+extern crate tag_modifiers;
 
 use postgres::TlsMode;
 use postgres::Connection;
 use std::error::Error;
 use newtypes::{Located, Location};
 use graph::{NodeID, EdgeID};
+pub use tag_modifiers::*;
+
 
 pub trait Convert {
     type From;
@@ -40,52 +43,14 @@ impl<T : Convert> Convert for Option<T> {
     }
 }
 
+
 impl Convert for Tags {
     type From = Vec<String>;
     fn convert(t : Vec<String>) -> Tags {
-        let mut res = Tags::default();
-        for i in t {
-            match i.as_ref() {
-                "tourism" => res.tourism = true,
-                "water" => res.water = true,
-                "park" => res.park = true,
-                _ => ()
-            }
-        }
-        res
+        Tags::from(t)
     }
 }
 
-#[derive(Debug, Default)]
-pub struct Tags {
-    // Okay, this sucks, I admit.
-    pub tourism : bool,
-    pub water : bool,
-    pub park : bool,
-}
-
-impl Tags {
-    pub fn trues(&self) -> usize {
-        (if self.tourism {1} else {0})
-        + (if self.water {1} else {0})
-        + (if self.park {1} else {0})
-    }
-}
-
-/*impl Convert<Vec<String>> for Tags {
-    fn convert(t : Vec<String>) -> Tags {
-        let mut res = Tags::default();
-        for i in t {
-            match i.as_ref() {
-                "tourism" => res.tourism = true,
-                "water" => res.water = true,
-                "park" => res.park = true,
-                _ => ()
-            }
-        }
-        res
-    }
-}*/
 
 pub trait DebugQuery {
     fn debug() -> String;

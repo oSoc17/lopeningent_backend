@@ -7,7 +7,8 @@ use graph::dijkstra::into_annotated_nodes;
 use graph::Majorising;
 use graph::NodeID;
 
-use database::{Node, Edge, Poi, Tags};
+use database::{Node, Edge, Poi, Tags, TagConverter};
+use database::TagModifier;
 use annotated::{PoiNode, AnnotatedEdge};
 
 use newtypes;
@@ -38,36 +39,22 @@ impl Majorising for Distance {
     }
 }
 
-pub trait TagModifier {
-    fn tag_modifier(&self, tag : &Tags) -> f64;
-}
-
 #[derive(Default, Debug)]
 pub struct Metadata {
     pub requested_length : Km,
-    pub water : f64,
-    pub tourism : f64,
-    pub park : f64,
+    pub tag_converter : TagConverter,
     pub original_route : Option<Path>,
 }
 
 impl Metadata {
     pub fn add(&mut self, tag : &str, size : f64) {
-        match tag.as_ref() {
-            "park" => self.park += size,
-            "tourism" => self.tourism += size,
-            "water" => self.water += size,
-            _ => (),
-        }
+        self.tag_converter.add(tag, size)
     }
 }
 
 impl<'a> TagModifier for &'a Metadata {
     fn tag_modifier(&self, tag : &Tags) -> f64 {
-        ( if tag.park {self.park} else {0.0}
-        + if tag.tourism {self.tourism} else {0.0}
-        + if tag.water {self.water} else {0.0}
-        ).exp()
+        (self.tag_converter.tag_modifier(tag)).exp()
     }
 }
 

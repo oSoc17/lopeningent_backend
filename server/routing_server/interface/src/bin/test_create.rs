@@ -5,7 +5,7 @@ extern crate serde_json;
 extern crate newtypes;
 
 use logic::get_graph;
-use database::load;
+use database::{load, TagConverter};
 use newtypes::{Location, Km};
 use logic::Metadata;
 use std::time;
@@ -22,10 +22,10 @@ fn main() {
     let mut file = fs::File::create("/home/gerwin/debug.svg").unwrap();
     file.write(&conversion.debug().into_bytes()).unwrap();
     */
-    let location = Location::new(3.7126612, 51.0475082);
+    let location = Location::new(3.7, 51.0);
     let edge = conversion.get_edge(&location).unwrap();
     // println!("{:?}, {:?}", graph.get(edge.edge.from_node), graph.get(edge.edge.to_node));
-    let metadata =  Metadata {requested_length : Km::from_f64(20.0), water : 1.0, park : 1.0, tourism : -1.0};
+    let metadata =  Metadata {requested_length : Km::from_f64(20.0), tag_modifier : TagConverter::default()};
     let now = time::Instant::now();
     let res = interface::route(&conversion, &location, &location , &metadata, interface::RoutingType::Directions).unwrap();
     // println!("{:?}", rod);
