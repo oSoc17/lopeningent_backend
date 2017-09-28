@@ -23,6 +23,9 @@ macro_rules! struct_tag {
 
         pub trait TagModifier {
             fn tag_modifier(&self, tag : &Tags) -> f64;
+            fn tag_bounds() -> (f64, f64) {
+                (0.5, 2.0)
+            }
         }
 
         #[derive(Debug, Default)]

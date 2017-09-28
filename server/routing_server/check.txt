@@ -1,0 +1,1892 @@
+   Compiling byteorder v1.1.0
+   Compiling fake-simd v0.1.2
+   Compiling odds v0.2.25
+   Compiling matches v0.1.6
+   Compiling unicode-normalization v0.1.5
+   Compiling percent-encoding v1.0.0
+   Compiling version_check v0.1.3
+   Compiling modifier v0.1.0
+   Compiling matrixmultiply v0.1.13
+   Compiling hex v0.2.0
+   Compiling byte-tools v0.2.0
+   Compiling serde v1.0.15
+   Compiling approx v0.1.1
+   Compiling constant_time_eq v0.1.3
+   Compiling rustc-serialize v0.3.24
+   Compiling traitobject v0.1.0
+   Compiling tag_modifiers v0.1.0 (file:///home/gerwin/Documents/projects/stujob/lopeningent_backend/server/routing_server/tag_modifiers)
+   Compiling quote v0.3.15
+warning: missing documentation for crate
+ --> tag_modifiers/src/lib.rs:1:1
+  |
+1 | / #![warn(missing_docs)]
+2 | | #[macro_use]
+3 | | mod macros;
+4 | |
+... |
+8 | |     park
+9 | | }
+  | |_^
+  |
+note: lint level defined here
+ --> tag_modifiers/src/lib.rs:1:9
+  |
+1 | #![warn(missing_docs)]
+  |         ^^^^^^^^^^^^
+
+warning: missing documentation for a struct
+ --> tag_modifiers/src/macros.rs:4:9
+  |
+4 |  /         pub struct Tags {
+5 |  |             $(pub $field : bool),*
+6 |  |         }
+  |  |_________^
+  | 
+ ::: tag_modifiers/src/lib.rs
+  |
+5 | /  struct_tag! {
+6 | |      tourism,
+7 | |      water,
+8 | |      park
+9 | |  }
+  | |__- in this macro invocation
+
+warning: missing documentation for a struct field
+ --> tag_modifiers/src/macros.rs:5:15
+  |
+5 |               $(pub $field : bool),*
+  |                 ^^^^^^^^^^^^^^^^^
+  | 
+ ::: tag_modifiers/src/lib.rs
+  |
+5 | / struct_tag! {
+6 | |     tourism,
+7 | |     water,
+8 | |     park
+9 | | }
+  | |_- in this macro invocation
+
+warning: missing documentation for a struct field
+ --> tag_modifiers/src/macros.rs:5:15
+  |
+5 |               $(pub $field : bool),*
+  |                 ^^^^^^^^^^^^^^^^^
+  | 
+ ::: tag_modifiers/src/lib.rs
+  |
+5 | / struct_tag! {
+6 | |     tourism,
+7 | |     water,
+8 | |     park
+9 | | }
+  | |_- in this macro invocation
+
+warning: missing documentation for a struct field
+ --> tag_modifiers/src/macros.rs:5:15
+  |
+5 |               $(pub $field : bool),*
+  |                 ^^^^^^^^^^^^^^^^^
+  | 
+ ::: tag_modifiers/src/lib.rs
+  |
+5 | / struct_tag! {
+6 | |     tourism,
+7 | |     water,
+8 | |     park
+9 | | }
+  | |_- in this macro invocation
+
+warning: missing documentation for a method
+  --> tag_modifiers/src/macros.rs:9:13
+   |
+9  | /              pub fn from(t : Vec<String>) -> Tags {
+10 | |                  let mut res = Tags::default();
+11 | |                  for i in t {
+12 | |                      match i.as_ref() {
+...  |
+17 | |                  res
+18 | |              }
+   | |______________^
+   | 
+  ::: tag_modifiers/src/lib.rs
+   |
+5  |  / struct_tag! {
+6  |  |     tourism,
+7  |  |     water,
+8  |  |     park
+9  |  | }
+   |  |_- in this macro invocation
+
+warning: missing documentation for a method
+  --> tag_modifiers/src/macros.rs:19:13
+   |
+19 | /             pub fn trues(&self) -> usize {
+20 | |                 $((if self.$field {1} else {0})+)* 0
+21 | |             }
+   | |_____________^
+   | 
+  ::: tag_modifiers/src/lib.rs
+   |
+5  | / struct_tag! {
+6  | |     tourism,
+7  | |     water,
+8  | |     park
+9  | | }
+   | |_- in this macro invocation
+
+warning: missing documentation for a trait
+  --> tag_modifiers/src/macros.rs:24:9
+   |
+24 | /         pub trait TagModifier {
+25 | |             fn tag_modifier(&self, tag : &Tags) -> f64;
+26 | |             fn tag_bounds() -> (f64, f64) {
+27 | |                 (0.5, 2.0)
+28 | |             }
+29 | |         }
+   | |_________^
+   | 
+  ::: tag_modifiers/src/lib.rs
+   |
+5  | / struct_tag! {
+6  | |     tourism,
+7  | |     water,
+8  | |     park
+9  | | }
+   | |_- in this macro invocation
+
+warning: missing documentation for a trait method
+  --> tag_modifiers/src/macros.rs:25:13
+   |
+25 |               fn tag_modifier(&self, tag : &Tags) -> f64;
+   |               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   | 
+  ::: tag_modifiers/src/lib.rs
+   |
+5  | / struct_tag! {
+6  | |     tourism,
+7  | |     water,
+8  | |     park
+9  | | }
+   | |_- in this macro invocation
+
+warning: missing documentation for a trait method
+  --> tag_modifiers/src/macros.rs:26:13
+   |
+26 | /             fn tag_bounds() -> (f64, f64) {
+27 | |                 (0.5, 2.0)
+28 | |             }
+   | |_____________^
+   | 
+  ::: tag_modifiers/src/lib.rs
+   |
+5  | / struct_tag! {
+6  | |     tourism,
+7  | |     water,
+8  | |     park
+9  | | }
+   | |_- in this macro invocation
+
+warning: missing documentation for a struct
+  --> tag_modifiers/src/macros.rs:32:9
+   |
+32 | /         pub struct TagConverter {
+33 | |             $(pub $field : f64),*
+34 | |         }
+   | |_________^
+   | 
+  ::: tag_modifiers/src/lib.rs
+   |
+5  | / struct_tag! {
+6  | |     tourism,
+7  | |     water,
+8  | |     park
+9  | | }
+   | |_- in this macro invocation
+
+warning: missing documentation for a struct field
+  --> tag_modifiers/src/macros.rs:33:15
+   |
+33 |               $(pub $field : f64),*
+   |                 ^^^^^^^^^^^^^^^^
+   | 
+  ::: tag_modifiers/src/lib.rs
+   |
+5  | / struct_tag! {
+6  | |     tourism,
+7  | |     water,
+8  | |     park
+9  | | }
+   | |_- in this macro invocation
+
+warning: missing documentation for a struct field
+  --> tag_modifiers/src/macros.rs:33:15
+   |
+33 |               $(pub $field : f64),*
+   |                 ^^^^^^^^^^^^^^^^
+   | 
+  ::: tag_modifiers/src/lib.rs
+   |
+5  | / struct_tag! {
+6  | |     tourism,
+7  | |     water,
+8  | |     park
+9  | | }
+   | |_- in this macro invocation
+
+warning: missing documentation for a struct field
+  --> tag_modifiers/src/macros.rs:33:15
+   |
+33 |               $(pub $field : f64),*
+   |                 ^^^^^^^^^^^^^^^^
+   | 
+  ::: tag_modifiers/src/lib.rs
+   |
+5  | / struct_tag! {
+6  | |     tourism,
+7  | |     water,
+8  | |     park
+9  | | }
+   | |_- in this macro invocation
+
+warning: missing documentation for a method
+  --> tag_modifiers/src/macros.rs:37:13
+   |
+37 | /             pub fn add(&mut self, tag : &str, size : f64) {
+38 | |                 match tag.as_ref() {
+39 | |                     $(stringify!($field) => self.$field += size,)*
+40 | |                     _ => (),
+41 | |                 }
+42 | |             }
+   | |_____________^
+   | 
+  ::: tag_modifiers/src/lib.rs
+   |
+5  | / struct_tag! {
+6  | |     tourism,
+7  | |     water,
+8  | |     park
+9  | | }
+   | |_- in this macro invocation
+
+   Compiling rawpointer v0.1.0
+   Compiling lazy_static v0.2.8
+   Compiling md5 v0.3.5
+   Compiling typeable v0.1.2
+   Compiling language-tags v0.2.2
+   Compiling httparse v1.2.3
+   Compiling log v0.3.8
+   Compiling libc v0.2.31
+   Compiling dtoa v0.4.2
+   Compiling vec_map v0.8.0
+   Compiling itoa v0.3.4
+   Compiling safemem v0.2.0
+   Compiling unicode-xid v0.0.4
+   Compiling fallible-iterator v0.1.3
+   Compiling num-traits v0.1.40
+   Compiling sequence_trie v0.2.1
+   Compiling typenum v1.9.0
+   Compiling siphasher v0.2.2
+   Compiling unicode-bidi v0.3.4
+   Compiling nodrop v0.1.9
+   Compiling unicase v1.4.2
+   Compiling unsafe-any v0.4.2
+   Compiling error v0.1.9
+   Compiling mime v0.2.6
+   Compiling num_cpus v1.6.2
+   Compiling memchr v1.0.1
+   Compiling rand v0.3.16
+   Compiling iovec v0.1.0
+   Compiling time v0.1.38
+   Compiling base64 v0.6.0
+   Compiling synom v0.11.3
+   Compiling num-integer v0.1.35
+   Compiling phf_shared v0.7.21
+   Compiling idna v0.1.4
+   Compiling stringprep v0.1.2
+   Compiling conduit-mime-types v0.7.3
+   Compiling num-complex v0.1.40
+   Compiling typemap v0.3.3
+   Compiling bytes v0.4.5
+   Compiling num-iter v0.1.34
+   Compiling syn v0.11.11
+   Compiling num-bigint v0.1.40
+   Compiling phf v0.7.21
+   Compiling plugin v0.2.6
+   Compiling alga v0.5.2
+   Compiling url v1.5.1
+   Compiling serde_json v1.0.3
+   Compiling num-rational v0.1.39
+   Compiling generic-array v0.8.3
+   Compiling hyper v0.10.13
+   Compiling serde_urlencoded v0.5.1
+   Compiling num v0.1.40
+   Compiling digest v0.6.2
+   Compiling crypto-mac v0.4.0
+   Compiling block-buffer v0.2.0
+   Compiling nalgebra v0.13.0
+   Compiling hmac v0.4.2
+   Compiling sha2 v0.6.0
+   Compiling postgres-protocol v0.3.1
+   Compiling postgres-shared v0.4.0
+   Compiling postgres v0.15.1
+   Compiling iron v0.5.1
+   Compiling mount v0.3.0
+   Compiling database_derive v0.1.0 (file:///home/gerwin/Documents/projects/stujob/lopeningent_backend/server/routing_server/database_derive)
+   Compiling serde_derive_internals v0.16.0
+   Compiling serde_derive v1.0.15
+   Compiling newtypes v0.1.0 (file:///home/gerwin/Documents/projects/stujob/lopeningent_backend/server/routing_server/newtypes)
+warning: missing documentation for a struct
+   --> newtypes/src/newtypes.rs:121:1
+    |
+121 | / pub struct Location {
+122 | |     pub lon : f64,
+123 | |     pub lat : f64
+124 | | }
+    | |_^
+    |
+note: lint level defined here
+   --> newtypes/src/lib.rs:1:9
+    |
+1   | #![warn(missing_docs)]
+    |         ^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+   --> newtypes/src/newtypes.rs:122:5
+    |
+122 |     pub lon : f64,
+    |     ^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+   --> newtypes/src/newtypes.rs:123:5
+    |
+123 |     pub lat : f64
+    |     ^^^^^^^^^^^^^
+
+warning: missing documentation for a method
+   --> newtypes/src/newtypes.rs:127:5
+    |
+127 | /     pub fn new(lon : f64, lat : f64) -> Location {
+128 | |         Location { lon : lon, lat : lat }
+129 | |     }
+    | |_____^
+
+warning: missing documentation for a method
+   --> newtypes/src/newtypes.rs:131:5
+    |
+131 | /     pub fn average(a : &Location, b : &Location) -> Location {
+132 | |         Location::new((a.lon + b.lon) / 2.0, (a.lat + b.lat) / 2.0)
+133 | |     }
+    | |_____^
+
+warning: missing documentation for a method
+   --> newtypes/src/newtypes.rs:135:5
+    |
+135 | /     pub fn into_radians(self) -> (f64, f64) {
+136 | |         (self.lat * PI / 180.0,
+137 | |          self.lon * PI / 180.0)
+138 | |     }
+    | |_____^
+
+warning: missing documentation for a method
+   --> newtypes/src/newtypes.rs:140:5
+    |
+140 | /     pub fn into_3d(&self) -> Vector3<f64> {
+141 | |         let rlon = self.lon * PI / 180.0;
+142 | |         let rlat = self.lat * PI / 180.0;
+143 | |         Vector3::new(rlon.sin() * rlat.cos(), rlon.cos() * rlat.cos(), rlat.sin())
+144 | |     }
+    | |_____^
+
+warning: missing documentation for a trait
+   --> newtypes/src/newtypes.rs:159:1
+    |
+159 | / pub trait Located {
+160 | |     fn located(&self) -> Location;
+161 | | }
+    | |_^
+
+warning: missing documentation for a trait method
+   --> newtypes/src/newtypes.rs:160:5
+    |
+160 |     fn located(&self) -> Location;
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+   Compiling util v0.1.0 (file:///home/gerwin/Documents/projects/stujob/lopeningent_backend/server/routing_server/util)
+   Compiling transform v0.1.0 (file:///home/gerwin/Documents/projects/stujob/lopeningent_backend/server/routing_server/transform)
+   Compiling buckets v0.1.0 (file:///home/gerwin/Documents/projects/stujob/lopeningent_backend/server/routing_server/buckets)
+warning: missing documentation for crate
+ --> transform/src/lib.rs:1:1
+  |
+1 | / #![warn(missing_docs)]
+2 | | extern crate newtypes;
+3 | | extern crate nalgebra as na;
+4 | | mod coords;
+5 | |
+6 | | pub use coords::*;
+7 | | pub use na::Vector3;
+  | |____________________^
+  |
+note: lint level defined here
+ --> transform/src/lib.rs:1:9
+  |
+1 | #![warn(missing_docs)]
+  |         ^^^^^^^^^^^^
+
+warning: missing documentation for a struct
+ --> transform/src/coords.rs:5:1
+  |
+5 | pub struct Coordinate<T>(pub T, pub T);
+  | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct
+  --> transform/src/coords.rs:25:1
+   |
+25 | / pub struct Projector {
+26 | |     up: Vector3<f64>,
+27 | |     perp: Vector3<f64>,
+28 | |     radius: Km,
+29 | | }
+   | |_^
+
+warning: missing documentation for a function
+  --> transform/src/coords.rs:31:1
+   |
+31 | / pub fn average<'a, I>(vec_iter: I) -> Vector3<f64>
+32 | |     where I: Iterator<Item = &'a Vector3<f64>>
+33 | | {
+34 | |     vec_iter
+35 | |         .fold(Vector3::new(0., 0., 0.), |x, y| x + y)
+36 | |         .normalize()
+37 | | }
+   | |_^
+
+warning: missing documentation for a method
+  --> transform/src/coords.rs:40:5
+   |
+40 | /     pub fn new(ray: Vector3<f64>, up: Vector3<f64>, radius: Km) -> Projector {
+41 | |         let up = up - ray * ray.dot(&up) / (ray.dot(&ray) * up.dot(&up)).sqrt();
+42 | |         Projector {
+43 | |             up: up.normalize(),
+...  |
+46 | |         }
+47 | |     }
+   | |_____^
+
+warning: missing documentation for a method
+  --> transform/src/coords.rs:48:5
+   |
+48 | /     pub fn map(&self, v: &Vector3<f64>) -> Coordinate<Km> {
+49 | |         Coordinate(self.radius * v.dot(&self.perp),
+50 | |                    self.radius * v.dot(&self.up))
+51 | |     }
+   | |_____^
+
+warning: missing documentation for a function
+  --> util/src/util/selectors.rs:85:1
+   |
+85 | / pub fn get_random(min : f64, max : f64) -> f64 {
+86 | |     let mut rng = rand::thread_rng();
+87 | |     let distribution = rand::distributions::Range::new(min, max);
+88 | |     distribution.ind_sample(&mut rng)
+89 | | }
+   | |_^
+   |
+note: lint level defined here
+  --> util/src/lib.rs:1:9
+   |
+1  | #![warn(missing_docs)]
+   |         ^^^^^^^^^^^^
+
+warning: missing documentation for a function
+  --> util/src/util/distance.rs:38:1
+   |
+38 | / pub fn distance_lon_lat<A : Located, B : Located>(a : &A, b: &B, radius : Km) -> Km {
+39 | |     let a = a.located();
+40 | |     let b = b.located();
+41 | |     let phi1 = a.lat * PI / 180.0;
+...  |
+45 | |     radius * ((1. - angle * 2.).acos())
+46 | | }
+   | |_^
+
+warning: missing documentation for a function
+  --> util/src/util/distance.rs:50:1
+   |
+50 | / pub fn distance_to_edge(point: (Km, Km), start: (Km, Km), end: (Km, Km)) -> Km {
+51 | |     let point = Vector2::new((point.0).to_f64(), (point.1).to_f64());
+52 | |     let start = Vector2::new((start.0).to_f64(), (start.1).to_f64());
+53 | |     let end = Vector2::new((end.0).to_f64(), (end.1).to_f64());
+...  |
+61 | |     }
+62 | | }
+   | |_^
+
+   Compiling graph v0.1.0 (file:///home/gerwin/Documents/projects/stujob/lopeningent_backend/server/routing_server/graph)
+warning: missing documentation for crate
+  --> buckets/src/lib.rs:1:1
+   |
+1  | / #![warn(missing_docs)]
+2  | |
+3  | | extern crate newtypes;
+4  | | extern crate num;
+...  |
+9  | | pub use grid::*;
+10 | | pub use interval::*;
+   | |____________________^
+   |
+note: lint level defined here
+  --> buckets/src/lib.rs:1:9
+   |
+1  | #![warn(missing_docs)]
+   |         ^^^^^^^^^^^^
+
+warning: missing documentation for a struct
+  --> buckets/src/grid.rs:5:1
+   |
+5  | / pub struct Grid<T> {
+6  | |     x: Km,
+7  | |     y: Km,
+8  | |     width: usize,
+...  |
+11 | |     data: Vec<Vec<T>>,
+12 | | }
+   | |_^
+
+warning: missing documentation for a method
+  --> buckets/src/grid.rs:15:5
+   |
+15 | /     pub fn from(interval: Interval, binsize: Km) -> Grid<T> {
+16 | |         let width = ((interval.max().0 - interval.min().0) / binsize) as usize;
+17 | |         let height = ((interval.max().1 - interval.min().1) / binsize) as usize;
+18 | |         let x = (interval.max().0 + interval.min().0 - binsize * width as f64) * 0.5;
+...  |
+27 | |         }
+28 | |     }
+   | |_____^
+
+warning: missing documentation for a method
+  --> buckets/src/grid.rs:30:5
+   |
+30 | /     pub fn get_max_x(&self) -> Km {
+31 | |         self.x + self.binsize * self.width as f64
+32 | |     }
+   | |_____^
+
+warning: missing documentation for a method
+  --> buckets/src/grid.rs:34:5
+   |
+34 | /     pub fn get_max_y(&self) -> Km {
+35 | |         self.y + self.binsize * self.height as f64
+36 | |     }
+   | |_____^
+
+warning: missing documentation for a method
+  --> buckets/src/grid.rs:44:5
+   |
+44 | /     pub fn get_xy(&self, coord: (Km, Km)) -> (usize, usize) {
+45 | |         let x = Self::clamp(coord.0 - self.x, Km::zero(), self.binsize, self.width);
+46 | |         let y = Self::clamp(coord.1 - self.y, Km::zero(), self.binsize, self.height);
+47 | |         (x, y)
+48 | |     }
+   | |_____^
+
+warning: missing documentation for a method
+  --> buckets/src/grid.rs:50:5
+   |
+50 | /     pub fn get_indexed(&self, index: (usize, usize)) -> Option<&[T]> {
+51 | |         if index.0 >= self.width || index.1 >= self.height {
+52 | |             None
+53 | |         } else {
+54 | |             Some(&self.data[self.get_index(index)])
+55 | |         }
+56 | |     }
+   | |_____^
+
+warning: missing documentation for a method
+  --> buckets/src/grid.rs:62:5
+   |
+62 | /     pub fn get(&self, coord: (Km, Km)) -> &[T] {
+63 | |         self.get_indexed(self.get_xy(coord))
+64 | |             .expect("Implementation error")
+65 | |     }
+   | |_____^
+
+warning: missing documentation for a method
+  --> buckets/src/grid.rs:83:5
+   |
+83 | /     pub fn add(&mut self, interval: Interval, t: &T) {
+84 | |         let min = self.get_xy(interval.min());
+85 | |         let max = self.get_xy(interval.max());
+86 | |         for x in min.0..max.0 + 1 {
+...  |
+91 | |         }
+92 | |     }
+   | |_____^
+
+warning: missing documentation for a struct
+  --> buckets/src/interval.rs:6:1
+   |
+6  | / pub struct Interval {
+7  | |     minx: Km,
+8  | |     maxx: Km,
+9  | |     miny: Km,
+10 | |     maxy: Km,
+11 | | }
+   | |_^
+
+warning: missing documentation for a method
+  --> buckets/src/interval.rs:14:5
+   |
+14 | /     pub fn from(start: (Km, Km), end: (Km, Km), tolerance: Km) -> Interval {
+15 | |         let x = if start.0 < end.0 {
+16 | |                      (start.0, end.0)
+17 | |                  } else {
+...  |
+30 | |         }
+31 | |     }
+   | |_____^
+
+warning: missing documentation for a method
+  --> buckets/src/interval.rs:32:5
+   |
+32 | /     pub fn min(&self) -> (Km, Km) {
+33 | |         (self.minx, self.miny)
+34 | |     }
+   | |_____^
+
+warning: missing documentation for a method
+  --> buckets/src/interval.rs:36:5
+   |
+36 | /     pub fn max(&self) -> (Km, Km) {
+37 | |         (self.maxx, self.maxy)
+38 | |     }
+   | |_____^
+
+warning: missing documentation for a type alias
+  --> graph/src/graph/graph.rs:13:1
+   |
+13 | pub type NodeID = u64;
+   | ^^^^^^^^^^^^^^^^^^^^^^
+   |
+note: lint level defined here
+  --> graph/src/lib.rs:1:9
+   |
+1  | #![warn(missing_docs)]
+   |         ^^^^^^^^^^^^
+
+warning: missing documentation for a type alias
+  --> graph/src/graph/graph.rs:14:1
+   |
+14 | pub type EdgeID = u64;
+   | ^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a method
+   --> graph/src/graph/graph.rs:203:5
+    |
+203 | /     pub fn get_edge(&'a self, from : NodeID, to : NodeID) -> Option<&'a E> {
+204 | |         self.data.get(from as usize).and_then(|el| el.links.get(&to))
+205 | |     }
+    | |_____^
+
+warning: missing documentation for a method
+   --> graph/src/graph/graph.rs:207:5
+    |
+207 | /     pub fn get_all_nodes(&'a self) -> iter::ListAllNodes<'a, V, E> {
+208 | |         iter::ListAllNodes::new(self.data.values())
+209 | |     }
+    | |_____^
+
+warning: missing documentation for a method
+   --> graph/src/graph/graph.rs:214:5
+    |
+214 | /     pub fn debug(&self) {
+215 | |         for id in self.list_ids() {
+216 | |             println!("{:?} -> {:?}", self.get(id).unwrap(), self.get_conn_idval(id).unwrap().map(|(id, val)| (val, self.get(id).unwrap())).collect::<Vec<_>>());
+217 | |         }
+218 | |     }
+    | |_____^
+
+warning: missing documentation for a module
+ --> graph/src/graph/mod.rs:5:1
+  |
+5 | pub mod dijkstra;
+  | ^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for an enum
+  --> graph/src/graph/dijkstra.rs:17:1
+   |
+17 | / pub enum Ending {
+18 | |     No,
+19 | |     Kinda,
+20 | |     Yes,
+21 | | }
+   | |_^
+
+warning: missing documentation for a variant
+  --> graph/src/graph/dijkstra.rs:18:5
+   |
+18 |     No,
+   |     ^^
+
+warning: missing documentation for a variant
+  --> graph/src/graph/dijkstra.rs:19:5
+   |
+19 |     Kinda,
+   |     ^^^^^
+
+warning: missing documentation for a variant
+  --> graph/src/graph/dijkstra.rs:20:5
+   |
+20 |     Yes,
+   |     ^^^
+
+warning: missing documentation for a struct
+  --> graph/src/graph/dijkstra.rs:24:1
+   |
+24 | / pub struct SingleAction<M : Majorising> {
+25 | |     pub previous_index : usize,
+26 | |     pub major : M,
+27 | |     pub node_handle : NodeID,
+28 | |     pub disabled : bool,
+29 | |     pub ignore : bool,
+30 | | }
+   | |_^
+
+warning: missing documentation for a struct field
+  --> graph/src/graph/dijkstra.rs:25:5
+   |
+25 |     pub previous_index : usize,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> graph/src/graph/dijkstra.rs:26:5
+   |
+26 |     pub major : M,
+   |     ^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> graph/src/graph/dijkstra.rs:27:5
+   |
+27 |     pub node_handle : NodeID,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> graph/src/graph/dijkstra.rs:28:5
+   |
+28 |     pub disabled : bool,
+   |     ^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> graph/src/graph/dijkstra.rs:29:5
+   |
+29 |     pub ignore : bool,
+   |     ^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a method
+  --> graph/src/graph/dijkstra.rs:33:5
+   |
+33 | /     pub fn new(previous_index : usize, node_handle : NodeID, major : M) -> SingleAction<M> {
+34 | |         SingleAction {
+35 | |             previous_index : previous_index,
+36 | |             node_handle : node_handle,
+...  |
+40 | |         }
+41 | |     }
+   | |_____^
+
+warning: missing documentation for a method
+  --> graph/src/graph/dijkstra.rs:43:5
+   |
+43 | /     pub fn ignore(self, ignore : bool) -> Self {
+44 | |         let mut res = self;
+45 | |         res.ignore = ignore;
+46 | |         res
+47 | |     }
+   | |_____^
+
+warning: missing documentation for a trait
+  --> graph/src/graph/dijkstra.rs:52:1
+   |
+52 | / pub trait DijkstraControl {
+53 | |     type V;
+54 | |     type E;
+55 | |     type M : Majorising;
+...  |
+69 | |     }
+70 | | }
+   | |_^
+
+warning: missing documentation for an associated type
+  --> graph/src/graph/dijkstra.rs:53:5
+   |
+53 |     type V;
+   |     ^^^^^^^
+
+warning: missing documentation for an associated type
+  --> graph/src/graph/dijkstra.rs:54:5
+   |
+54 |     type E;
+   |     ^^^^^^^
+
+warning: missing documentation for an associated type
+  --> graph/src/graph/dijkstra.rs:55:5
+   |
+55 |     type M : Majorising;
+   |     ^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a trait method
+  --> graph/src/graph/dijkstra.rs:56:5
+   |
+56 |     fn add_edge(&self, m : &Self::M, e : &Self::E) -> Self::M;
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a trait method
+  --> graph/src/graph/dijkstra.rs:57:5
+   |
+57 | /     fn filter(&self, _ : &Self::M) -> bool {
+58 | |         true
+59 | |     }
+   | |_____^
+
+warning: missing documentation for a trait method
+  --> graph/src/graph/dijkstra.rs:60:5
+   |
+60 |     fn hint(&self, m : &Self::M) -> u64;
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a trait method
+  --> graph/src/graph/dijkstra.rs:61:5
+   |
+61 | /     fn is_ending(&self, _ : &Self::V, _ : &Self::M) -> Ending {
+62 | |         Ending::No
+63 | |     }
+   | |_____^
+
+warning: missing documentation for a trait method
+  --> graph/src/graph/dijkstra.rs:64:5
+   |
+64 | /     fn yield_on_empty(&self) -> bool {
+65 | |         false
+66 | |     }
+   | |_____^
+
+warning: missing documentation for a trait method
+  --> graph/src/graph/dijkstra.rs:67:5
+   |
+67 | /     fn force_finish(&self) -> bool {
+68 | |         false
+69 | |     }
+   | |_____^
+
+warning: missing documentation for a struct
+  --> graph/src/graph/dijkstra.rs:72:1
+   |
+72 | / pub struct DijkstraBuilder<C : DijkstraControl> {
+73 | |     start_node : NodeID,
+74 | |     start_value : C::M,
+75 | | }
+   | |_^
+
+warning: missing documentation for a method
+  --> graph/src/graph/dijkstra.rs:81:5
+   |
+81 | /     pub fn new(start_node : NodeID, start_value : C::M) -> DijkstraBuilder<C> {
+82 | |         DijkstraBuilder {
+83 | |             start_node : start_node,
+84 | |             start_value : start_value,
+85 | |         }
+86 | |     }
+   | |_____^
+
+warning: missing documentation for a method
+   --> graph/src/graph/dijkstra.rs:88:5
+    |
+88  | /     pub fn generate_dijkstra(self, graph : &Graph<C::V, C::E>, control : &C)
+89  | |          -> (Vec<SingleAction<C::M>>, Vec<usize>)
+90  | |     {
+91  | |         let mut progress : VecMap<Vec<usize>> = VecMap::new();
+...   |
+160 | |         (res_chain, res_endpoints)
+161 | |     }
+    | |_____^
+
+warning: missing documentation for a function
+   --> graph/src/graph/dijkstra.rs:167:1
+    |
+167 | / pub fn into_nodes<M : Majorising>(res_chain : &Vec<SingleAction<M>>, start : usize) -> Path {
+168 | |     let mut res = Vec::new();
+169 | |     let mut index = start;
+170 | |     loop {
+...   |
+181 | |     return Path::new(res);
+182 | | }
+    | |_^
+
+warning: missing documentation for a function
+   --> graph/src/graph/dijkstra.rs:185:1
+    |
+185 | / pub fn into_annotated_nodes<M : Majorising + Clone>(res_chain : &Vec<SingleAction<M>>, start : usize) -> AnnotatedPath<M> {
+186 | |     let mut res = Vec::new();
+187 | |     let mut index = start;
+188 | |     loop {
+...   |
+199 | |     return AnnotatedPath::new(res);
+200 | | }
+    | |_^
+
+warning: missing documentation for a struct field
+  --> graph/src/graph/heapdata.rs:16:5
+   |
+16 |     pub hint : u64,
+   |     ^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> graph/src/graph/heapdata.rs:17:5
+   |
+17 |     pub index : usize,
+   |     ^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> graph/src/graph/heapdata.rs:18:5
+   |
+18 |     pub node: NodeID,
+   |     ^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a trait
+ --> graph/src/graph/ordering.rs:3:1
+  |
+3 | / pub trait Majorising : PartialEq {
+4 | |     fn majorises(&self, other : &Self) -> bool;
+5 | |     fn majorises_strict(&self, other : &Self) -> bool {
+6 | |         if self == other {false} else {self.majorises(other)}
+7 | |     }
+8 | | }
+  | |_^
+
+warning: missing documentation for a trait method
+ --> graph/src/graph/ordering.rs:4:5
+  |
+4 |     fn majorises(&self, other : &Self) -> bool;
+  |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a trait method
+ --> graph/src/graph/ordering.rs:5:5
+  |
+5 | /     fn majorises_strict(&self, other : &Self) -> bool {
+6 | |         if self == other {false} else {self.majorises(other)}
+7 | |     }
+  | |_____^
+
+warning: missing documentation for a struct
+ --> graph/src/graph/path.rs:7:1
+  |
+7 | pub struct Path(Vec<NodeID>);
+  | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a method
+  --> graph/src/graph/path.rs:10:5
+   |
+10 | /     pub fn new(vec : Vec<NodeID>) -> Path {
+11 | |         Path(vec)
+12 | |     }
+   | |_____^
+
+warning: missing documentation for a method
+  --> graph/src/graph/path.rs:14:5
+   |
+14 | /     pub fn get_elements<'a, V : 'a, E : 'a>(&self, graph : &'a Graph<V, E>) -> (Vec<&'a V>, Vec<&'a E>) {
+15 | |         (
+16 | |             self.0.iter().map(|&i| graph.get(i).unwrap()).collect(),
+17 | |             self.0.iter().zip(self.0.iter().skip(1)).map(|(&i, &j)| graph.get_edge(i, j).unwrap()).collect()
+18 | |         )
+19 | |     }
+   | |_____^
+
+warning: missing documentation for a method
+  --> graph/src/graph/path.rs:21:5
+   |
+21 | /     pub fn first(&self) -> NodeID{
+22 | |         self.0[0]
+23 | |     }
+   | |_____^
+
+warning: missing documentation for a method
+  --> graph/src/graph/path.rs:25:5
+   |
+25 | /     pub fn last(&self) -> NodeID {
+26 | |         self.0[self.0.len() - 1]
+27 | |     }
+   | |_____^
+
+warning: missing documentation for a method
+  --> graph/src/graph/path.rs:29:5
+   |
+29 | /     pub fn join(self, other : Path) -> Path {
+30 | |         let last = other.last();
+31 | |         Path::new((self.0).into_iter().take_while(|&n| n != last).chain((other.0).into_iter().rev()).collect())
+32 | |     }
+   | |_____^
+
+warning: missing documentation for a method
+  --> graph/src/graph/path.rs:34:5
+   |
+34 | /     pub fn get_indices(&self) -> &[NodeID] {
+35 | |         &self.0
+36 | |     }
+   | |_____^
+
+warning: missing documentation for a struct
+  --> graph/src/graph/path.rs:40:1
+   |
+40 | pub struct AnnotatedPath<D>(Vec<(NodeID, D)>);
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a method
+  --> graph/src/graph/path.rs:43:5
+   |
+43 | /     pub fn new(vec : Vec<(NodeID, D)>) -> AnnotatedPath<D> {
+44 | |         AnnotatedPath(vec)
+45 | |     }
+   | |_____^
+
+warning: missing documentation for a method
+  --> graph/src/graph/path.rs:47:5
+   |
+47 | /     pub fn first(&self) -> &(NodeID, D) {
+48 | |         &self.0[0]
+49 | |     }
+   | |_____^
+
+warning: missing documentation for a method
+  --> graph/src/graph/path.rs:51:5
+   |
+51 | /     pub fn last(&self) -> &(NodeID, D) {
+52 | |         &self.0[self.0.len() - 1]
+53 | |     }
+   | |_____^
+
+warning: missing documentation for a method
+  --> graph/src/graph/path.rs:55:5
+   |
+55 | /     pub fn into_map(&self) -> VecMap<&D> {
+56 | |         self.0.iter().map(|tuple| (tuple.0 as usize, &tuple.1)).collect()
+57 | |     }
+   | |_____^
+
+warning: missing documentation for a method
+  --> graph/src/graph/path.rs:59:5
+   |
+59 | /     pub fn into_path(&self) -> Path {
+60 | |         Path::new((self.0).iter().map(|&(n, _)| n).collect())
+61 | |     }
+   | |_____^
+
+warning: missing documentation for a method
+  --> graph/src/graph/path.rs:63:5
+   |
+63 | /     pub fn get_elements<'a, V : 'a, E : 'a>(&self, graph : &'a Graph<V, E>) -> (Vec<&'a V>, Vec<&'a E>) {
+64 | |         (
+65 | |             self.0.iter().map(|i| graph.get(i.0).unwrap()).collect(),
+66 | |             self.0.iter().zip(self.0.iter().skip(1)).map(|(i, j)| graph.get_edge(i.0, j.0).unwrap()).collect()
+67 | |         )
+68 | |     }
+   | |_____^
+
+warning: missing documentation for a module
+  --> graph/src/graph/mod.rs:18:1
+   |
+18 | pub mod testgraph;
+   | ^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a function
+  --> graph/src/graph/testgraph.rs:6:1
+   |
+6  | / pub fn create_testgraph<V, E, FV : FnMut(usize, usize) -> V, FE : FnMut(NodeID, NodeID) -> E>
+7  | |     (w : usize, h : usize, fv : FV, fe : FE) -> Result<Graph<V, E>, Error> {
+8  | |     let mut fv = fv;
+9  | |     let mut fe = fe;
+...  |
+23 | |     Graph::new(node_iterator, edge_iterator)
+24 | | }
+   | |_^
+
+   Compiling database v0.1.0 (file:///home/gerwin/Documents/projects/stujob/lopeningent_backend/server/routing_server/database)
+warning: missing documentation for crate
+   --> database/src/lib.rs:1:1
+    |
+1   | / #![warn(missing_docs)]
+2   | |
+3   | |
+4   | | extern crate postgres;
+...   |
+180 | |     })
+181 | | }
+    | |_^
+    |
+note: lint level defined here
+   --> database/src/lib.rs:1:9
+    |
+1   | #![warn(missing_docs)]
+    |         ^^^^^^^^^^^^
+
+warning: missing documentation for a trait
+  --> database/src/lib.rs:22:1
+   |
+22 | / pub trait Convert {
+23 | |     type From;
+24 | |     fn convert(from : Self::From) -> Self;
+25 | | }
+   | |_^
+
+warning: missing documentation for an associated type
+  --> database/src/lib.rs:23:5
+   |
+23 |     type From;
+   |     ^^^^^^^^^^
+
+warning: missing documentation for a trait method
+  --> database/src/lib.rs:24:5
+   |
+24 |     fn convert(from : Self::From) -> Self;
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a trait
+  --> database/src/lib.rs:64:1
+   |
+64 | / pub trait DebugQuery {
+65 | |     fn debug() -> String;
+66 | | }
+   | |_^
+
+warning: missing documentation for a trait method
+  --> database/src/lib.rs:65:5
+   |
+65 |     fn debug() -> String;
+   |     ^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a trait
+  --> database/src/lib.rs:68:1
+   |
+68 | / pub trait Query : Sized {
+69 | |     fn load(conn : &::postgres::Connection) -> Result<Vec<Self>, Box<Error>>;
+70 | | }
+   | |_^
+
+warning: missing documentation for a trait method
+  --> database/src/lib.rs:69:5
+   |
+69 |     fn load(conn : &::postgres::Connection) -> Result<Vec<Self>, Box<Error>>;
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct
+  --> database/src/lib.rs:74:1
+   |
+74 | / pub struct Node {
+75 | |     pub nid : NodeID,
+76 | |     pub lon : f64,
+77 | |     pub lat : f64,
+78 | |     pub poi_id : Vec<usize>,
+79 | | }
+   | |_^
+
+warning: missing documentation for a struct field
+  --> database/src/lib.rs:75:5
+   |
+75 |     pub nid : NodeID,
+   |     ^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> database/src/lib.rs:76:5
+   |
+76 |     pub lon : f64,
+   |     ^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> database/src/lib.rs:77:5
+   |
+77 |     pub lat : f64,
+   |     ^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> database/src/lib.rs:78:5
+   |
+78 |     pub poi_id : Vec<usize>,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct
+  --> database/src/lib.rs:89:1
+   |
+89 | / pub struct Edge {
+90 | |     pub eid : EdgeID,
+91 | |     pub rating : f32,
+92 | |     pub tags : Tags,
+93 | |     pub from_node : NodeID,
+94 | |     pub to_node : NodeID,
+95 | | }
+   | |_^
+
+warning: missing documentation for a struct field
+  --> database/src/lib.rs:90:5
+   |
+90 |     pub eid : EdgeID,
+   |     ^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> database/src/lib.rs:91:5
+   |
+91 |     pub rating : f32,
+   |     ^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> database/src/lib.rs:92:5
+   |
+92 |     pub tags : Tags,
+   |     ^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> database/src/lib.rs:93:5
+   |
+93 |     pub from_node : NodeID,
+   |     ^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> database/src/lib.rs:94:5
+   |
+94 |     pub to_node : NodeID,
+   |     ^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct
+   --> database/src/lib.rs:99:1
+    |
+99  | / pub struct Poi {
+100 | |     pub pid : usize,
+101 | |     pub name : String,
+102 | |     pub description : Option<String>,
+...   |
+105 | |     pub tag : Option<String>,
+106 | | }
+    | |_^
+
+warning: missing documentation for a struct field
+   --> database/src/lib.rs:100:5
+    |
+100 |     pub pid : usize,
+    |     ^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+   --> database/src/lib.rs:101:5
+    |
+101 |     pub name : String,
+    |     ^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+   --> database/src/lib.rs:102:5
+    |
+102 |     pub description : Option<String>,
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+   --> database/src/lib.rs:103:5
+    |
+103 |     pub lon : f64,
+    |     ^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+   --> database/src/lib.rs:104:5
+    |
+104 |     pub lat : f64,
+    |     ^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+   --> database/src/lib.rs:105:5
+    |
+105 |     pub tag : Option<String>,
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct
+   --> database/src/lib.rs:108:1
+    |
+108 | / pub struct Update {
+109 | |     edges : Vec<EdgeID>,
+110 | |     rating : f64,
+111 | | }
+    | |_^
+
+warning: missing documentation for a method
+   --> database/src/lib.rs:114:5
+    |
+114 | /     pub fn new(edges : Vec<EdgeID>, rating : f64) -> Update {
+115 | |         Update {
+116 | |             edges : edges,
+117 | |             rating : rating,
+118 | |         }
+119 | |     }
+    | |_____^
+
+warning: missing documentation for a method
+   --> database/src/lib.rs:136:5
+    |
+136 | /     pub fn apply(&self, connection : &Connection, influence : f64) -> Result<(), Box<Error>> {
+137 | |         let query = format!("UPDATE lopeningent.edges SET rating = rating * (1.0 - {1:}) + {2:} * {1:} WHERE eid IN {}", &Update::print(&self.edges), influence, self.rating) ;
+138 | |         println!("{}", query);
+139 | |         connection.execute(&query, &[])?;
+140 | |         Ok(())
+141 | |     }
+    | |_____^
+
+warning: missing documentation for a method
+   --> database/src/lib.rs:143:5
+    |
+143 | /     pub fn store(&self, database_url : &str, influence : f64) -> Result<(), Box<Error>> {
+144 | |         let connection = Connection::connect(database_url, TlsMode::None)?;
+145 | |         self.apply(&connection, influence)?;
+146 | |         Ok(())
+147 | |     }
+    | |_____^
+
+warning: missing documentation for a struct
+   --> database/src/lib.rs:156:1
+    |
+156 | / pub struct Scheme {
+157 | |     pub nodes : Vec<Node>,
+158 | |     pub edges : Vec<Edge>,
+159 | |     pub pois : Vec<Poi>,
+160 | | }
+    | |_^
+
+warning: missing documentation for a struct field
+   --> database/src/lib.rs:157:5
+    |
+157 |     pub nodes : Vec<Node>,
+    |     ^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+   --> database/src/lib.rs:158:5
+    |
+158 |     pub edges : Vec<Edge>,
+    |     ^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+   --> database/src/lib.rs:159:5
+    |
+159 |     pub pois : Vec<Poi>,
+    |     ^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a function
+   --> database/src/lib.rs:168:1
+    |
+168 | / pub fn load(database_url : &str) -> Result<Scheme, Box<Error>> {
+169 | |     let connection = Connection::connect(database_url, TlsMode::None)?;
+170 | |     use std::io;
+171 | |     use std::io::Write;
+...   |
+180 | |     })
+181 | | }
+    | |_^
+
+   Compiling logic v0.1.0 (file:///home/gerwin/Documents/projects/stujob/lopeningent_backend/server/routing_server/logic)
+warning: missing documentation for crate
+  --> logic/src/lib.rs:1:1
+   |
+1  | / #![warn(missing_docs)]
+2  | |
+3  | |
+4  | | extern crate graph;
+...  |
+22 | | pub use routing::{Distance, Metadata};
+23 | | pub use routing::{create_rod, close_rod};
+   | |_________________________________________^
+   |
+note: lint level defined here
+  --> logic/src/lib.rs:1:9
+   |
+1  | #![warn(missing_docs)]
+   |         ^^^^^^^^^^^^
+
+warning: missing documentation for a function
+  --> logic/src/data.rs:22:1
+   |
+22 | / pub fn get_graph(scheme : Scheme) -> Result<ApplicationGraph, Box<Error>> {
+23 | |     let nodes = scheme.nodes;
+24 | |     let edges = scheme.edges;
+25 | |     let pois = scheme.pois;
+...  |
+48 | |     Ok(Graph::new(poinodes.into_iter().map(|node| (node.node.nid, node)), edges_collected)?)
+49 | | }
+   | |_^
+
+warning: missing documentation for a struct
+  --> logic/src/data.rs:51:1
+   |
+51 | / pub struct Conversion {
+52 | |     pub graph : ApplicationGraph,
+53 | |     pub projector : Projector,
+54 | |     pub grid : Grid<(NodeID, NodeID)>,
+55 | | }
+   | |_^
+
+warning: missing documentation for a struct field
+  --> logic/src/data.rs:52:5
+   |
+52 |     pub graph : ApplicationGraph,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> logic/src/data.rs:53:5
+   |
+53 |     pub projector : Projector,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> logic/src/data.rs:54:5
+   |
+54 |     pub grid : Grid<(NodeID, NodeID)>,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a method
+  --> logic/src/data.rs:66:5
+   |
+66 | /     pub fn get_conversion(graph : ApplicationGraph, projector : Projector) -> Conversion {
+67 | |         let z = Km::from_f64(0.0);
+68 | |         let interval = graph.get_all_nodes()
+69 | |         .map(|node| node.located())
+...  |
+92 | |         }
+93 | |     }
+   | |_____^
+
+warning: missing documentation for a method
+  --> logic/src/data.rs:95:5
+   |
+95 | /     pub fn get_default_conversion(graph : ApplicationGraph) -> Conversion {
+96 | |         let projector = get_projector(&graph);
+97 | |         Self::get_conversion(graph, projector)
+98 | |     }
+   | |_____^
+
+warning: missing documentation for a method
+   --> logic/src/data.rs:100:5
+    |
+100 | /     pub fn get_edge(&self, location : &Location) -> Option<&AnnotatedEdge> {
+101 | |         let pos = self.projector.map(&location.into_3d()).into();
+102 | |         let choices = self.grid.get(pos);
+103 | |         choices.iter()
+...   |
+114 | |         }).map(|(_, edge)| edge)
+115 | |     }
+    | |_____^
+
+warning: missing documentation for a method
+   --> logic/src/data.rs:117:5
+    |
+117 | /     pub fn debug(&self) -> String {
+118 | |         let start_string = "<svg xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\">\n".to_string();
+119 | |         let mut res = self.graph.list_ids().flat_map(move |f| self.graph.get_connids(f).unwrap().map(move |t| (f, t)))
+120 | |         .map(|(from, to)| (&self.graph.get(from).unwrap().node, &self.graph.get(to).unwrap().node))
+...   |
+137 | |         res
+138 | |     }
+    | |_____^
+
+warning: missing documentation for a type alias
+  --> logic/src/annotated.rs:10:1
+   |
+10 | pub type ApplicationGraph = Graph<PoiNode, AnnotatedEdge>;
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct
+  --> logic/src/annotated.rs:13:1
+   |
+13 | / pub struct PoiNode {
+14 | |     pub node : Node,
+15 | |     pub poi : Option<Vec<Arc<Poi>>>
+16 | | }
+   | |_^
+
+warning: missing documentation for a struct field
+  --> logic/src/annotated.rs:14:5
+   |
+14 |     pub node : Node,
+   |     ^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> logic/src/annotated.rs:15:5
+   |
+15 |     pub poi : Option<Vec<Arc<Poi>>>
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct
+  --> logic/src/annotated.rs:25:1
+   |
+25 | / pub struct AnnotatedEdge {
+26 | |     pub edge : Edge,
+27 | |     pub dist : Km,
+28 | |     pub average : na::Vector3<f64>
+29 | | }
+   | |_^
+
+warning: missing documentation for a struct field
+  --> logic/src/annotated.rs:26:5
+   |
+26 |     pub edge : Edge,
+   |     ^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> logic/src/annotated.rs:27:5
+   |
+27 |     pub dist : Km,
+   |     ^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> logic/src/annotated.rs:28:5
+   |
+28 |     pub average : na::Vector3<f64>
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct
+  --> logic/src/routing.rs:38:1
+   |
+38 | / pub struct Distance{
+39 | |     major_value : f64,
+40 | |     minor_value : f64,
+41 | |     actual_length : f64,
+42 | |     illegal_node_hits : f64,
+43 | |     node_potential : f64,
+44 | | }
+   | |_^
+
+warning: missing documentation for a method
+  --> logic/src/routing.rs:47:5
+   |
+47 | /     pub fn new(values : (f64, f64, f64, f64, f64)) -> Distance {
+48 | |         Distance {
+49 | |             major_value : values.0,
+50 | |             minor_value : values.1,
+...  |
+54 | |         }
+55 | |     }
+   | |_____^
+
+warning: missing documentation for a method
+  --> logic/src/routing.rs:57:5
+   |
+57 | /     pub fn def() -> Distance {
+58 | |         let mut res = Self::default();
+59 | |         res.node_potential = 1.0;
+60 | |         res
+61 | |     }
+   | |_____^
+
+warning: missing documentation for a struct
+  --> logic/src/routing.rs:76:1
+   |
+76 | / pub struct Metadata {
+77 | |     pub requested_length : Km,
+78 | |     pub tag_converter : TagConverter,
+79 | |     pub original_route : Option<Path>,
+80 | | }
+   | |_^
+
+warning: missing documentation for a struct field
+  --> logic/src/routing.rs:77:5
+   |
+77 |     pub requested_length : Km,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> logic/src/routing.rs:78:5
+   |
+78 |     pub tag_converter : TagConverter,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> logic/src/routing.rs:79:5
+   |
+79 |     pub original_route : Option<Path>,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a method
+  --> logic/src/routing.rs:83:5
+   |
+83 | /     pub fn add(&mut self, tag : &str, size : f64) {
+84 | |         self.tag_converter.add(tag, size)
+85 | |     }
+   | |_____^
+
+warning: method is never used: `new`
+   --> logic/src/routing.rs:110:5
+    |
+110 | /     fn new(start : &Location, end : &Location) -> PoisonMiddle {
+111 | |         PoisonMiddle {
+112 | |             midpoint : Location::average(start, &Location::average(start, end)),
+113 | |             size : util::distance::distance_lon_lat(start, end, Km::from_f64(EARTH_RADIUS / 2.0)).to_f64(),
+114 | |         }
+115 | |     }
+    | |_____^
+    |
+    = note: #[warn(dead_code)] on by default
+
+warning: missing documentation for a function
+   --> logic/src/routing.rs:239:1
+    |
+239 | / pub fn create_rod(conversion : &Conversion, pos : &Location, metadata : &Metadata) -> Option<AnnotatedPath<Distance>> {
+240 | |     let edge = match conversion.get_edge(pos) {Some(x) => x, _ => return None};
+241 | |     let (starting_node, skip_node) = match metadata.original_route {
+242 | |         Some(ref route) => {
+...   |
+277 | |
+278 | | }
+    | |_^
+
+warning: missing documentation for a function
+   --> logic/src/routing.rs:282:1
+    |
+282 | / pub fn close_rod(conversion : &Conversion, pos : &Location, metadata : &Metadata, path : AnnotatedPath<Distance>) -> Option<(Path, Km)> {
+283 | |     let now = time::Instant::now();
+284 | |     let map = path.into_map();
+285 | |     let map : VecMap<_> = map.into_iter().map(|(n, c)| (n, c.clone())).collect();
+...   |
+344 | |     })
+345 | | }
+    | |_^
+
+warning: missing documentation for a constant
+ --> logic/src/consts.rs:2:1
+  |
+2 | pub const EARTH_RADIUS : f64 = 6731.0;
+  | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a constant
+ --> logic/src/consts.rs:3:1
+  |
+3 | pub const BIN_SIZE : f64 = 1.0;
+  | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a constant
+ --> logic/src/consts.rs:4:1
+  |
+4 | pub const TOLERANCE : f64 = 0.1;
+  | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct
+  --> logic/src/consts.rs:5:1
+   |
+5  | / pub struct RandomConfig {
+6  | |     pub min : f64,
+7  | |     pub max : f64,
+8  | |     pub increase : f64,
+9  | |     pub min_lin : f64,
+10 | |     pub max_lin : f64,
+11 | | }
+   | |_^
+
+warning: missing documentation for a struct field
+ --> logic/src/consts.rs:6:5
+  |
+6 |     pub min : f64,
+  |     ^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+ --> logic/src/consts.rs:7:5
+  |
+7 |     pub max : f64,
+  |     ^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+ --> logic/src/consts.rs:8:5
+  |
+8 |     pub increase : f64,
+  |     ^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+ --> logic/src/consts.rs:9:5
+  |
+9 |     pub min_lin : f64,
+  |     ^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> logic/src/consts.rs:10:5
+   |
+10 |     pub max_lin : f64,
+   |     ^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a constant
+  --> logic/src/consts.rs:13:1
+   |
+13 | / pub const CONFIG : RandomConfig = RandomConfig {
+14 | |     min : 0.5,
+15 | |     max : 0.8,
+16 | |     increase : 0.04,
+17 | |     min_lin : 400.0,
+18 | |     max_lin : 500.0
+19 | | };
+   | |__^
+
+warning: missing documentation for a constant
+  --> logic/src/consts.rs:21:1
+   |
+21 | pub const MIN_LENGTH_FACTOR : f64 = 0.9;
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a constant
+  --> logic/src/consts.rs:22:1
+   |
+22 | pub const DILUTE_FAVOURITE : f64 = 0.78;
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a constant
+  --> logic/src/consts.rs:23:1
+   |
+23 | pub const FALLOFF : f64 = 4.0;
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+   Compiling interface v0.1.0 (file:///home/gerwin/Documents/projects/stujob/lopeningent_backend/server/routing_server/interface)
+warning: missing documentation for crate
+  --> interface/src/lib.rs:1:1
+   |
+1  | / #![warn(missing_docs)]
+2  | |
+3  | |
+4  | | extern crate graph;
+...  |
+62 | |     return update;
+63 | | }
+   | |_^
+   |
+note: lint level defined here
+  --> interface/src/lib.rs:1:9
+   |
+1  | #![warn(missing_docs)]
+   |         ^^^^^^^^^^^^
+
+warning: missing documentation for a module
+  --> interface/src/lib.rs:26:1
+   |
+26 | pub mod serialize;
+   | ^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a function
+  --> interface/src/serialize.rs:8:1
+   |
+8  | / pub fn to_string(path : &Path) -> String {
+9  | |     let slice = path.get_indices();
+10 | |     base64::encode_config(unsafe {from_raw_parts(slice.as_ptr() as *const u8, slice.len() * 8)}, URL_SAFE)
+11 | | }
+   | |_^
+
+warning: missing documentation for a function
+  --> interface/src/serialize.rs:13:1
+   |
+13 | / pub fn to_path(path : &str) -> Result<Path, Box<Error>> {
+14 | |     let decoded = base64::decode_config(path, URL_SAFE)?;
+15 | |     let vec = unsafe {from_raw_parts(decoded.as_ptr() as *const NodeID, decoded.len() / 8)}.into_iter().cloned().collect();
+16 | |     Ok(Path::new(vec))
+17 | | }
+   | |_^
+
+warning: missing documentation for an enum
+  --> interface/src/lib.rs:28:1
+   |
+28 | / pub enum RoutingType {
+29 | |     GeoJson,
+30 | |     Directions,
+31 | | }
+   | |_^
+
+warning: missing documentation for a variant
+  --> interface/src/lib.rs:29:5
+   |
+29 |     GeoJson,
+   |     ^^^^^^^
+
+warning: missing documentation for a variant
+  --> interface/src/lib.rs:30:5
+   |
+30 |     Directions,
+   |     ^^^^^^^^^^
+
+warning: missing documentation for a method
+  --> interface/src/lib.rs:36:5
+   |
+36 | /     pub fn from(s : &str) -> RoutingType {
+37 | |         match s {
+38 | |             "geojson" => GeoJson,
+39 | |             _ => Directions
+40 | |         }
+41 | |     }
+   | |_____^
+
+warning: missing documentation for a function
+  --> interface/src/lib.rs:44:1
+   |
+44 | / pub fn route(conversion : &Conversion, from : &Location, to : &Location, metadata : &Metadata, routing_type : RoutingType) -> Result<String, Box<Error>> {
+45 | |     let mut route = None;
+46 | |     for _ in 0..20 {
+47 | |         let rod = logic::create_rod(conversion, from, metadata).ok_or("Rod failed")?;
+...  |
+55 | |     })
+56 | | }
+   | |_^
+
+warning: missing documentation for a function
+  --> interface/src/lib.rs:58:1
+   |
+58 | / pub fn rate(graph : &ApplicationGraph, route : &Path, rating : f64) -> Update {
+59 | |     let edges = route.get_elements(graph).1;
+60 | |     let edges_ids : Vec<_> = edges.into_iter().map(|edge| edge.edge.eid).collect();
+61 | |     let update = Update::new(edges_ids, rating);
+62 | |     return update;
+63 | | }
+   | |_^
+
+   Compiling iron_frontend v0.1.0 (file:///home/gerwin/Documents/projects/stujob/lopeningent_backend/server/routing_server/iron_frontend)
+warning: missing documentation for crate
+   --> iron_frontend/src/lib.rs:1:1
+    |
+1   | / #![warn(missing_docs)]
+2   | |
+3   | |
+4   | | extern crate graph;
+...   |
+224 | | impl_handler!(Rater, RatingData);
+225 | | impl_handler!(GraphHandler, RoutingUrlData);
+    | |____________________________________________^
+    |
+note: lint level defined here
+   --> iron_frontend/src/lib.rs:1:9
+    |
+1   | #![warn(missing_docs)]
+    |         ^^^^^^^^^^^^
+
+warning: missing documentation for a function
+  --> iron_frontend/src/lib.rs:62:1
+   |
+62 | / pub fn fire(config_filename : &str) -> Result<(), Box<Error>>{
+63 | |     let config = match fs::File::open(config_filename) {
+64 | |         Ok(file) => serde_json::from_reader(file)?,
+65 | |         Err(_) => {
+...  |
+86 | |     Ok(())
+87 | | }
+   | |_^
+
+   Compiling routing_server v0.1.0 (file:///home/gerwin/Documents/projects/stujob/lopeningent_backend/server/routing_server)
+warning: missing documentation for crate
+ --> src/main.rs:1:1
+  |
+1 | / #![warn(missing_docs)]
+2 | | extern crate iron_frontend;
+3 | |
+4 | | use std::env;
+... |
+8 | |     iron_frontend::fire(&config).unwrap();
+9 | | }
+  | |_^
+  |
+note: lint level defined here
+ --> src/main.rs:1:9
+  |
+1 | #![warn(missing_docs)]
+  |         ^^^^^^^^^^^^
+
+    Finished dev [unoptimized + debuginfo] target(s) in 72.75 secs

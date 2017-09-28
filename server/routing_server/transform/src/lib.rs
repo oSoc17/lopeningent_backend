@@ -1,3 +1,4 @@
+#![warn(missing_docs)]
 extern crate newtypes;
 extern crate nalgebra as na;
 mod coords;

@@ -1,5 +1,5 @@
 use graph::Graph;
-use graph::dijkstra::{DijkstraBuilder, DijkstraControl, SingleAction};
+
 use graph::NodeID;
 use error::Error;
 
@@ -13,7 +13,6 @@ pub fn create_testgraph<V, E, FV : FnMut(usize, usize) -> V, FE : FnMut(NodeID, 
             });
     let edge_iterator = (0..w).flat_map(|x| (0..h).flat_map(|y|
         {
-            let fe = &mut fe;
             if x > 0     {Some((x - 1, y))} else {None}.into_iter().chain(
             if x < w - 1 {Some((x + 1, y))} else {None}.into_iter().chain(
             if y > 0     {Some((x, y - 1))} else {None}.into_iter().chain(

@@ -1,3 +1,6 @@
+#![warn(missing_docs)]
+
+
 extern crate postgres;
 #[macro_use]
 extern crate database_derive;
@@ -43,6 +46,12 @@ impl<T : Convert> Convert for Option<T> {
     }
 }
 
+impl<T : Convert> Convert for Vec<T> {
+    type From = Vec<T::From>;
+    fn convert(from : Self::From) -> Self {
+        from.into_iter().map(|t| T::convert(t)).collect()
+    }
+}
 
 impl Convert for Tags {
     type From = Vec<String>;
@@ -66,6 +75,7 @@ pub struct Node {
     pub nid : NodeID,
     pub lon : f64,
     pub lat : f64,
+    pub poi_id : Vec<usize>,
 }
 
 impl Located for Node {
@@ -159,9 +169,9 @@ pub fn load(database_url : &str) -> Result<Scheme, Box<Error>> {
     let connection = Connection::connect(database_url, TlsMode::None)?;
     use std::io;
     use std::io::Write;
-    writeln!(io::stderr(), "{}", Node::debug());
-    writeln!(io::stderr(), "{}", Edge::debug());
-    writeln!(io::stderr(), "{}", Poi::debug());
+    let _ = writeln!(io::stderr(), "{}", Node::debug());
+    let _ = writeln!(io::stderr(), "{}", Edge::debug());
+    let _ = writeln!(io::stderr(), "{}", Poi::debug());
 
     Ok(Scheme {
         nodes : Node::load(&connection)?,

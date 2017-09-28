@@ -1,8 +1,8 @@
 use graph::Path;
-use std::sync::Arc;
+
 use database::Poi;
 use logic::{ApplicationGraph, PoiNode};
-use newtypes::{Location, Located};
+use newtypes::{Located};
 use serialize;
 
 #[derive(Serialize)]
@@ -10,7 +10,7 @@ pub struct DirectionalNode<'a> {
     pub lon : f64,
     pub lat : f64,
     pub dir : &'static str,
-    pub pois : Option<&'a Vec<Poi>>,
+    pub pois : Option<Vec<&'a Poi>>,
 }
 
 impl<'a>  DirectionalNode<'a> {
@@ -21,15 +21,13 @@ impl<'a>  DirectionalNode<'a> {
             lon : q.lon,
             lat : q.lat,
             dir : dir,
-            pois : poinode.poi.as_ref().map(|arc| arc.deref())
+            pois : poinode.poi.as_ref().map(|vec| vec.iter().map(|arc| arc.deref()).collect())
         }
     }
 }
 
 fn dir_none() -> &'static str {"none"}
 fn dir_forward() -> &'static str {"forward"}
-fn dir_hasleft() -> &'static str {"hasleft"}
-fn dir_hasright() -> &'static str {"hasright"}
 fn dir_turn() -> &'static str {"turnaround"}
 fn dir_left() -> &'static str {"left"}
 fn dir_right() -> &'static str {"right"}

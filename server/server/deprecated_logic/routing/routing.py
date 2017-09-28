@@ -34,6 +34,7 @@ def close_rod(graph, start_node, rod, routing_config, alt_rod=None):
     if alt_rod is None:
         alt_rod = rod
     res = []
+    res_size =[]
 
     # Poison
     poisoned_graph = poison_graph(graph, rod, routing_config)
@@ -48,18 +49,24 @@ def close_rod(graph, start_node, rod, routing_config, alt_rod=None):
     dijkstra = poisoned_graph.generate_dijkstra(start_node, routing_config).filter(alt_rod)
     for node_id, (size, actual) in dijkstra:
         total_length = actual + distance_dict[node_id]
-        res.append((node_id, total_length))
+        #res.append((node_id, total_length))
+	res_size.append((node_id, total_length, size))
 
-    print "Routes found:", len(res)
+    print "Routes found:", len(res_size)
 
     # Remove routes that are not of satisfying length
-    filtered_res = filter(lambda (_, tl): tl < routing_config.max_length and tl > routing_config.min_length, res)
+    #filtered_res = filter(lambda (_, tl): tl < routing_config.max_length and tl > routing_config.min_length, res)
+    
+    res_filter = [row for row in res_size if (row[1] < routing_config.max_length and row[1] >routing_config.min_length)]
+
+    #filtered_res_rooted = [(alt_rod[:rod_pos[node_id] + 1] + dijkstra.root(node_id), length) for (node_id, length) in filtered_res]
 
     # Calculate the actual route.
     filtered_res_rooted = [(alt_rod[:rod_pos[node_id] + 1] +
-                            dijkstra.root(node_id), length) for (node_id, length) in filtered_res]
+                            dijkstra.root(node_id), length, size) for (node_id, length, size) in res_filter]
+    
     print "Routes selected:", len(filtered_res_rooted)
-    return [route for route, _ in filtered_res_rooted]
+    return filtered_res_rooted
 
 
 def annotate_rod(rod, graph, distance_fn):

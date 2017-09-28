@@ -1,6 +1,6 @@
 use graph::{Graph, NodeID};
-use database::{Scheme, Node, Edge, Poi};
-use database::load;
+use database::{Scheme, Poi};
+
 use newtypes::{Located, Location};
 use std::sync::Arc;
 use std::collections::HashMap as Map;
@@ -23,26 +23,26 @@ pub fn get_graph(scheme : Scheme) -> Result<ApplicationGraph, Box<Error>> {
     let nodes = scheme.nodes;
     let edges = scheme.edges;
     let pois = scheme.pois;
-    let mut loc_poi_map : Map<Location, Vec<Poi>> = Map::new();
+    let mut pid_arc_poi_map : Map<usize, Arc<Poi>> = Map::new();
     for poi in pois {
-        loc_poi_map.entry(poi.located()).or_insert_with(Vec::new).push(poi);
-    }
-    let mut loc_arc_poi_map = Map::new();
-    for (key, value) in loc_poi_map {
-        loc_arc_poi_map.insert(key, Arc::new(value));
+        pid_arc_poi_map.insert(poi.pid, Arc::new(poi));
     }
     let poinodes : Vec<_> = nodes.into_iter().map(|node| PoiNode {
-        poi : loc_arc_poi_map.get(&node.located()).map(|n| n.clone()),
+        poi : node.poi_id.iter().map(|&id| pid_arc_poi_map.get(&id).map(Arc::clone)).collect(),
         node : node
         }).collect();
     let edges_collected : Vec<_> = {
         let indexed_nodes : VecMap<_> = poinodes.iter().map(|n| (n.node.nid as usize, &n.node)).collect();
         edges.into_iter().map(|edge| {
-        let (from, to) = (edge.from_node, edge.to_node);
-        let from_loc = indexed_nodes[from as usize];
-        let to_loc = indexed_nodes[to as usize];
-        let dist = util::distance::distance_lon_lat(&from_loc.located(), &to_loc.located(), Km::from_f64(EARTH_RADIUS));
-            (from, AnnotatedEdge{edge : edge, dist : dist, average : Location::average(&from_loc.located(), &to_loc.located()).into_3d()}, to)
+            let (from, to) = (edge.from_node, edge.to_node);
+            let from_loc = indexed_nodes[from as usize];
+            let to_loc = indexed_nodes[to as usize];
+            let dist = util::distance::distance_lon_lat(&from_loc.located(), &to_loc.located(), Km::from_f64(EARTH_RADIUS));
+                (from, AnnotatedEdge{
+                    edge : edge,
+                    dist : dist,
+                    average : Location::average(&from_loc.located(), &to_loc.located()).into_3d(),}
+                , to)
         }).collect()
     };
     Ok(Graph::new(poinodes.into_iter().map(|node| (node.node.nid, node)), edges_collected)?)

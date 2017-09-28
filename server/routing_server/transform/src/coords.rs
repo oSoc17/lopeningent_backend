@@ -1,6 +1,5 @@
 use newtypes::{Km};
 use na::Vector3;
-use std::f64::consts::PI;
 use newtypes::ToF64;
 
 pub struct Coordinate<T>(pub T, pub T);

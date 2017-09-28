@@ -44,14 +44,12 @@ macro_rules! implTupleMajorising {
                 return true;
             }
         }
-        //implTupleMajorising!($($v),* ; $($i),*);
+        implTupleMajorising!($($v),* ; $($i),*);
     };
     (;) => {};
 }
 
-implTupleMajorising!(A ; 0);
-implTupleMajorising!(A, B ; 1, 0);
-implTupleMajorising!(A, B, C ; 2, 1, 0);
+implTupleMajorising!(A, B, C, D, E, F, G, H; 7, 6, 5, 4, 3, 2, 1, 0);
 
 #[test]
 fn test_majorisation() {

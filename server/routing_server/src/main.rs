@@ -1,3 +1,4 @@
+#![warn(missing_docs)]
 extern crate iron_frontend;
 
 use std::env;

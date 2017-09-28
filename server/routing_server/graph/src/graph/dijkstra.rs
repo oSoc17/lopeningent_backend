@@ -1,10 +1,10 @@
 
 use std::collections::BinaryHeap;
-use std::rc::Rc;
-use std::cell::RefCell;
-use std::collections::HashMap;
-use std::collections::HashSet;
-use std::ops::Add;
+
+
+
+
+
 
 use vec_map::VecMap;
 
@@ -13,12 +13,20 @@ use graph::HeapData;
 use graph::Majorising;
 use graph::NodeID;
 
+#[derive(Debug, PartialEq, Eq)]
+pub enum Ending {
+    No,
+    Kinda,
+    Yes,
+}
+
 #[derive(Debug)]
 pub struct SingleAction<M : Majorising> {
     pub previous_index : usize,
     pub major : M,
     pub node_handle : NodeID,
     pub disabled : bool,
+    pub ignore : bool,
 }
 
 impl<M : Majorising> SingleAction<M> {
@@ -28,7 +36,14 @@ impl<M : Majorising> SingleAction<M> {
             node_handle : node_handle,
             major : major,
             disabled : false,
+            ignore : false,
         }
+    }
+
+    pub fn ignore(self, ignore : bool) -> Self {
+        let mut res = self;
+        res.ignore = ignore;
+        res
     }
 }
 
@@ -39,12 +54,12 @@ pub trait DijkstraControl {
     type E;
     type M : Majorising;
     fn add_edge(&self, m : &Self::M, e : &Self::E) -> Self::M;
-    fn filter(&self, m : &Self::M) -> bool {
+    fn filter(&self, _ : &Self::M) -> bool {
         true
     }
     fn hint(&self, m : &Self::M) -> u64;
-    fn is_ending(&self, v : &Self::V, m : &Self::M) -> bool {
-        false
+    fn is_ending(&self, _ : &Self::V, _ : &Self::M) -> Ending {
+        Ending::No
     }
     fn yield_on_empty(&self) -> bool {
         false
@@ -84,10 +99,15 @@ where C::M : Debug, C::V : Debug, C::E : Debug
             if res_chain[data.index].disabled {
                 continue;
             }
-            if control.force_finish()
-                && control.is_ending(graph.get(data.node).unwrap(), &res_chain[data.index].major) {
-                break;
-            }
+            let ignore_next_step = control.force_finish() && {
+                let ending = control.is_ending(graph.get(data.node).unwrap(), &res_chain[data.index].major);
+                if ending == Ending::Yes && ! res_chain[data.index].ignore {
+                    break;
+                }
+                ending == Ending::Kinda
+            };
+
+
             if let Some(iter) = graph.get_conn_idval(data.node) {
                 for (next_node, next_edge) in iter {
                     let next_major = control.add_edge(&res_chain[data.index].major, &next_edge);
@@ -107,17 +127,18 @@ where C::M : Debug, C::V : Debug, C::E : Debug
                         let index = res_chain.len();
                         heap.push(HeapData::new(index, next_node, &next_major, control));
                         h_vec.push(index);
-                        res_chain.push(SingleAction::new(data.index, next_node, next_major) )
+                        res_chain.push(SingleAction::new(data.index, next_node, next_major)
+                            .ignore(ignore_next_step))
                     }
                     //println!("Got {:?}", h_vec.iter().map(|&c| &res_chain[c].major).collect::<Vec<_>>());
                 }
             }
         }
-        for &index in progress.iter().flat_map(|(n, v)| v.iter()) {
+        for &index in progress.iter().flat_map(|(_, v)| v.iter()) {
             let action = &res_chain[index];
-            if control.is_ending(graph.get(action.node_handle).unwrap(), &action.major) {
+            if control.is_ending(graph.get(action.node_handle).unwrap(), &action.major) == Ending::Yes {
                 let prev_action = &res_chain[action.previous_index];
-                if !control.is_ending(graph.get(prev_action.node_handle).unwrap(), &prev_action.major)  {
+                if control.is_ending(graph.get(prev_action.node_handle).unwrap(), &prev_action.major) == Ending::No {
                     res_endpoints.push(index);
                 }
             }

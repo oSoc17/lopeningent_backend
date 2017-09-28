@@ -32,7 +32,7 @@ fn main() {
     // println!("{:?}", vertices);
     let duration = time::Instant::now() - now;
     println!("{}", res);
-    writeln!(io::stderr(), "{}.{:09}", duration.as_secs(), duration.subsec_nanos());
+    let _ = writeln!(io::stderr(), "{}.{:09}", duration.as_secs(), duration.subsec_nanos());
     //println!();
     //println!();
 

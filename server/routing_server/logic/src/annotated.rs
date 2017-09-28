@@ -12,7 +12,7 @@ pub type ApplicationGraph = Graph<PoiNode, AnnotatedEdge>;
 #[derive(Debug)]
 pub struct PoiNode {
     pub node : Node,
-    pub poi : Option<Arc<Vec<Poi>>>
+    pub poi : Option<Vec<Arc<Poi>>>
 }
 
 impl Located for PoiNode {
@@ -25,5 +25,5 @@ impl Located for PoiNode {
 pub struct AnnotatedEdge {
     pub edge : Edge,
     pub dist : Km,
-    pub average : na::Vector3<f64>,
+    pub average : na::Vector3<f64>
 }

@@ -1,3 +1,6 @@
+#![warn(missing_docs)]
+
+
 extern crate graph;
 extern crate logic;
 extern crate serde;
@@ -40,8 +43,8 @@ impl RoutingType {
 
 pub fn route(conversion : &Conversion, from : &Location, to : &Location, metadata : &Metadata, routing_type : RoutingType) -> Result<String, Box<Error>> {
     let mut route = None;
-    for _ in 0..10 {
-        let mut rod = logic::create_rod(conversion, from, metadata).ok_or("Rod failed")?;
+    for _ in 0..20 {
+        let rod = logic::create_rod(conversion, from, metadata).ok_or("Rod failed")?;
         route = logic::close_rod(conversion, to, metadata, rod);
         if route.is_some() {break;}
     }

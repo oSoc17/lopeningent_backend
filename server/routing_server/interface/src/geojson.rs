@@ -32,7 +32,7 @@ pub enum Geometry {
 }
 
 pub fn into_geojson(path : Path, graph : &ApplicationGraph) -> GeoJson {
-    let (nodes, edges) = path.get_elements(graph);
+    let (nodes, _) = path.get_elements(graph);
     GeoJson {
         type_ : "FeatureCollection".to_string(),
         features : vec![Feature {

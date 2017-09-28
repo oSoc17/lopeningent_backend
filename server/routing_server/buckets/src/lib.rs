@@ -1,3 +1,5 @@
+#![warn(missing_docs)]
+
 extern crate newtypes;
 extern crate num;
 

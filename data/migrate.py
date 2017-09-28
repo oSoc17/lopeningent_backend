@@ -4,6 +4,7 @@ from xml.etree.cElementTree import iterparse
 from rtree import index
 from time import time
 from json import loads
+import threading, re
 import migrate_config as C
 
 
@@ -13,6 +14,7 @@ class Edge:
         self.osm_id = osm_id
         self.nodes = list()
         self.tags = list()
+        self.poi_id = list()
 
     def get_bounds(self):
         # Get all latitudes and longtitudes inside the edge
@@ -25,13 +27,13 @@ class Edge:
 
         return (min_coord, max_coord)
 
-    def into_box(self, radius=0.001):
+    def into_box(self, radius=0.0006):
         min_coord, max_coord = self.get_bounds()
 
         # Helper function to apply some space around the edge
         def apply_radius(coord, radius):
             lat, lon = coord
-            return (round(lat + radius, 7), round(lon + radius, 7))
+            return (round(lat + radius, 4), round(lon + radius, 4))
 
         # Create a bounding box around an edge
         min_coord = apply_radius(min_coord, -radius)
@@ -142,19 +144,21 @@ def map_pois(edges, pois):
     # Open up an rtree
     idx = index.Rtree()
     edge_dict = dict()
-
+    edge_id_dict = dict()
     # Transform edges into boxes and put them inside the rtree
     for i, edge in enumerate(edges):
         edge_dict[i] = edge
+        edge_id_dict[i]= edge
         idx.insert(i, edge.into_box())
 
     # Helper function to turn a poi into a box
-    def poi_into_box(poi, radius=0.001):
-        lat, lon = poi["coord"]
-        left = round(lat - radius, 7)
-        bottom = round(lon - radius, 7)
-        right = round(lat + radius, 7)
-        top = round(lon + radius, 7)
+    def poi_into_box(poi, radius=0.0006):
+        lat = poi["lat"]
+        lon = poi["lon"]
+        left = round(lat - radius, 4)
+        bottom = round(lon - radius, 4)
+        right = round(lat + radius, 4)
+        top = round(lon + radius, 4)
         return (left, bottom, right, top)
 
     # Helper function to find edge/poi intersections
@@ -166,15 +170,14 @@ def map_pois(edges, pois):
     # intersections with the edges inside the rtree.
     # If it's intersecting, add an attribute
     # with the name of the POI set.
-    for pset in pois:
-        for element in pset["elements"]:
-            for edge_id in find_intersects(element):
-                if pset["name"] not in edge_dict[edge_id].tags:
-                    edge_dict[edge_id].tags.append(pset["name"])
-                else:
-                    break
-
-    return edge_dict.values()
+    for element in pois:
+        for edge_id in find_intersects(element):
+            if element["type"] not in edge_dict[edge_id].tags:
+                edge_dict[edge_id].tags.append(element["type"])
+                edge_id_dict[edge_id].poi_id.append(element["pid"])
+            else:
+                break
+    return edge_dict.values(),edge_id_dict.values()
 
 
 def db_connect(connstr):
@@ -225,10 +228,11 @@ def db_write_edges(connection, edges):
     for edge in edges:
         edge.nodes = map(lambda node: node['nid'], edge.nodes)
         for start, end in zip(edge.nodes, edge.nodes[1:]):
-            one_to_one_edges.append((start, end, edge.tags))
+            one_to_one_edges.append((start,end, edge.tags))
             one_to_one_edges.append((end, start, edge.tags))
 
     for e in one_to_one_edges:
+
         fr, to, tags = e
         cursor.execute(
             """
@@ -244,23 +248,58 @@ def db_write_edges(connection, edges):
 def db_write_pois(connection, pois):
     cursor = connection.cursor()
 
+    coords = list()
     def convert_poi_coord(poi):
         return ("{}".format(poi["coord"][0]), "{}".format(poi["coord"][1]))
 
     for pset in pois:
         for poi in pset["elements"]:
-            coords = convert_poi_coord(poi);
+            coord = convert_poi_coord(poi);
             cursor.execute(
                 """
                 INSERT INTO lopeningent.pois (name, description, lat, lon, tag)
-                    VALUES(%s, %s, %s, %s, %s)
+                    VALUES(%s, %s, %s, %s, %s) RETURNING pid,tag,lat,lon
                 """
                 , (poi["name"], poi["description"],
-                    coords[0], coords[1], pset["name"])
+                    coord[0], coord[1], pset["name"])
             )
+            pid,pid_type,lat,lon = cursor.fetchone()
+            coords.append({
+                "pid": pid,
+                "lat": lat,
+                "lon": lon,
+                "type": pid_type
+            })
 
     cursor.close()
+    return coords
 
+def db_write_poi_coords_nodes(connection, edges):
+    cursor = connection.cursor()
+    node_poi_id_list = list()
+
+    def list_into_pg(list):
+        list = str(map(int, list))
+        return list.replace('[', '{').replace(']', '}').replace('\'', '\"')
+
+
+    for edge in edges:
+        for start in edge.nodes:
+            node_poi_id_list.append((start,edge.poi_id))
+
+    for node_items in node_poi_id_list:
+        node_id, poi = node_items
+        cursor.execute(
+            """
+                UPDATE lopeningent.nodes
+                SET
+                poi_id = %s
+                WHERE nid = %s
+            """
+            , (list_into_pg(poi),node_id)
+        )
+
+    cursor.close()
 
 def db_close(connection):
     connection.commit()
@@ -284,14 +323,17 @@ if __name__ == "__main__":
     print "Cleared database... ({})".format(end - start)
 
     osm_nid_dict = db_write_nodes(conn, nodes)
+    coords = db_write_pois(conn, pois)
 
-    edges = map_pois(update_edge_nodes(edges, nodes, osm_nid_dict), pois)
+    edges,edges_poi_id = map_pois(update_edge_nodes(edges, nodes, osm_nid_dict), coords)
+
+
+
     end = time()
     print "Mapped POIs to edges... ({})".format(end - start)
 
     db_write_edges(conn, edges)
-    db_write_pois(conn, pois)
-
+    db_write_poi_coords_nodes(conn,edges_poi_id )
     db_close(conn)
     end = time()
     "Wrote changes to the database... ({})".format(end -start)

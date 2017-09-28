@@ -81,7 +81,8 @@ ALTER SEQUENCE edges_eid_seq OWNED BY edges.eid;
 CREATE TABLE nodes (
     nid integer NOT NULL,
     lon double precision,
-    lat double precision
+    lat double precision,
+    poi_id integer[]
 );
 
 

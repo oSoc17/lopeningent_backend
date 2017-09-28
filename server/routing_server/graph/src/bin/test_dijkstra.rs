@@ -1,6 +1,6 @@
 extern crate graph;
 
-use graph::dijkstra::DijkstraControl;
+use graph::dijkstra::{DijkstraControl, Ending};
 use graph::testgraph::*;
 use graph::dijkstra::{DijkstraBuilder, SingleAction};
 use std::f64;
@@ -43,8 +43,8 @@ impl DijkstraControl for Controller {
     fn hint(&self, m : &Self::M) -> u64 {
         (m.1 * 1000.0) as u64
     }
-    fn is_ending(&self, v : &Self::V, m : &Self::M) -> bool {
-        false//v == &(0, 9)
+    fn is_ending(&self, v : &Self::V, m : &Self::M) -> Ending {
+        Ending::No//v == &(0, 9)
     }
     fn yield_on_empty(&self) -> bool {
         true

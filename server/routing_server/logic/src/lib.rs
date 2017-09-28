@@ -1,3 +1,6 @@
+#![warn(missing_docs)]
+
+
 extern crate graph;
 extern crate database;
 extern crate util;

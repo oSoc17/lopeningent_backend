@@ -1,3 +1,6 @@
+#![warn(missing_docs)]
+
+
 extern crate graph;
 extern crate newtypes;
 extern crate interface;
@@ -59,10 +62,10 @@ struct Config {
 pub fn fire(config_filename : &str) -> Result<(), Box<Error>>{
     let config = match fs::File::open(config_filename) {
         Ok(file) => serde_json::from_reader(file)?,
-        Err(e) => {
-            writeln!(io::stderr(), "Failed to open config, creating default config at {}...", config_filename);
+        Err(_) => {
+            let _ = writeln!(io::stderr(), "Failed to open config, creating default config at {}...", config_filename);
             let res = Config::default();
-            writeln!(fs::File::create(config_filename)?, "{}", serde_json::to_string_pretty::<Config>(&res)?);
+            let _ = writeln!(fs::File::create(config_filename)?, "{}", serde_json::to_string_pretty::<Config>(&res)?);
             res
         }
     };
@@ -78,7 +81,7 @@ pub fn fire(config_filename : &str) -> Result<(), Box<Error>>{
     mount.mount("/route/rate", Rater::new(conversion.clone(), sender));
     let server_info = &config.server_info;
     let server_location = format!("{}:{}", server_info.host, server_info.port);
-    writeln!(io::stderr(), "We're up and running!");
+    let _ = writeln!(io::stderr(), "We're up and running!");
     iron::Iron::new(mount).http(&server_location)?;
     Ok(())
 }
@@ -143,13 +146,8 @@ impl RoutingUrlData {
 }
 
 impl GraphHandler {
-    fn handle_loc(&self, request : &mut Request) -> Result<Response, Box<Error>>  {
-        let mut body = String::new();
-        request.body.read_to_string(&mut body);
-        writeln!(io::stderr(), "Parsing {:?}:", body);
-        let parse : RoutingUrlData = fromurl::from_str(&body)?;
-
-        writeln!(io::stderr(), "{:#?}", parse);
+    fn handle_loc(&self, parse : RoutingUrlData) -> Result<Response, Box<Error>>  {
+        let _ = writeln!(io::stderr(), "{:#?}", parse);
         let from = newtypes::Location::new(parse.lon, parse.lat);
         let metadata = parse.get_metadata()?;
         let to = match metadata.original_route {
@@ -159,13 +157,14 @@ impl GraphHandler {
                 Some(ref x) => x.located()
             }
         };
-        writeln!(io::stderr(), "{:#?}", metadata);
+        let _ = writeln!(io::stderr(), "{:#?}", metadata);
         let path = interface::route(
             &self.conversion,
             &from,
             &to,
             &metadata,
-            parse.type_.as_ref().map(|s| interface::RoutingType::from(s)).unwrap_or(interface::RoutingType::Directions)
+            parse.type_.as_ref().map(|s| interface::RoutingType::from(s))
+                .unwrap_or(interface::RoutingType::Directions)
             )?;
 
         let response = Response::with((iron::status::Ok, path));
@@ -175,11 +174,17 @@ impl GraphHandler {
 
 
 macro_rules! impl_handler {
-    ($type : ty) => {
+    ($type : ty, $data : ty) => {
         impl Handler for $type {
             fn handle(&self, request : &mut Request) -> IronResult<Response> {
-                self.handle_loc(request)
-                    .map_err(|e| {
+                let mut body = String::new();
+                request.body.read_to_string(&mut body).map_err(<Box<Error>>::from).and_then(|_|
+                    {
+                        let _ = writeln!(io::stderr(), "Parsing {:?}:", body);
+                        let parse : Result<$data, _> = fromurl::from_str(&body);
+                        parse.map_err(<Box<Error>>::from)
+                            .and_then(|parse| self.handle_loc(parse).map_err(<Box<Error>>::from))
+                    }).map_err(|e| {
                         println!("{}", e.description());
                         iron::IronError::new(io::Error::new(io::ErrorKind::Other, e.description().to_string()), (iron::status::NotFound, "Empty route!".to_string()))}
                     )
@@ -205,21 +210,16 @@ impl Rater {
             sender : Mutex::new(sender),
         }
     }
-}
 
-impl Rater {
-    fn handle_loc(&self, request : &mut Request) -> Result<Response, Box<Error>> {
-        let mut body = String::new();
-        request.body.read_to_string(&mut body);
-        let parse : RatingData = fromurl::from_str(&body)?;
+    fn handle_loc(&self, parse : RatingData) -> Result<Response, Box<Error>> {
         let update = interface::rate(&self.conversion.graph, &interface::serialize::to_path(&parse.tag)?, parse.rating);
         {
-            self.sender.lock().map_err(|e| e.to_string())?.send(update);
+            self.sender.lock().map_err(|e| e.to_string())?.send(update)?;
         }
         let response = Response::with((iron::status::Ok, "Everything is fine!"));
         Ok(response)
     }
 }
 
-impl_handler!(Rater);
-impl_handler!(GraphHandler);
+impl_handler!(Rater, RatingData);
+impl_handler!(GraphHandler, RoutingUrlData);

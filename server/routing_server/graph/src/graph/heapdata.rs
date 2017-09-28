@@ -2,8 +2,8 @@
 //! It also inverts the comparison operator, which is useful since the
 //! Binary Heap data structure in Rust yields all data in high-to-low order.
 
-use std::cmp::Ordering;
-use graph::ordering::Majorising;
+
+
 use graph::NodeID;
 use graph::dijkstra::DijkstraControl;
 use num::traits::WrappingSub;

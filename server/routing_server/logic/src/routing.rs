@@ -2,16 +2,16 @@ use graph::{Path, AnnotatedPath};
 use data::Conversion;
 
 use graph::dijkstra::DijkstraBuilder;
-use graph::dijkstra::DijkstraControl;
+use graph::dijkstra::{DijkstraControl, Ending};
 use graph::dijkstra::into_annotated_nodes;
 use graph::Majorising;
 use graph::NodeID;
 
-use database::{Node, Edge, Poi, Tags, TagConverter};
+use database::{Tags, TagConverter};
 use database::TagModifier;
 use annotated::{PoiNode, AnnotatedEdge};
 
-use newtypes;
+
 use newtypes::{Location, Located};
 use newtypes::ToF64;
 use newtypes::Km;
@@ -28,14 +28,47 @@ use na;
 use util;
 use util::selectors::Selector;
 
-use consts::EARTH_RADIUS;
+use consts::*;
 
-#[derive(PartialEq, Debug, Clone)]
-pub struct Distance(f64, f64, f64, f64);
+
+
+
+
+#[derive(PartialEq, Debug, Clone, Default)]
+pub struct Distance{
+    major_value : f64,
+    minor_value : f64,
+    actual_length : f64,
+    illegal_node_hits : f64,
+    node_potential : f64,
+}
+
+impl Distance {
+    pub fn new(values : (f64, f64, f64, f64, f64)) -> Distance {
+        Distance {
+            major_value : values.0,
+            minor_value : values.1,
+            actual_length : values.2,
+            illegal_node_hits : values.3,
+            node_potential : values.4,
+        }
+    }
+
+    pub fn def() -> Distance {
+        let mut res = Self::default();
+        res.node_potential = 1.0;
+        res
+    }
+
+    fn into_majorising(&self) -> (f64, f64, f64) {
+        (self.major_value, self.minor_value, self.illegal_node_hits)//, self.node_potential)
+    }
+}
+
 
 impl Majorising for Distance {
     fn majorises(&self, other : &Self) -> bool {
-        (self.0, self.1, self.3).majorises(&(other.0, other.1, other.3))
+        self.into_majorising().majorises(&other.into_majorising())
     }
 }
 
@@ -54,7 +87,7 @@ impl Metadata {
 
 impl<'a> TagModifier for &'a Metadata {
     fn tag_modifier(&self, tag : &Tags) -> f64 {
-        (self.tag_converter.tag_modifier(tag)).exp()
+        self.tag_converter.tag_modifier(tag)
     }
 }
 
@@ -63,11 +96,11 @@ trait Poisoned {
 }
 
 impl Poisoned for () {
-    fn poison(&self, pos : &na::Vector3<f64>) -> f64 {
+    fn poison(&self, _ : &na::Vector3<f64>) -> f64 {
         1.0
     }
 }
-
+#[allow(unused)]
 struct PoisonMiddle {
     midpoint : Location,
     size : f64,
@@ -99,8 +132,7 @@ pub struct PoisonLine {
     end : na::Vector3<f64>,
     radius : f64,
     size : f64,
-    factor : f64,
-    maximum : f64,
+    maximum_ln : f64,
 }
 
 impl PoisonLine {
@@ -110,8 +142,7 @@ impl PoisonLine {
             end : end.into_3d(),
             radius : EARTH_RADIUS,
             size : util::distance::distance_lon_lat(start, end, Km::from_f64(EARTH_RADIUS)).to_f64() * factor,
-            factor : factor,
-            maximum : maximum,
+            maximum_ln : maximum.ln(),
         }
     }
 }
@@ -121,7 +152,8 @@ impl Poisoned for PoisonLine {
         let value_vec = (pos - self.start).cross(&(self.end - self.start));
         let value = self.size - self.radius * value_vec.norm().sqrt();
         if value > 0.0 {
-            (value / self.size * (self.maximum).ln()).exp()
+            let n = value / self.size * self.maximum_ln;
+            n.exp()
         } else {
             1.0
         }
@@ -140,15 +172,27 @@ struct RodController<P : Poisoned, M : TagModifier> {
 
 impl<P : Poisoned, M : TagModifier> RodController<P, M> {
     fn enjoyment(&self, tags : &Tags) -> f64 {
-        self.modifier.tag_modifier(tags)
+        -self.modifier.tag_modifier(tags)
     }
 
-    fn annotate(&self, edge : &AnnotatedEdge) -> Distance {
+    fn annotate(&self, edge : &AnnotatedEdge, potential : f64) -> Distance {
         let t = edge.dist.to_f64();
+        let mut next_potential = (potential - 1.0) * (-t * FALLOFF).exp() + 1.0;
         let p_l = self.poisoner_large.poison(&edge.average);
         let p_s = self.poisoner_small.poison(&edge.average);
         let e = self.enjoyment(&edge.edge.tags);
-        Distance(t * e * p_l,  t * e * p_s, t, 0.0)
+        if e != 0.0 {
+            next_potential *= e.exp() * DILUTE_FAVOURITE;
+            let (min, max) = M::tag_bounds();
+            if next_potential > max {
+                next_potential = max;
+            }
+            if next_potential < min {
+                next_potential = min;
+            }
+        }
+        let n_p = next_potential;
+        Distance::new((t * n_p * p_l,  t * n_p * p_s, t , 0.0, n_p))
     }
 }
 
@@ -157,19 +201,31 @@ impl<P : Poisoned, TM : TagModifier> DijkstraControl for RodController<P, TM> {
     type E = AnnotatedEdge;
     type M = Distance;
     fn add_edge(&self, m : &Self::M, e : &Self::E) -> Self::M {
-        let added = self.annotate(e);
-        Distance(m.0 + added.0, m.1 + added.1, m.2 + added.2, m.3 + added.3)
+        let added = self.annotate(e, m.node_potential);
+        let res = Distance {
+            major_value : m.major_value + added.major_value,
+            minor_value : m.minor_value + added.minor_value,
+            actual_length : m.actual_length + added.actual_length,
+            illegal_node_hits : m.illegal_node_hits +
+            if Some(e.edge.to_node) == self.point_to_skip {1.0} else {0.0},
+            node_potential : added.node_potential,
+        };
+        //println!("{:?}", res);
+        res
     }
     fn filter(&self, m : &Self::M) -> bool {
-        m.2 < self.max_length
+        m.actual_length < self.max_length
     }
     fn hint(&self, m : &Self::M) -> u64 {
-        (m.0 * 1000000.0) as u64
+        (m.major_value * 1000000.0) as u64
     }
-    fn is_ending(&self, v : &Self::V, m : &Self::M) -> bool {
+    fn is_ending(&self, v : &Self::V, m : &Self::M) -> Ending {
         match self.endings.get(v.node.nid as usize) {
-            None => false,
-            Some(dist) => m.2 + dist.2 <= self.max_length && m.2 + dist.2 > self.max_length * 0.8
+            None => Ending::No,
+            Some(dist) =>
+                if m.actual_length + dist.actual_length <= self.max_length
+                    && m.actual_length + dist.actual_length > self.max_length * MIN_LENGTH_FACTOR
+                    {Ending::Yes} else {Ending::Kinda}
         }
     }
     fn yield_on_empty(&self) -> bool {
@@ -194,7 +250,7 @@ pub fn create_rod(conversion : &Conversion, pos : &Location, metadata : &Metadat
         },
         None => (edge.edge.from_node, None),
     };
-    let builder = DijkstraBuilder::new(starting_node, Distance(0.0, 0.0, 0.0, 0.0));
+    let builder = DijkstraBuilder::new(starting_node, Distance::def());
     let rod_controller = RodController{
         max_length : metadata.requested_length.to_f64(),
         poisoner_large : (),
@@ -208,14 +264,14 @@ pub fn create_rod(conversion : &Conversion, pos : &Location, metadata : &Metadat
 
     let mut selector = Selector::new_default_rng();
     for &ending in &endings {
-        if actions[ending].major.2 < metadata.requested_length.to_f64() / 2.0
+        if actions[ending].major.actual_length < metadata.requested_length.to_f64() / 2.0
         {continue;}
-        selector.update(actions[ending].major.1, ending);
+        selector.update(actions[ending].major.minor_value, ending);
     }
 
     selector.decompose().map(|last| {
 
-        writeln!(io::stderr(), "Chosen rod : {:#?}", actions[last]);
+        let _ = writeln!(io::stderr(), "Chosen rod : {:#?}", actions[last]);
         into_annotated_nodes(&actions, last)
     })
 
@@ -229,15 +285,15 @@ pub fn close_rod(conversion : &Conversion, pos : &Location, metadata : &Metadata
     let map : VecMap<_> = map.into_iter().map(|(n, c)| (n, c.clone())).collect();
     let edge = match conversion.get_edge(pos) {Some(x) => x, None => return None};
     let starting_node = edge.edge.from_node;
-    let builder = DijkstraBuilder::new(starting_node, Distance(0.0, 0.0, 0.0, 0.0));
-    let large_random = util::selectors::get_random(0.5, 0.8);
-    let small_random = large_random - 0.08;//util::selectors::get_random(0.3, 0.5);
+    let builder = DijkstraBuilder::new(starting_node, Distance::def());
+    let large_random = util::selectors::get_random(CONFIG.min, CONFIG.max);
+    let small_random = large_random - CONFIG.increase;//util::selectors::get_random(0.3, 0.5);
     let rod_controller = RodController {
         max_length : metadata.requested_length.to_f64(),
         poisoner_large : PoisonLine::new(&conversion.graph.get(path.first().0).unwrap().located(), &conversion.graph.get(path.last().0).unwrap().located(),
-        large_random, util::selectors::get_random(400.0, 500.0)),
+        large_random, util::selectors::get_random(CONFIG.min_lin, CONFIG.max_lin)),
         poisoner_small : PoisonLine::new(&conversion.graph.get(path.first().0).unwrap().located(), &conversion.graph.get(path.last().0).unwrap().located(),
-        small_random, util::selectors::get_random(400.0, 500.0)),
+        small_random, util::selectors::get_random(CONFIG.min_lin, CONFIG.max_lin)),
         endings : map,
         closing : true,
         modifier : metadata,
@@ -254,15 +310,18 @@ pub fn close_rod(conversion : &Conversion, pos : &Location, metadata : &Metadata
         }
         let node = actions[ending].node_handle;
         let distance = &actions[ending].major;
-        let total_distance = distance.2 + map[node as usize].2;
-        let total_weight = distance.1 + map[node as usize].1;
+        let total_distance = distance.actual_length + map[node as usize].actual_length;
+        let total_weight = distance.minor_value + map[node as usize].minor_value;
+        let _ = write!(io::stderr(), "Totals of {} : abs({}) rel({}) ({:?}) ", ending, total_distance, total_weight, distance);
         if total_distance >= metadata.requested_length.to_f64() {
+            let _ = writeln!(io::stderr(), "Failure!");
             continue;
         }
-        if total_distance <= metadata.requested_length.to_f64() * 0.8 {
+        if total_distance <= metadata.requested_length.to_f64() * MIN_LENGTH_FACTOR {
+            let _ = writeln!(io::stderr(), "Failure!");
             continue;
         }
-        writeln!(io::stderr(), "Totals of {} : abs({}) rel({}) ({:?})", ending, total_distance, total_weight, distance);
+        let _ = writeln!(io::stderr(), "Success!");
         count += 1;
         selector.update((total_distance).exp(), ending);
     }
@@ -270,17 +329,18 @@ pub fn close_rod(conversion : &Conversion, pos : &Location, metadata : &Metadata
     let duration = time::Instant::now() - now;
     println!("{} {} {}.{:09} {}", large_random, small_random, duration.as_secs(), duration.subsec_nanos(), count);
 
-    writeln!(io::stderr(), "Routes selected : {} / {}", count, endings.len());
+    let _ = writeln!(io::stderr(), "Routes selected : {} / {}", count, endings.len());
     let longest_index = selector.decompose();
+
     longest_index.map(|longest_index| {
         let prev_node = &actions[actions[longest_index].previous_index].node_handle;
-        writeln!(io::stderr(), "longest_index : {} {} {}", longest_index, actions[longest_index].previous_index, prev_node);
-        writeln!(io::stderr(), "contains : {}", map.get(*prev_node as usize).is_some());
-        writeln!(io::stderr(), "disabled : {}", actions[actions[longest_index].previous_index].disabled);
+        let _ = writeln!(io::stderr(), "longest_index : {} {} {}", longest_index, actions[longest_index].previous_index, prev_node);
+        let _ = writeln!(io::stderr(), "contains : {}", map.get(*prev_node as usize).is_some());
+        let _ = writeln!(io::stderr(), "disabled : {}", actions[actions[longest_index].previous_index].disabled);
 
 
-        let true_length = actions[longest_index].major.2 + map[actions[longest_index].node_handle as usize].2;
-        writeln!(io::stderr(), "True length: {}", true_length);
+        let true_length = actions[longest_index].major.actual_length + map[actions[longest_index].node_handle as usize].actual_length;
+        let _ = writeln!(io::stderr(), "True length: {}", true_length);
         (path.into_path().join(into_annotated_nodes(&actions, longest_index).into_path()), Km::from_f64(true_length))
     })
 }

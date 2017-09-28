@@ -15,6 +15,7 @@ Including another URLconf
 """
 from django.conf.urls import url
 import interface.stats as stats
+import interface.pois as pois
 
 urlpatterns = [
     url(r'^stats/check/', stats.get_stats_from_id ),
@@ -22,6 +23,6 @@ urlpatterns = [
     # url(r'^route/generate/', route.generate),
     # url(r'^route/return/', route.return_home),
     # url(r'^route/rate/', route.rate_route),
-    # url(r'^poi/coords/', pois.get_coords),
-    # url(r'^poi/types/', pois.get_types)
+    url(r'^poi/coords/', pois.get_coords),
+    url(r'^poi/types/', pois.get_types)
 ]

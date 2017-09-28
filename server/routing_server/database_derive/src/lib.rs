@@ -51,12 +51,10 @@ fn impl_query(ast: &syn::DeriveInput) -> quote::Tokens {
     let query = &format!("SELECT {} FROM {};", &select_fields[..select_fields.len() - 2], table_name);
 
     // create a bunch of field initialisers for the constructor.
-    use std::io;
-    use std::io::Write;
     let fields = field_vec.iter()
         .filter_map(|field| {
             match field.ident.as_ref() {
-                Some(x) => {writeln!(io::stderr(), "{:?}", field.ty); Some((&field.ty, x))},
+                Some(x) => {Some((&field.ty, x))},
                 None => None
             }
         }).enumerate()
