@@ -2,7 +2,7 @@
 from collections import namedtuple
 
 import server.static.data as data
-from server.logic.distance.util import get_closest_edge
+from server.util import get_closest_edge
 
 
 class SerialNode(namedtuple('SerialNode', 'id mapid lat lon connections')):

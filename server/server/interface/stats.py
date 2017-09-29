@@ -38,7 +38,7 @@ def get_stats_from_id(request):
     except ValueError:
         logging.error("STATS: You don't have access to this api from outside the android app/Wrong Firebase token")
         resp ={'message': 'acces denied','values' : None}
-        logging.error("STATS: response that caused error was: %s", json.dumps(res))
+        logging.error("STATS: response that caused error was: %s", json.dumps(resp))
         return HttpResponse(json.dumps(resp), content_type="application/json")
 
 

@@ -281,7 +281,7 @@ use std::time;
 
 pub fn close_rod(conversion : &Conversion, pos : &Location, metadata : &Metadata, path : AnnotatedPath<Distance>) -> Option<(Path, Km)> {
     let now = time::Instant::now();
-    let map = path.into_map();
+    let map = path.as_map();
     let map : VecMap<_> = map.into_iter().map(|(n, c)| (n, c.clone())).collect();
     let edge = match conversion.get_edge(pos) {Some(x) => x, None => return None};
     let starting_node = edge.edge.from_node;
@@ -341,6 +341,6 @@ pub fn close_rod(conversion : &Conversion, pos : &Location, metadata : &Metadata
 
         let true_length = actions[longest_index].major.actual_length + map[actions[longest_index].node_handle as usize].actual_length;
         let _ = writeln!(io::stderr(), "True length: {}", true_length);
-        (path.into_path().join(into_annotated_nodes(&actions, longest_index).into_path()), Km::from_f64(true_length))
+        (path.as_path().join(into_annotated_nodes(&actions, longest_index).as_path()), Km::from_f64(true_length))
     })
 }

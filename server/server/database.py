@@ -2,7 +2,7 @@ from psycopg2 import pool, InterfaceError
 from model.edge import Edge
 from model.node import Node
 from model.user import User
-from logic.graph.util import distance
+from util import distance
 from time import time
 from multiprocessing import Process
 import threading, re, config, logging
@@ -170,7 +170,7 @@ def update_edge_in_db(edge, new_rating):
     )
 
     eid, rating, _, _, _ = cursor.fetchone()
-    new_rating = (rating + new_rating) / 2    
+    new_rating = (rating + new_rating) / 2
 
     cursor.execute(
         """
@@ -196,15 +196,15 @@ def get_poi_coords(types,route_poi):
     for type in types:
         cursor.execute(
             """
-            SELECT pid, name, description, coord 
-            FROM lopeningent.pois WHERE type = %s
+            SELECT pid, name, description, lon, lat
+            FROM lopeningent.pois WHERE tag = %s
             """,
             (type, )
         )
 
         for row in cursor.fetchall():
             if row[0] in route_poi:
-                lat, lon = cast_into_point(row[3])
+                lat, lon = row[3], row[4]
                 coords.append({
                     "name": row[1],
                     "description": row[2],
@@ -212,7 +212,7 @@ def get_poi_coords(types,route_poi):
                     "lon": lon,
                     "type": type
                 })
-    
+
     return coords
     cursor.close()
     POOL.putconn(conn, key="get-poi-coords")
@@ -220,7 +220,7 @@ def get_poi_coords(types,route_poi):
 def get_poi_types():
     conn = POOL.getconn(key="get-poi-types")
     cursor = conn.cursor()
-    cursor.execute("SELECT DISTINCT type FROM lopeningent.pois;")
+    cursor.execute("SELECT DISTINCT tag FROM lopeningent.pois;")
     return [row[0] for row in cursor.fetchall()]
     cursor.close()
     POOL.putconn(conn, key="get-poi-types")
