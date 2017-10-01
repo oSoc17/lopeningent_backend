@@ -4,6 +4,8 @@ use database::Edge;
 use database::Poi;
 use newtypes::{Located, Location, Km};
 use na;
+use std::sync::atomic::AtomicUsize;
+
 
 use graph::Graph;
 
@@ -25,5 +27,6 @@ impl Located for PoiNode {
 pub struct AnnotatedEdge {
     pub edge : Edge,
     pub dist : Km,
-    pub average : na::Vector3<f64>
+    pub average : na::Vector3<f64>,
+    pub hits : AtomicUsize,
 }

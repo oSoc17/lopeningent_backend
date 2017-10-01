@@ -20,10 +20,11 @@ use database::Update;
 
 use std::error::Error;
 use iron::Handler;
-use iron::{IronResult, Request, Response};
+use iron::{IronResult, Request, Response, BeforeMiddleware};
 use mount::Mount;
-use logic::Metadata;
-use logic::Conversion;
+use interface::Metadata;
+use interface::Conversion;
+use interface::Limit;
 use std::io;
 use std::io::{Write, Read};
 use std::sync::Arc;
@@ -74,16 +75,30 @@ pub fn fire(config_filename : &str) -> Result<(), Box<Error>>{
     let graph = logic::get_graph(database::load(&database_url)?)?;
     let conversion = logic::Conversion::get_default_conversion(graph);
     let conversion = Arc::new(conversion);
+    let limit = Limit::new(conversion.clone(), 0.1);
+    let limit = Arc::new(limit);
     let mut mount = Mount::new();
     let sender = async_updater(database_url, config.hyperparameters.rating_influence);
-    mount.mount("/route/generate", GraphHandler::new(conversion.clone()));
-    mount.mount("/route/return", GraphHandler::new(conversion.clone()));
+    mount.mount("/route/generate", GraphHandler::new(conversion.clone(), limit.clone()));
+    mount.mount("/route/return", GraphHandler::new(conversion.clone(), limit.clone()));
     mount.mount("/route/rate", Rater::new(conversion.clone(), sender));
     let server_info = &config.server_info;
     let server_location = format!("{}:{}", server_info.host, server_info.port);
     let _ = writeln!(io::stderr(), "We're up and running!");
-    iron::Iron::new(mount).http(&server_location)?;
+    let mut chain = iron::Chain::new(mount);
+    chain.link_before(Logger);
+    iron::Iron::new(chain).http(&server_location)?;
     Ok(())
+}
+
+struct Logger;
+
+
+impl BeforeMiddleware for Logger {
+    fn before(&self, req: &mut Request) -> IronResult<()> {
+        let _ = writeln!(io::stderr(), "Received {:?}", req);
+        Ok(())
+    }
 }
 
 fn async_updater(database_url : String, influence : f64) -> Sender<Update> {
@@ -101,12 +116,14 @@ fn async_updater(database_url : String, influence : f64) -> Sender<Update> {
 
 struct GraphHandler {
     conversion : Arc<Conversion>,
+    limit : Arc<Limit>,
 }
 
 impl GraphHandler {
-    fn new(conversion : Arc<Conversion>) -> GraphHandler {
+    fn new(conversion : Arc<Conversion>, limit : Arc<Limit>) -> GraphHandler {
         GraphHandler {
-            conversion : conversion,
+            conversion : conversion.clone(),
+            limit : limit,
         }
     }
 }
@@ -147,7 +164,7 @@ impl RoutingUrlData {
 
 impl GraphHandler {
     fn handle_loc(&self, parse : RoutingUrlData) -> Result<Response, Box<Error>>  {
-        let _ = writeln!(io::stderr(), "{:#?}", parse);
+        let _ = writeln!(io::stderr(), "Parsed: {:?}", parse);
         let from = newtypes::Location::new(parse.lon, parse.lat);
         let metadata = parse.get_metadata()?;
         let to = match metadata.original_route {
@@ -157,14 +174,15 @@ impl GraphHandler {
                 Some(ref x) => x.located()
             }
         };
-        let _ = writeln!(io::stderr(), "{:#?}", metadata);
+        let _ = writeln!(io::stderr(), "Metadata: {:?}", metadata);
         let path = interface::route(
             &self.conversion,
             &from,
             &to,
             &metadata,
             parse.type_.as_ref().map(|s| interface::RoutingType::from(s))
-                .unwrap_or(interface::RoutingType::Directions)
+                .unwrap_or(interface::RoutingType::Directions),
+            &self.limit
             )?;
 
         let response = Response::with((iron::status::Ok, path));

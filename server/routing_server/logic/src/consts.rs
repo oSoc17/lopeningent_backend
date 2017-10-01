@@ -18,6 +18,8 @@ pub const CONFIG : RandomConfig = RandomConfig {
     max_lin : 500.0
 };
 
-pub const MIN_LENGTH_FACTOR : f64 = 0.9;
-pub const DILUTE_FAVOURITE : f64 = 0.78;
+pub const MIN_LENGTH_FACTOR : f64 = 0.8;
+pub const DILUTE_FAVOURITE : f64 = 1.5;
 pub const FALLOFF : f64 = 4.0;
+pub const ABS_MINIMUM : f64 = 0.25;
+pub const ABS_MAXIMUM : f64 = 4.0;

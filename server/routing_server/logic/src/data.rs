@@ -3,6 +3,7 @@ use database::{Scheme, Poi};
 
 use newtypes::{Located, Location};
 use std::sync::Arc;
+use std::sync::atomic::AtomicUsize;
 use std::collections::HashMap as Map;
 use buckets::{Grid, Interval};
 use transform::Projector;
@@ -18,6 +19,8 @@ use std::error::Error;
 use util;
 use transform;
 use na;
+
+
 
 pub fn get_graph(scheme : Scheme) -> Result<ApplicationGraph, Box<Error>> {
     let nodes = scheme.nodes;
@@ -41,7 +44,8 @@ pub fn get_graph(scheme : Scheme) -> Result<ApplicationGraph, Box<Error>> {
                 (from, AnnotatedEdge{
                     edge : edge,
                     dist : dist,
-                    average : Location::average(&from_loc.located(), &to_loc.located()).into_3d(),}
+                    average : Location::average(&from_loc.located(), &to_loc.located()).into_3d(),
+                    hits : AtomicUsize::new(0),}
                 , to)
         }).collect()
     };

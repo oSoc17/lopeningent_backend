@@ -169,9 +169,6 @@ pub fn load(database_url : &str) -> Result<Scheme, Box<Error>> {
     let connection = Connection::connect(database_url, TlsMode::None)?;
     use std::io;
     use std::io::Write;
-    let _ = writeln!(io::stderr(), "{}", Node::debug());
-    let _ = writeln!(io::stderr(), "{}", Edge::debug());
-    let _ = writeln!(io::stderr(), "{}", Poi::debug());
 
     Ok(Scheme {
         nodes : Node::load(&connection)?,

@@ -21,6 +21,8 @@ use std::io;
 use std::io::Write;
 use std::collections::HashSet;
 
+use std::sync::atomic::Ordering;
+
 use vec_map::VecMap;
 
 use na;
@@ -88,6 +90,9 @@ impl Metadata {
 impl<'a> TagModifier for &'a Metadata {
     fn tag_modifier(&self, tag : &Tags) -> f64 {
         self.tag_converter.tag_modifier(tag)
+    }
+    fn tag_bounds() -> (f64, f64) {
+        (ABS_MINIMUM, ABS_MAXIMUM)
     }
 }
 
@@ -192,7 +197,9 @@ impl<P : Poisoned, M : TagModifier> RodController<P, M> {
             }
         }
         let n_p = next_potential;
-        Distance::new((t * n_p * p_l,  t * n_p * p_s, t , 0.0, n_p))
+        let random_factor = (edge.hits.load(Ordering::Relaxed) as f64 + 1.0);
+        let random_factor = random_factor * random_factor * util::selectors::get_random(0.1, 1.0);
+        Distance::new((t * n_p * p_l * random_factor,  t * n_p * p_s * random_factor, t , 0.0, n_p))
     }
 }
 
@@ -271,7 +278,7 @@ pub fn create_rod(conversion : &Conversion, pos : &Location, metadata : &Metadat
 
     selector.decompose().map(|last| {
 
-        let _ = writeln!(io::stderr(), "Chosen rod : {:#?}", actions[last]);
+        //let _ = writeln!(io::stderr(), "Chosen rod : {:#?}", actions[last]);
         into_annotated_nodes(&actions, last)
     })
 
@@ -312,31 +319,31 @@ pub fn close_rod(conversion : &Conversion, pos : &Location, metadata : &Metadata
         let distance = &actions[ending].major;
         let total_distance = distance.actual_length + map[node as usize].actual_length;
         let total_weight = distance.minor_value + map[node as usize].minor_value;
-        let _ = write!(io::stderr(), "Totals of {} : abs({}) rel({}) ({:?}) ", ending, total_distance, total_weight, distance);
+        //let _ = write!(io::stderr(), "Totals of {} : abs({}) rel({}) ({:?}) ", ending, total_distance, total_weight, distance);
         if total_distance >= metadata.requested_length.to_f64() {
-            let _ = writeln!(io::stderr(), "Failure!");
+            //let _ = writeln!(io::stderr(), "Failure!");
             continue;
         }
         if total_distance <= metadata.requested_length.to_f64() * MIN_LENGTH_FACTOR {
-            let _ = writeln!(io::stderr(), "Failure!");
+            //let _ = writeln!(io::stderr(), "Failure!");
             continue;
         }
-        let _ = writeln!(io::stderr(), "Success!");
+        //let _ = writeln!(io::stderr(), "Success!");
         count += 1;
         selector.update((total_distance).exp(), ending);
     }
 
     let duration = time::Instant::now() - now;
-    println!("{} {} {}.{:09} {}", large_random, small_random, duration.as_secs(), duration.subsec_nanos(), count);
+    let _ = writeln!(io::stderr(), "{} {} {}.{:09} {}", large_random, small_random, duration.as_secs(), duration.subsec_nanos(), count);
 
-    let _ = writeln!(io::stderr(), "Routes selected : {} / {}", count, endings.len());
+    //let _ = writeln!(io::stderr(), "Routes selected : {} / {}", count, endings.len());
     let longest_index = selector.decompose();
 
     longest_index.map(|longest_index| {
         let prev_node = &actions[actions[longest_index].previous_index].node_handle;
-        let _ = writeln!(io::stderr(), "longest_index : {} {} {}", longest_index, actions[longest_index].previous_index, prev_node);
-        let _ = writeln!(io::stderr(), "contains : {}", map.get(*prev_node as usize).is_some());
-        let _ = writeln!(io::stderr(), "disabled : {}", actions[actions[longest_index].previous_index].disabled);
+        //let _ = writeln!(io::stderr(), "longest_index : {} {} {}", longest_index, actions[longest_index].previous_index, prev_node);
+        //let _ = writeln!(io::stderr(), "contains : {}", map.get(*prev_node as usize).is_some());
+        //let _ = writeln!(io::stderr(), "disabled : {}", actions[actions[longest_index].previous_index].disabled);
 
 
         let true_length = actions[longest_index].major.actual_length + map[actions[longest_index].node_handle as usize].actual_length;

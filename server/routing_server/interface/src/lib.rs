@@ -17,6 +17,7 @@ use std::error::Error;
 pub use logic::Conversion;
 pub use logic::Metadata;
 pub use logic::ApplicationGraph;
+pub use logic::Limit;
 pub use graph::Path;
 
 use database::Update;
@@ -41,7 +42,7 @@ impl RoutingType {
     }
 }
 
-pub fn route(conversion : &Conversion, from : &Location, to : &Location, metadata : &Metadata, routing_type : RoutingType) -> Result<String, Box<Error>> {
+pub fn route(conversion : &Conversion, from : &Location, to : &Location, metadata : &Metadata, routing_type : RoutingType, limit : &Limit) -> Result<String, Box<Error>> {
     let mut route = None;
     for _ in 0..20 {
         let rod = logic::create_rod(conversion, from, metadata).ok_or("Rod failed")?;
@@ -49,6 +50,7 @@ pub fn route(conversion : &Conversion, from : &Location, to : &Location, metadat
         if route.is_some() {break;}
     }
     let route = route.ok_or("Closure failed")?.0;
+    limit.improve(&route);
     Ok(match routing_type {
         Directions => serde_json::to_string_pretty(&directions::into_directions(route, &conversion.graph))?,
         GeoJson => serde_json::to_string_pretty(&geojson::into_geojson(route, &conversion.graph))?,
