@@ -1,0 +1,7 @@
+echo "deb http://nginx.org/packages/ubuntu/ xenial nginx" > /etc/apt/sources.list.d/nginx.list
+echo "deb-src http://nginx.org/packages/ubuntu/ xenial nginx" >> /etc/apt/sources.list.d/nginx.list
+apt-key adv --keyserver keyserver.ubuntu.com --recv-keys ABF5BD827BD9BF62
+apt-get update 
+apt-get install nginx
+sudo nginx -c $(pwd)/nginx.conf
+
