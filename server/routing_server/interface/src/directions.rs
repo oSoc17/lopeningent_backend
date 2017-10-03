@@ -9,6 +9,7 @@ use serialize;
 pub struct DirectionalNode<'a> {
     pub lon : f64,
     pub lat : f64,
+    #[serde(rename = "c")]
     pub dir : &'static str,
     pub pois : Option<Vec<&'a Poi>>,
 }

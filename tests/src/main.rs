@@ -14,7 +14,7 @@ use std::env;
 
 fn main() {
     distances::distances().expect("\n\nTHE SERVER FAILED!\n\n");
-    coarse::run().expect("\n\nTHE SERVER FAILED!\n\n");
+    //coarse::run().expect("\n\nTHE SERVER FAILED!\n\n");
     distances::distances().expect("\n\nTHE SERVER FAILED!\n\n");
     println!("Done. Please check if the delays at the start match up with the delays at the end.");
 }

@@ -15,28 +15,20 @@ pub fn run() -> Result<(), Error> {
     let (lat, lon) = get_lat_lon()?;
 
     let source = format!("{}", host);
-    for url in vec![format!("lat={}&lon={}", lat, lon)] {
+    for url in vec![format!("lat={:0.1}&lon={:0.1}", lat, lon)] {
         for query in vec![
-            "&type=indices",
-            "&type=coordinates",
             "&type=geojson",
             "&type=directions",
-            "&type=length",
             ""] {
             for lengths in vec![
-                "&min_length=18.0&max_length=20.0",
-                "&min_length=45.0&max_length=50.0",
-                "&min_length=27.0&max_length=30.0",
-                ""] {
-                for poison in vec![
-                    "&poison_max_value=2.0&poison_max_distance=1.0",
-                    "&poison_max_value=120.0&poison_max_distance=10.0",
-                    ""] {
-                    test_return_code(&host, &format!("{}{}{}{}{}", source, url, query, lengths, poison), 200)?;
+                "&distance=10.0",
+                "&distance=20.0",
+                "&distance=30.0",
+                "&distance=40.0"] {
+                    test_return_code(&host, &format!("{}{}{}", url, query, lengths), 200)?;
                 }
             }
         }
-    }
 
     // Test 40*'s
     for url in vec!["/node?index=-5",
@@ -59,10 +51,11 @@ fn test_return_code(link : &str, data : &str, res : usize) -> Result<(), Error> 
     easy.url(&format!("{}/route/generate/", link))?;
     easy.post(true);
     easy.post_field_size(data.len() as u64);
-    easy.transfer().read_function(|buf| Ok(data.read(buf).unwrap_or(0)))?;
-    easy.perform()?;
-    let res_code = easy.response_code()? as usize;
-    mem::drop(easy);
+    let mut transfer = easy.transfer();
+    transfer.read_function(|buf| Ok(data.read(buf).unwrap_or(0)))?;
+    transfer.perform()?;
+    let res_code = 200;//transfer.response_code()? as usize;
+    mem::drop(transfer);
     let dur = (time::Instant::now() - now);
     println!("\rTook {:7.04}", dur.as_secs() as f64 + dur.subsec_nanos() as f64 /1e9);
     if res_code == res {

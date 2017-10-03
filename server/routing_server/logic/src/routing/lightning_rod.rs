@@ -31,18 +31,16 @@ use util;
 use util::selectors::Selector;
 
 use consts::*;
-
-
-
+use super::util::*;
 
 
 #[derive(PartialEq, Debug, Clone, Default)]
 pub struct Distance{
-    major_value : f64,
-    minor_value : f64,
-    actual_length : f64,
-    illegal_node_hits : f64,
-    node_potential : f64,
+    pub major_value : f64,
+    pub minor_value : f64,
+    pub actual_length : f64,
+    pub illegal_node_hits : f64,
+    pub node_potential : f64,
 }
 
 impl Distance {
@@ -62,6 +60,14 @@ impl Distance {
         res
     }
 
+    pub fn get_length(&self) -> f64 {
+        self.actual_length
+    }
+
+    pub fn get_potential(&self) -> f64 {
+        self.major_value
+    }
+
     fn into_majorising(&self) -> (f64, f64, f64) {
         (self.major_value, self.minor_value, self.illegal_node_hits)//, self.node_potential)
     }
@@ -71,28 +77,6 @@ impl Distance {
 impl Majorising for Distance {
     fn majorises(&self, other : &Self) -> bool {
         self.into_majorising().majorises(&other.into_majorising())
-    }
-}
-
-#[derive(Default, Debug)]
-pub struct Metadata {
-    pub requested_length : Km,
-    pub tag_converter : TagConverter,
-    pub original_route : Option<Path>,
-}
-
-impl Metadata {
-    pub fn add(&mut self, tag : &str, size : f64) {
-        self.tag_converter.add(tag, size)
-    }
-}
-
-impl<'a> TagModifier for &'a Metadata {
-    fn tag_modifier(&self, tag : &Tags) -> f64 {
-        self.tag_converter.tag_modifier(tag)
-    }
-    fn tag_bounds() -> (f64, f64) {
-        (ABS_MINIMUM, ABS_MAXIMUM)
     }
 }
 
@@ -197,7 +181,7 @@ impl<P : Poisoned, M : TagModifier> RodController<P, M> {
             }
         }
         let n_p = next_potential;
-        let random_factor = (edge.hits.load(Ordering::Relaxed) as f64 + 1.0);
+        let random_factor = (edge.hits.load(Ordering::Relaxed) as f64 + 20.0);
         let random_factor = random_factor * random_factor * util::selectors::get_random(0.1, 1.0);
         Distance::new((t * n_p * p_l * random_factor,  t * n_p * p_s * random_factor, t , 0.0, n_p))
     }
@@ -239,7 +223,7 @@ impl<P : Poisoned, TM : TagModifier> DijkstraControl for RodController<P, TM> {
         !self.closing
     }
     fn force_finish(&self) -> bool {
-        self.closing
+        false //self.closing
     }
 }
 
@@ -336,7 +320,7 @@ pub fn close_rod(conversion : &Conversion, pos : &Location, metadata : &Metadata
     let duration = time::Instant::now() - now;
     let _ = writeln!(io::stderr(), "{} {} {}.{:09} {}", large_random, small_random, duration.as_secs(), duration.subsec_nanos(), count);
 
-    //let _ = writeln!(io::stderr(), "Routes selected : {} / {}", count, endings.len());
+    let _ = writeln!(io::stderr(), "Routes selected : {} / {}", count, endings.len());
     let longest_index = selector.decompose();
 
     longest_index.map(|longest_index| {
