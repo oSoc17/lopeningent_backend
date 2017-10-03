@@ -70,7 +70,7 @@ pub trait Query : Sized {
 }
 
 #[derive(Query, Debug)]
-#[table_name = "lopeningent.nodes"]
+#[table_name = "nodes"]
 pub struct Node {
     pub nid : NodeID,
     pub lon : f64,
@@ -85,7 +85,7 @@ impl Located for Node {
 }
 
 #[derive(Query, Debug)]
-#[table_name = "lopeningent.edges"]
+#[table_name = "edges"]
 pub struct Edge {
     pub eid : EdgeID,
     pub rating : f32,
@@ -95,7 +95,7 @@ pub struct Edge {
 }
 
 #[derive(Query, Debug, Serialize)]
-#[table_name = "lopeningent.pois"]
+#[table_name = "pois"]
 pub struct Poi {
     pub pid : usize,
     pub name : String,
@@ -134,7 +134,8 @@ impl Update {
     }
 
     pub fn apply(&self, connection : &Connection, influence : f64) -> Result<(), Box<Error>> {
-        let query = format!("UPDATE lopeningent.edges SET rating = rating * (1.0 - {1:}) + {2:} * {1:} WHERE eid IN {}", &Update::print(&self.edges), influence, self.rating) ;
+        let option_schema = option_env!("SCHEMA");
+        let query = format!("UPDATE {}{}edges SET rating = rating * (1.0 - {3:}) + {4:} * {3:} WHERE eid IN {}", option_schema.as_ref().map_or("", |x| &**x), if option_schema.is_some() {"."} else {""}, &Update::print(&self.edges), influence, self.rating) ;
         println!("{}", query);
         connection.execute(&query, &[])?;
         Ok(())

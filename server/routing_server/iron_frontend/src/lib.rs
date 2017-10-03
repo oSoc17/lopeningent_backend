@@ -71,7 +71,7 @@ pub fn fire(config_filename : &str) -> Result<(), Box<Error>>{
         }
     };
     let database_config = &config.database_config;
-    let database_url = format!("postgresql://{}:{}@{}", database_config.username, database_config.password, database_config.url);
+    let database_url = format!("postgresql://{}:{}@{}", database_config.username, option_env!("DATABASE_PASSWORD").unwrap_or(&database_config.password), database_config.url);
     let graph = logic::get_graph(database::load(&database_url)?)?;
     let conversion = logic::Conversion::get_default_conversion(graph);
     let conversion = Arc::new(conversion);

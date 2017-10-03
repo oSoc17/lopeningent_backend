@@ -8,6 +8,8 @@ import threading, re
 import migrate_config as C
 
 
+schema = os.environ['SCHEMA']
+
 class Edge:
 
     def __init__(self, osm_id):
@@ -188,9 +190,9 @@ def db_truncate(connection):
     cursor = connection.cursor()
     cursor.execute(
         """
-        TRUNCATE lopeningent.edges, lopeningent.nodes, lopeningent.pois
+        TRUNCATE {}.edges, {}.nodes, {}.pois
             RESTART IDENTITY CASCADE
-        """
+        """.format(schema, schema, schema)
     )
     cursor.close()
 
@@ -205,9 +207,9 @@ def db_write_nodes(connection, nodes):
     for osm_id, node in nodes.iteritems():
         cursor.execute(
             """
-            INSERT INTO lopeningent.nodes (lat, lon)
+            INSERT INTO {}.nodes (lat, lon)
                 VALUES (%s, %s) RETURNING nid
-            """
+            """.format(schema)
             , convert_node(node)
         )
         osm_nid_dict[osm_id] = cursor.fetchone()[0]
@@ -236,9 +238,9 @@ def db_write_edges(connection, edges):
         fr, to, tags = e
         cursor.execute(
             """
-            INSERT INTO lopeningent.edges (rating, tags, from_node, to_node)
+            INSERT INTO {}.edges (rating, tags, from_node, to_node)
                 VALUES (%s, %s, %s, %s)
-            """
+            """.format(schema)
             , (2.5, list_into_pg(tags), fr, to)
         )
 
@@ -257,9 +259,9 @@ def db_write_pois(connection, pois):
             coord = convert_poi_coord(poi);
             cursor.execute(
                 """
-                INSERT INTO lopeningent.pois (name, description, lat, lon, tag)
+                INSERT INTO {}.pois (name, description, lat, lon, tag)
                     VALUES(%s, %s, %s, %s, %s) RETURNING pid,tag,lat,lon
-                """
+                """.format(schema)
                 , (poi["name"], poi["description"],
                     coord[0], coord[1], pset["name"])
             )
@@ -291,11 +293,11 @@ def db_write_poi_coords_nodes(connection, edges):
         node_id, poi = node_items
         cursor.execute(
             """
-                UPDATE lopeningent.nodes
+                UPDATE {}.nodes
                 SET
                 poi_id = %s
                 WHERE nid = %s
-            """
+            """.format(schema)
             , (list_into_pg(poi),node_id)
         )
 

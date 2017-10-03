@@ -23,6 +23,8 @@ pub fn query(input: TokenStream) -> TokenStream {
 }
 
 fn impl_query(ast: &syn::DeriveInput) -> quote::Tokens {
+    use std::env;
+    let schema = env::var("SCHEMA").ok();
     let name = &ast.ident;
 
     // get a list of all fields in this struct.
@@ -48,7 +50,7 @@ fn impl_query(ast: &syn::DeriveInput) -> quote::Tokens {
         }).next().unwrap_or_else(|| panic!("No table_name specified for {}", name.as_ref()));
 
     // construct the query
-    let query = &format!("SELECT {} FROM {};", &select_fields[..select_fields.len() - 2], table_name);
+    let query = &format!("SELECT {} FROM {}{}{};", &select_fields[..select_fields.len() - 2], schema.as_ref().map_or("", |x| &**x), if schema.is_some() {"."} else {""}, table_name);
 
     // create a bunch of field initialisers for the constructor.
     let fields = field_vec.iter()

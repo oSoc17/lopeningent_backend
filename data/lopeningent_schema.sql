@@ -18,15 +18,15 @@ SET row_security = off;
 
 --
 -- TOC entry 5 (class 2615 OID 16388)
--- Name: lopeningent; Type: SCHEMA; Schema: -; Owner: postgres
+-- Name: $SCHEMA; Type: SCHEMA; Schema: -; Owner: postgres
 --
 
-CREATE SCHEMA lopeningent;
+CREATE SCHEMA $SCHEMA;
 
 
-ALTER SCHEMA lopeningent OWNER TO postgres;
+ALTER SCHEMA $SCHEMA OWNER TO postgres;
 
-SET search_path = lopeningent, pg_catalog;
+SET search_path = $SCHEMA, pg_catalog;
 
 SET default_tablespace = '';
 
@@ -34,7 +34,7 @@ SET default_with_oids = false;
 
 --
 -- TOC entry 189 (class 1259 OID 16399)
--- Name: edges; Type: TABLE; Schema: lopeningent; Owner: postgres
+-- Name: edges; Type: TABLE; Schema: $SCHEMA; Owner: postgres
 --
 
 CREATE TABLE edges (
@@ -51,7 +51,7 @@ ALTER TABLE edges OWNER TO postgres;
 
 --
 -- TOC entry 188 (class 1259 OID 16397)
--- Name: edges_eid_seq; Type: SEQUENCE; Schema: lopeningent; Owner: postgres
+-- Name: edges_eid_seq; Type: SEQUENCE; Schema: $SCHEMA; Owner: postgres
 --
 
 CREATE SEQUENCE edges_eid_seq
@@ -67,7 +67,7 @@ ALTER TABLE edges_eid_seq OWNER TO postgres;
 --
 -- TOC entry 2159 (class 0 OID 0)
 -- Dependencies: 188
--- Name: edges_eid_seq; Type: SEQUENCE OWNED BY; Schema: lopeningent; Owner: postgres
+-- Name: edges_eid_seq; Type: SEQUENCE OWNED BY; Schema: $SCHEMA; Owner: postgres
 --
 
 ALTER SEQUENCE edges_eid_seq OWNED BY edges.eid;
@@ -75,7 +75,7 @@ ALTER SEQUENCE edges_eid_seq OWNED BY edges.eid;
 
 --
 -- TOC entry 187 (class 1259 OID 16391)
--- Name: nodes; Type: TABLE; Schema: lopeningent; Owner: postgres
+-- Name: nodes; Type: TABLE; Schema: $SCHEMA; Owner: postgres
 --
 
 CREATE TABLE nodes (
@@ -90,7 +90,7 @@ ALTER TABLE nodes OWNER TO postgres;
 
 --
 -- TOC entry 186 (class 1259 OID 16389)
--- Name: nodes_nid_seq; Type: SEQUENCE; Schema: lopeningent; Owner: postgres
+-- Name: nodes_nid_seq; Type: SEQUENCE; Schema: $SCHEMA; Owner: postgres
 --
 
 CREATE SEQUENCE nodes_nid_seq
@@ -106,7 +106,7 @@ ALTER TABLE nodes_nid_seq OWNER TO postgres;
 --
 -- TOC entry 2160 (class 0 OID 0)
 -- Dependencies: 186
--- Name: nodes_nid_seq; Type: SEQUENCE OWNED BY; Schema: lopeningent; Owner: postgres
+-- Name: nodes_nid_seq; Type: SEQUENCE OWNED BY; Schema: $SCHEMA; Owner: postgres
 --
 
 ALTER SEQUENCE nodes_nid_seq OWNED BY nodes.nid;
@@ -114,7 +114,7 @@ ALTER SEQUENCE nodes_nid_seq OWNED BY nodes.nid;
 
 --
 -- TOC entry 191 (class 1259 OID 16425)
--- Name: pois; Type: TABLE; Schema: lopeningent; Owner: postgres
+-- Name: pois; Type: TABLE; Schema: $SCHEMA; Owner: postgres
 --
 
 CREATE TABLE pois (
@@ -131,7 +131,7 @@ ALTER TABLE pois OWNER TO postgres;
 
 --
 -- TOC entry 190 (class 1259 OID 16423)
--- Name: pois_pid_seq; Type: SEQUENCE; Schema: lopeningent; Owner: postgres
+-- Name: pois_pid_seq; Type: SEQUENCE; Schema: $SCHEMA; Owner: postgres
 --
 
 CREATE SEQUENCE pois_pid_seq
@@ -147,7 +147,7 @@ ALTER TABLE pois_pid_seq OWNER TO postgres;
 --
 -- TOC entry 2161 (class 0 OID 0)
 -- Dependencies: 190
--- Name: pois_pid_seq; Type: SEQUENCE OWNED BY; Schema: lopeningent; Owner: postgres
+-- Name: pois_pid_seq; Type: SEQUENCE OWNED BY; Schema: $SCHEMA; Owner: postgres
 --
 
 ALTER SEQUENCE pois_pid_seq OWNED BY pois.pid;
@@ -155,7 +155,7 @@ ALTER SEQUENCE pois_pid_seq OWNED BY pois.pid;
 
 --
 -- TOC entry 192 (class 1259 OID 16446)
--- Name: users; Type: TABLE; Schema: lopeningent; Owner: postgres
+-- Name: users; Type: TABLE; Schema: $SCHEMA; Owner: postgres
 --
 
 CREATE TABLE users (
@@ -175,7 +175,7 @@ ALTER TABLE users OWNER TO postgres;
 
 --
 -- TOC entry 2025 (class 2604 OID 16402)
--- Name: edges eid; Type: DEFAULT; Schema: lopeningent; Owner: postgres
+-- Name: edges eid; Type: DEFAULT; Schema: $SCHEMA; Owner: postgres
 --
 
 ALTER TABLE ONLY edges ALTER COLUMN eid SET DEFAULT nextval('edges_eid_seq'::regclass);
@@ -183,7 +183,7 @@ ALTER TABLE ONLY edges ALTER COLUMN eid SET DEFAULT nextval('edges_eid_seq'::reg
 
 --
 -- TOC entry 2024 (class 2604 OID 16394)
--- Name: nodes nid; Type: DEFAULT; Schema: lopeningent; Owner: postgres
+-- Name: nodes nid; Type: DEFAULT; Schema: $SCHEMA; Owner: postgres
 --
 
 ALTER TABLE ONLY nodes ALTER COLUMN nid SET DEFAULT nextval('nodes_nid_seq'::regclass);
@@ -191,7 +191,7 @@ ALTER TABLE ONLY nodes ALTER COLUMN nid SET DEFAULT nextval('nodes_nid_seq'::reg
 
 --
 -- TOC entry 2027 (class 2604 OID 16428)
--- Name: pois pid; Type: DEFAULT; Schema: lopeningent; Owner: postgres
+-- Name: pois pid; Type: DEFAULT; Schema: $SCHEMA; Owner: postgres
 --
 
 ALTER TABLE ONLY pois ALTER COLUMN pid SET DEFAULT nextval('pois_pid_seq'::regclass);
@@ -199,7 +199,7 @@ ALTER TABLE ONLY pois ALTER COLUMN pid SET DEFAULT nextval('pois_pid_seq'::regcl
 
 --
 -- TOC entry 2031 (class 2606 OID 16407)
--- Name: edges edges_pkey; Type: CONSTRAINT; Schema: lopeningent; Owner: postgres
+-- Name: edges edges_pkey; Type: CONSTRAINT; Schema: $SCHEMA; Owner: postgres
 --
 
 ALTER TABLE ONLY edges
@@ -208,7 +208,7 @@ ALTER TABLE ONLY edges
 
 --
 -- TOC entry 2029 (class 2606 OID 16396)
--- Name: nodes nodes_pkey; Type: CONSTRAINT; Schema: lopeningent; Owner: postgres
+-- Name: nodes nodes_pkey; Type: CONSTRAINT; Schema: $SCHEMA; Owner: postgres
 --
 
 ALTER TABLE ONLY nodes
@@ -217,7 +217,7 @@ ALTER TABLE ONLY nodes
 
 --
 -- TOC entry 2033 (class 2606 OID 16433)
--- Name: pois pois_pkey; Type: CONSTRAINT; Schema: lopeningent; Owner: postgres
+-- Name: pois pois_pkey; Type: CONSTRAINT; Schema: $SCHEMA; Owner: postgres
 --
 
 ALTER TABLE ONLY pois
@@ -226,7 +226,7 @@ ALTER TABLE ONLY pois
 
 --
 -- TOC entry 2035 (class 2606 OID 16450)
--- Name: users users_pkey; Type: CONSTRAINT; Schema: lopeningent; Owner: postgres
+-- Name: users users_pkey; Type: CONSTRAINT; Schema: $SCHEMA; Owner: postgres
 --
 
 ALTER TABLE ONLY users
@@ -235,7 +235,7 @@ ALTER TABLE ONLY users
 
 --
 -- TOC entry 2036 (class 2606 OID 17072)
--- Name: edges from_fkey; Type: FK CONSTRAINT; Schema: lopeningent; Owner: postgres
+-- Name: edges from_fkey; Type: FK CONSTRAINT; Schema: $SCHEMA; Owner: postgres
 --
 
 ALTER TABLE ONLY edges
@@ -244,7 +244,7 @@ ALTER TABLE ONLY edges
 
 --
 -- TOC entry 2037 (class 2606 OID 17077)
--- Name: edges to_fkey; Type: FK CONSTRAINT; Schema: lopeningent; Owner: postgres
+-- Name: edges to_fkey; Type: FK CONSTRAINT; Schema: $SCHEMA; Owner: postgres
 --
 
 ALTER TABLE ONLY edges
