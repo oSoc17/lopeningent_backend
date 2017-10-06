@@ -67,6 +67,9 @@ pub trait DijkstraControl {
     fn force_finish(&self) -> bool {
         false
     }
+    fn ignore_filter_until_ending(&self) -> bool {
+        false
+    }
 }
 
 pub struct DijkstraBuilder<C : DijkstraControl> {
@@ -88,6 +91,7 @@ where C::M : Debug, C::V : Debug, C::E : Debug
     pub fn generate_dijkstra(self, graph : &Graph<C::V, C::E>, control : &C)
          -> (Vec<SingleAction<C::M>>, Vec<usize>)
     {
+        let mut possible_ending_found = false;
         let mut progress : VecMap<Vec<usize>> = VecMap::new();
         progress.insert(0, vec![0]);
         let mut heap = BinaryHeap::new();
@@ -99,14 +103,16 @@ where C::M : Debug, C::V : Debug, C::E : Debug
             if res_chain[data.index].disabled {
                 continue;
             }
+            let ending = control.is_ending(graph.get(data.node).unwrap(), &res_chain[data.index].major);
+            if ending != Ending::No {
+                possible_ending_found = true;
+            }
             let ignore_next_step = control.force_finish() && {
-                let ending = control.is_ending(graph.get(data.node).unwrap(), &res_chain[data.index].major);
                 if ending == Ending::Yes && ! res_chain[data.index].ignore {
                     break;
                 }
                 ending == Ending::Kinda
             };
-
 
             if let Some(iter) = graph.get_conn_idval(data.node) {
                 for (next_node, next_edge) in iter {
@@ -122,7 +128,7 @@ where C::M : Debug, C::V : Debug, C::E : Debug
                         }
                     }
                     h_vec.retain(|&e| ! res_chain[e].disabled);
-                    if h_vec.iter().filter(|&&e| next_major.majorises(&res_chain[e].major)).next() == None {
+                    if (control.ignore_filter_until_ending() && !possible_ending_found) || h_vec.iter().filter(|&&e| next_major.majorises(&res_chain[e].major)).next() == None {
                         //print!("Replacement. ");
                         let index = res_chain.len();
                         heap.push(HeapData::new(index, next_node, &next_major, control));

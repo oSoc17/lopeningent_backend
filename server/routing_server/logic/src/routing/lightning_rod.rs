@@ -225,6 +225,9 @@ impl<P : Poisoned, TM : TagModifier> DijkstraControl for RodController<P, TM> {
     fn force_finish(&self) -> bool {
         false //self.closing
     }
+    fn ignore_filter_until_ending(&self) -> bool {
+        true
+    }
 }
 
 pub fn create_rod(conversion : &Conversion, pos : &Location, metadata : &Metadata) -> Option<AnnotatedPath<Distance>> {
@@ -304,10 +307,6 @@ pub fn close_rod(conversion : &Conversion, pos : &Location, metadata : &Metadata
         let total_distance = distance.actual_length + map[node as usize].actual_length;
         let total_weight = distance.minor_value + map[node as usize].minor_value;
         //let _ = write!(io::stderr(), "Totals of {} : abs({}) rel({}) ({:?}) ", ending, total_distance, total_weight, distance);
-        if total_distance >= metadata.requested_length.to_f64() {
-            //let _ = writeln!(io::stderr(), "Failure!");
-            continue;
-        }
         if total_distance <= metadata.requested_length.to_f64() * MIN_LENGTH_FACTOR {
             //let _ = writeln!(io::stderr(), "Failure!");
             continue;
