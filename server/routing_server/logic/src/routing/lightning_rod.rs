@@ -165,6 +165,10 @@ impl<'a, P : Poisoned, M : TagModifier + 'a> RodController<'a, P, M> {
     }
 
     fn annotate(&self, edge : &AnnotatedEdge, potential : f64) -> Distance {
+        if self.endings.get(edge.edge.from_node as usize).is_some()
+          && self.endings.get(edge.edge.to_node as usize).is_some() {
+            return Distance::new((f64::INFINITY, f64::INFINITY, f64::INFINITY, f64::INFINITY, f64::INFINITY));
+        }
         let t = edge.dist.to_f64();
         let mut next_potential = (potential - 1.0) * (-t * FALLOFF).exp() + 1.0;
         let p_l = self.poisoner_large.poison(&edge.average);
@@ -225,7 +229,7 @@ impl<'a, P : Poisoned, TM : TagModifier + 'a> DijkstraControl for RodController<
         false //self.closing
     }
     fn ignore_filter_until_ending(&self) -> bool {
-        true
+        self.closing
     }
 }
 
@@ -242,8 +246,6 @@ pub fn create_rod(conversion : &Conversion, pos : &Location, metadata : &mut Met
             if ! route.truncate(res.1) {
                 return None;
             }
-            metadata.requested_length = metadata.requested_length - (route.get_elements(&conversion.graph).1)
-                .into_iter().map(|x| x.dist).fold(Km::from_f64(0.0), |x, y| x + y);
             (res.0, Some(res.1))
         },
         None => (edge.edge.from_node, None),
@@ -287,12 +289,20 @@ pub fn close_rod(conversion : &Conversion, pos : &Location, metadata : &mut Meta
     let builder = DijkstraBuilder::new(starting_node, Distance::def());
     let large_random = util::selectors::get_random(CONFIG.min, CONFIG.max);
     let small_random = large_random - CONFIG.increase;//util::selectors::get_random(0.3, 0.5);
-    let original_route = metadata.original_route.take();
+    let original_route = metadata.original_route.take().unwrap_or_else(|| Path::new(Vec::new()));
+    metadata.requested_length = metadata.requested_length - (original_route.get_elements(&conversion.graph).1)
+        .into_iter().map(|x| x.dist).fold(Km::from_f64(0.0), |x, y| x + y);
+    let location_from = &conversion.graph.get(path.first().0).unwrap().located();
+    let location_to = &conversion.graph.get(path.last().0).unwrap().located();
+    let min_distance = util::distance::distance_lon_lat(location_from, pos, Km::from_f64(EARTH_RADIUS));
+    if metadata.requested_length.to_f64() < min_distance.to_f64() * 1.2 {
+        metadata.requested_length = min_distance * 1.2
+    }
     let rod_controller = RodController {
         max_length : metadata.requested_length.to_f64(),
-        poisoner_large : PoisonLine::new(&conversion.graph.get(path.first().0).unwrap().located(), pos,
+        poisoner_large : PoisonLine::new(location_from, location_to,
         large_random, util::selectors::get_random(CONFIG.min_lin, CONFIG.max_lin)),
-        poisoner_small : PoisonLine::new(&conversion.graph.get(path.first().0).unwrap().located(), pos,
+        poisoner_small : PoisonLine::new(location_from, location_to,
         small_random, util::selectors::get_random(CONFIG.min_lin, CONFIG.max_lin)),
         endings : map,
         closing : true,
@@ -343,7 +353,7 @@ pub fn close_rod(conversion : &Conversion, pos : &Location, metadata : &mut Meta
         let true_length = actions[longest_index].major.actual_length + map[actions[longest_index].node_handle as usize].actual_length;
         let _ = writeln!(io::stderr(), "Length: {}", true_length);
         let final_path = path.as_path().join(into_annotated_nodes(&actions, longest_index).as_path());
-        let path = original_route.unwrap_or_else(|| Path::new(Vec::new())).append(final_path);
+        let path = original_route.append(final_path);
         let _ = writeln!(io::stderr(), "True length: {}", (path.get_elements(&conversion.graph).1).into_iter().map(|e| e.dist.to_f64()).fold(0.0, |x, y| x + y));
         (path, Km::from_f64(true_length))
     })

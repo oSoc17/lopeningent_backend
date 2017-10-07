@@ -44,13 +44,18 @@ impl RoutingType {
 
 pub fn route<MF : Fn() -> Metadata>(conversion : &Conversion, from : &Location, to : &Location, metadata_supplier : MF, routing_type : RoutingType, limit : &Limit) -> Result<String, Box<Error>> {
     let mut route = None;
+    let mut string = String::new();
     for _ in 0..20 {
         let mut metadata = metadata_supplier();
         let rod = logic::create_rod(conversion, from, &mut metadata).ok_or("Rod failed")?;
+        string = serde_json::to_string_pretty(&geojson::into_geojson(rod.as_path(), &conversion.graph))?;
         route = logic::close_rod(conversion, to, &mut metadata, rod);
         if route.is_some() {break;}
     }
     let route = route.ok_or("Closure failed")?.0;
+    use std::fs;
+    use std::io::Write;
+    fs::File::create("debug.json").unwrap().write_all(string.as_bytes());
     limit.improve(&route);
     Ok(match routing_type {
         Directions => serde_json::to_string_pretty(&directions::into_directions(route, &conversion.graph))?,
