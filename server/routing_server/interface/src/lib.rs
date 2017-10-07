@@ -42,7 +42,7 @@ impl RoutingType {
     }
 }
 
-pub fn route(conversion : &Conversion, from : &Location, to : &Location, metadata : &Metadata, routing_type : RoutingType, limit : &Limit) -> Result<String, Box<Error>> {
+pub fn route(conversion : &Conversion, from : &Location, to : &Location, metadata : &mut Metadata, routing_type : RoutingType, limit : &Limit) -> Result<String, Box<Error>> {
     let mut route = None;
     for _ in 0..20 {
         let rod = logic::create_rod(conversion, from, metadata).ok_or("Rod failed")?;

@@ -166,7 +166,7 @@ impl GraphHandler {
     fn handle_loc(&self, parse : RoutingUrlData) -> Result<Response, Box<Error>>  {
         let _ = writeln!(io::stderr(), "Parsed: {:?}", parse);
         let from = newtypes::Location::new(parse.lon, parse.lat);
-        let metadata = parse.get_metadata()?;
+        let mut metadata = parse.get_metadata()?;
         let to = match metadata.original_route {
             None => from.clone(),
             Some(ref path) => match self.conversion.graph.get(path.last()) {
@@ -179,7 +179,7 @@ impl GraphHandler {
             &self.conversion,
             &from,
             &to,
-            &metadata,
+            &mut metadata,
             parse.type_.as_ref().map(|s| interface::RoutingType::from(s))
                 .unwrap_or(interface::RoutingType::Directions),
             &self.limit

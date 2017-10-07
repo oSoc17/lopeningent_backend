@@ -49,12 +49,17 @@ pub fn into_directions<'a>(path : Path, graph : &'a ApplicationGraph) -> Directi
             continue;
         }
         let value = angle(a, b, c);
-        if value < -threshold {
-            res.push(DirectionalNode::new(&b, dir_left()));
+        let topush = if value < -threshold {
+            DirectionalNode::new(&b, dir_left())
         } else if value > threshold {
-            res.push(DirectionalNode::new(&b, dir_right()));
+            DirectionalNode::new(&b, dir_right())
         } else {
-            res.push(DirectionalNode::new(&b, dir_forward()));
+            DirectionalNode::new(&b, dir_forward())
+        };
+        if graph.get_edges(b.node.nid).unwrap().count() <= 2 {
+            res.push(DirectionalNode::new(&b, dir_none()));
+        } else {
+            res.push(topush);
         }
     }
     res.push(DirectionalNode::new(&nodes[nodes.len() - 1], dir_none()));

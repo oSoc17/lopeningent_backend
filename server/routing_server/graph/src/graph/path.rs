@@ -34,6 +34,15 @@ impl Path {
     pub fn get_indices(&self) -> &[NodeID] {
         &self.0
     }
+
+    pub fn truncate(&mut self, last_index : NodeID) -> bool {
+        let size = match (self.0).iter().enumerate().filter(|&(n, &i)| i == last_index).next() {
+            Some((n, _)) => n + 1,
+            None => return false,
+        };
+        (self.0).truncate(size);
+        true
+    }
 }
 
 #[derive(Debug)]

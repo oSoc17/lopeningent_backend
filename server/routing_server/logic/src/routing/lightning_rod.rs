@@ -31,7 +31,7 @@ use util;
 use util::selectors::Selector;
 
 use consts::*;
-use super::util::*;
+use super::util::Metadata;
 
 
 #[derive(PartialEq, Debug, Clone, Default)]
@@ -149,17 +149,17 @@ impl Poisoned for PoisonLine {
     }
 }
 
-struct RodController<P : Poisoned, M : TagModifier> {
+struct RodController<'a, P : Poisoned, M : TagModifier + 'a> {
     max_length : f64,
     poisoner_large : P,
     poisoner_small : P,
     endings : VecMap<Distance>,
     closing : bool,
-    modifier : M,
+    modifier : &'a M,
     point_to_skip : Option<NodeID>,
 }
 
-impl<P : Poisoned, M : TagModifier> RodController<P, M> {
+impl<'a, P : Poisoned, M : TagModifier + 'a> RodController<'a, P, M> {
     fn enjoyment(&self, tags : &Tags) -> f64 {
         -self.modifier.tag_modifier(tags)
     }
@@ -187,7 +187,7 @@ impl<P : Poisoned, M : TagModifier> RodController<P, M> {
     }
 }
 
-impl<P : Poisoned, TM : TagModifier> DijkstraControl for RodController<P, TM> {
+impl<'a, P : Poisoned, TM : TagModifier + 'a> DijkstraControl for RodController<'a, P, TM> {
     type V = PoiNode;
     type E = AnnotatedEdge;
     type M = Distance;
@@ -230,17 +230,22 @@ impl<P : Poisoned, TM : TagModifier> DijkstraControl for RodController<P, TM> {
     }
 }
 
-pub fn create_rod(conversion : &Conversion, pos : &Location, metadata : &Metadata) -> Option<AnnotatedPath<Distance>> {
+pub fn create_rod(conversion : &Conversion, pos : &Location, metadata : &mut Metadata) -> Option<AnnotatedPath<Distance>> {
     let edge = match conversion.get_edge(pos) {Some(x) => x, _ => return None};
     let (starting_node, skip_node) = match metadata.original_route {
-        Some(ref route) => {
-            let q : HashSet<_> = route.get_indices().iter().collect();
-            if let Some(_) = q.get(&edge.edge.to_node) {
-                (edge.edge.from_node, Some(edge.edge.to_node))
+        Some(ref mut route) => {
+            let q : HashSet<_> = route.get_indices().iter().cloned().collect();
+            let res = if let Some(_) = q.get(&edge.edge.to_node) {
+                (edge.edge.from_node, edge.edge.to_node)
             } else {
-                (edge.edge.to_node, Some(edge.edge.from_node))
+                (edge.edge.to_node, edge.edge.from_node)
+            };
+            if ! route.truncate(res.1) {
+                return None;
             }
-
+            metadata.requested_length = metadata.requested_length - (route.get_elements(&conversion.graph).1)
+                .into_iter().map(|x| x.dist).fold(Km::from_f64(0.0), |x, y| x + y);
+            (res.0, Some(res.1))
         },
         None => (edge.edge.from_node, None),
     };
@@ -251,7 +256,7 @@ pub fn create_rod(conversion : &Conversion, pos : &Location, metadata : &Metadat
         poisoner_small : (),
         endings : VecMap::new(),
         closing : false,
-        modifier : metadata,
+        modifier : &*metadata,
         point_to_skip : skip_node,
     };
     let (actions, endings) = builder.generate_dijkstra(&conversion.graph, &rod_controller);

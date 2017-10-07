@@ -47,7 +47,7 @@ impl Metadata {
     }
 }
 
-impl<'a> TagModifier for &'a Metadata {
+impl TagModifier for Metadata {
     fn tag_modifier(&self, tag : &Tags) -> f64 {
         self.tag_converter.tag_modifier(tag)
     }

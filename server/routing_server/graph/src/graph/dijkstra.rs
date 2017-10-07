@@ -117,7 +117,7 @@ where C::M : Debug, C::V : Debug, C::E : Debug
             if let Some(iter) = graph.get_conn_idval(data.node) {
                 for (next_node, next_edge) in iter {
                     let next_major = control.add_edge(&res_chain[data.index].major, &next_edge);
-                    if ! control.filter(&next_major) {
+                    if (!control.ignore_filter_until_ending() || possible_ending_found) && ! control.filter(&next_major) {
                         continue;
                     }
                     let mut h_vec = progress.entry(next_node as usize).or_insert_with(Vec::new);
@@ -128,7 +128,7 @@ where C::M : Debug, C::V : Debug, C::E : Debug
                         }
                     }
                     h_vec.retain(|&e| ! res_chain[e].disabled);
-                    if (control.ignore_filter_until_ending() && !possible_ending_found) || h_vec.iter().filter(|&&e| next_major.majorises(&res_chain[e].major)).next() == None {
+                    if  h_vec.iter().filter(|&&e| next_major.majorises(&res_chain[e].major)).next() == None {
                         //print!("Replacement. ");
                         let index = res_chain.len();
                         heap.push(HeapData::new(index, next_node, &next_major, control));
