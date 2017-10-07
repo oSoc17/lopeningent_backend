@@ -214,8 +214,7 @@ impl<'a, P : Poisoned, TM : TagModifier + 'a> DijkstraControl for RodController<
         match self.endings.get(v.node.nid as usize) {
             None => Ending::No,
             Some(dist) =>
-                if m.actual_length + dist.actual_length <= self.max_length
-                    && m.actual_length + dist.actual_length > self.max_length * MIN_LENGTH_FACTOR
+                if m.actual_length + dist.actual_length > self.max_length * MIN_LENGTH_FACTOR
                     {Ending::Yes} else {Ending::Kinda}
         }
     }
@@ -250,6 +249,7 @@ pub fn create_rod(conversion : &Conversion, pos : &Location, metadata : &mut Met
         None => (edge.edge.from_node, None),
     };
     let builder = DijkstraBuilder::new(starting_node, Distance::def());
+    println!("Reduced metadata : {:?}", metadata);
     let rod_controller = RodController{
         max_length : metadata.requested_length.to_f64(),
         poisoner_large : (),
@@ -278,7 +278,7 @@ pub fn create_rod(conversion : &Conversion, pos : &Location, metadata : &mut Met
 
 use std::time;
 
-pub fn close_rod(conversion : &Conversion, pos : &Location, metadata : &Metadata, path : AnnotatedPath<Distance>) -> Option<(Path, Km)> {
+pub fn close_rod(conversion : &Conversion, pos : &Location, metadata : &mut Metadata, path : AnnotatedPath<Distance>) -> Option<(Path, Km)> {
     let now = time::Instant::now();
     let map = path.as_map();
     let map : VecMap<_> = map.into_iter().map(|(n, c)| (n, c.clone())).collect();
@@ -287,11 +287,12 @@ pub fn close_rod(conversion : &Conversion, pos : &Location, metadata : &Metadata
     let builder = DijkstraBuilder::new(starting_node, Distance::def());
     let large_random = util::selectors::get_random(CONFIG.min, CONFIG.max);
     let small_random = large_random - CONFIG.increase;//util::selectors::get_random(0.3, 0.5);
+    let original_route = metadata.original_route.take();
     let rod_controller = RodController {
         max_length : metadata.requested_length.to_f64(),
-        poisoner_large : PoisonLine::new(&conversion.graph.get(path.first().0).unwrap().located(), &conversion.graph.get(path.last().0).unwrap().located(),
+        poisoner_large : PoisonLine::new(&conversion.graph.get(path.first().0).unwrap().located(), pos,
         large_random, util::selectors::get_random(CONFIG.min_lin, CONFIG.max_lin)),
-        poisoner_small : PoisonLine::new(&conversion.graph.get(path.first().0).unwrap().located(), &conversion.graph.get(path.last().0).unwrap().located(),
+        poisoner_small : PoisonLine::new(&conversion.graph.get(path.first().0).unwrap().located(), pos,
         small_random, util::selectors::get_random(CONFIG.min_lin, CONFIG.max_lin)),
         endings : map,
         closing : true,
@@ -301,6 +302,7 @@ pub fn close_rod(conversion : &Conversion, pos : &Location, metadata : &Metadata
     let (actions, endings) = builder.generate_dijkstra(&conversion.graph, &rod_controller);
 
     let mut selector = Selector::new_default_rng();
+    let mut selector_large = Selector::new_default_rng();
     let map = rod_controller.endings;
     let mut count = 0;
     for &ending in &endings {
@@ -311,21 +313,25 @@ pub fn close_rod(conversion : &Conversion, pos : &Location, metadata : &Metadata
         let distance = &actions[ending].major;
         let total_distance = distance.actual_length + map[node as usize].actual_length;
         let total_weight = distance.minor_value + map[node as usize].minor_value;
-        //let _ = write!(io::stderr(), "Totals of {} : abs({}) rel({}) ({:?}) ", ending, total_distance, total_weight, distance);
+        let _ = write!(io::stderr(), "Totals of {} : abs({}) rel({}) ({:?}) ", ending, total_distance, total_weight, distance);
         if total_distance <= metadata.requested_length.to_f64() * MIN_LENGTH_FACTOR {
             //let _ = writeln!(io::stderr(), "Failure!");
             continue;
         }
         //let _ = writeln!(io::stderr(), "Success!");
         count += 1;
-        selector.update((total_distance).exp(), ending);
+        if total_distance <= metadata.requested_length.to_f64() {
+            selector.update((total_distance).exp(), ending);
+        } else {
+            selector_large.update((-total_distance).exp(), ending);
+        }
     }
 
     let duration = time::Instant::now() - now;
     let _ = writeln!(io::stderr(), "{} {} {}.{:09} {}", large_random, small_random, duration.as_secs(), duration.subsec_nanos(), count);
 
     let _ = writeln!(io::stderr(), "Routes selected : {} / {}", count, endings.len());
-    let longest_index = selector.decompose();
+    let longest_index = selector.decompose().or(selector_large.decompose());
 
     longest_index.map(|longest_index| {
         let prev_node = &actions[actions[longest_index].previous_index].node_handle;
@@ -335,7 +341,10 @@ pub fn close_rod(conversion : &Conversion, pos : &Location, metadata : &Metadata
 
 
         let true_length = actions[longest_index].major.actual_length + map[actions[longest_index].node_handle as usize].actual_length;
-        let _ = writeln!(io::stderr(), "True length: {}", true_length);
-        (path.as_path().join(into_annotated_nodes(&actions, longest_index).as_path()), Km::from_f64(true_length))
+        let _ = writeln!(io::stderr(), "Length: {}", true_length);
+        let final_path = path.as_path().join(into_annotated_nodes(&actions, longest_index).as_path());
+        let path = original_route.unwrap_or_else(|| Path::new(Vec::new())).append(final_path);
+        let _ = writeln!(io::stderr(), "True length: {}", (path.get_elements(&conversion.graph).1).into_iter().map(|e| e.dist.to_f64()).fold(0.0, |x, y| x + y));
+        (path, Km::from_f64(true_length))
     })
 }

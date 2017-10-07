@@ -34,7 +34,7 @@ use util::selectors::Selector;
 use consts::*;
 
 
-#[derive(Default, Debug)]
+#[derive(Default, Debug, Clone)]
 pub struct Metadata {
     pub requested_length : Km,
     pub tag_converter : TagConverter,

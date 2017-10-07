@@ -42,11 +42,12 @@ impl RoutingType {
     }
 }
 
-pub fn route(conversion : &Conversion, from : &Location, to : &Location, metadata : &mut Metadata, routing_type : RoutingType, limit : &Limit) -> Result<String, Box<Error>> {
+pub fn route<MF : Fn() -> Metadata>(conversion : &Conversion, from : &Location, to : &Location, metadata_supplier : MF, routing_type : RoutingType, limit : &Limit) -> Result<String, Box<Error>> {
     let mut route = None;
     for _ in 0..20 {
-        let rod = logic::create_rod(conversion, from, metadata).ok_or("Rod failed")?;
-        route = logic::close_rod(conversion, to, metadata, rod);
+        let mut metadata = metadata_supplier();
+        let rod = logic::create_rod(conversion, from, &mut metadata).ok_or("Rod failed")?;
+        route = logic::close_rod(conversion, to, &mut metadata, rod);
         if route.is_some() {break;}
     }
     let route = route.ok_or("Closure failed")?.0;

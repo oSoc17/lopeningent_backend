@@ -179,7 +179,7 @@ impl GraphHandler {
             &self.conversion,
             &from,
             &to,
-            &mut metadata,
+            || metadata.clone(),
             parse.type_.as_ref().map(|s| interface::RoutingType::from(s))
                 .unwrap_or(interface::RoutingType::Directions),
             &self.limit

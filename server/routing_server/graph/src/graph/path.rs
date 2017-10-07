@@ -3,7 +3,7 @@ use graph::NodeID;
 
 use vec_map::VecMap;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Path(Vec<NodeID>);
 
 impl Path {
@@ -29,6 +29,10 @@ impl Path {
     pub fn join(self, other : Path) -> Path {
         let last = other.last();
         Path::new((self.0).into_iter().take_while(|&n| n != last).chain((other.0).into_iter().rev()).collect())
+    }
+
+    pub fn append(self, other : Path) -> Path {
+        Path::new((self.0).into_iter().chain((other.0).into_iter()).collect())
     }
 
     pub fn get_indices(&self) -> &[NodeID] {

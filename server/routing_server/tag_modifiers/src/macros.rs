@@ -28,7 +28,7 @@ macro_rules! struct_tag {
             }
         }
 
-        #[derive(Debug, Default)]
+        #[derive(Debug, Default, Clone)]
         pub struct TagConverter {
             $(pub $field : f64),*
         }
