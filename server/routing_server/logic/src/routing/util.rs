@@ -10,7 +10,7 @@ use graph::NodeID;
 
 use database::{Tags, TagConverter};
 use database::TagModifier;
-use annotated::{PoiNode, AnnotatedEdge};
+use annotated::{PoiNode, AnnotatedEdge, ApplicationGraph};
 
 
 use newtypes::{Location, Located};
@@ -54,4 +54,9 @@ impl TagModifier for Metadata {
     fn tag_bounds() -> (f64, f64) {
         (ABS_MINIMUM, ABS_MAXIMUM)
     }
+}
+
+pub fn path_length(path : &Path, graph : &ApplicationGraph) -> Km {
+    (path.get_elements(graph).1)
+        .into_iter().map(|x| x.dist).fold(Km::from_f64(0.0), |x, y| x + y)
 }

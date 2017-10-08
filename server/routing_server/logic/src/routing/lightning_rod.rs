@@ -2,7 +2,7 @@ use graph::{Path, AnnotatedPath};
 use data::Conversion;
 
 use graph::dijkstra::DijkstraBuilder;
-use graph::dijkstra::{DijkstraControl, Ending};
+use graph::dijkstra::{DijkstraControl, Ending, SingleAction};
 use graph::dijkstra::into_annotated_nodes;
 use graph::Majorising;
 use graph::NodeID;
@@ -165,15 +165,16 @@ impl<'a, P : Poisoned, M : TagModifier + 'a> RodController<'a, P, M> {
     }
 
     fn annotate(&self, edge : &AnnotatedEdge, potential : f64) -> Distance {
-        if self.endings.get(edge.edge.from_node as usize).is_some()
-          && self.endings.get(edge.edge.to_node as usize).is_some() {
-            return Distance::new((f64::INFINITY, f64::INFINITY, f64::INFINITY, f64::INFINITY, f64::INFINITY));
-        }
         let t = edge.dist.to_f64();
         let mut next_potential = (potential - 1.0) * (-t * FALLOFF).exp() + 1.0;
         let p_l = self.poisoner_large.poison(&edge.average);
         let p_s = self.poisoner_small.poison(&edge.average);
-        let e = self.enjoyment(&edge.edge.tags);
+        let e = if self.endings.get(edge.edge.from_node as usize).is_some()
+                  && self.endings.get(edge.edge.to_node as usize).is_some() {
+                    f64::INFINITY
+                } else {
+                    self.enjoyment(&edge.edge.tags)
+                };
         if e != 0.0 {
             next_potential *= e.exp() * DILUTE_FAVOURITE;
             let (min, max) = M::tag_bounds();
@@ -184,10 +185,11 @@ impl<'a, P : Poisoned, M : TagModifier + 'a> RodController<'a, P, M> {
                 next_potential = min;
             }
         }
+        let hit_illegal_node = if Some(edge.edge.to_node) == self.point_to_skip {1.0} else {0.0};
         let n_p = next_potential;
         let random_factor = (edge.hits.load(Ordering::Relaxed) as f64 + 20.0);
         let random_factor = random_factor * random_factor * util::selectors::get_random(0.1, 1.0);
-        Distance::new((t * n_p * p_l * random_factor,  t * n_p * p_s * random_factor, t , 0.0, n_p))
+        Distance::new((t * n_p * p_l * random_factor,  t * n_p * p_s * random_factor, t , hit_illegal_node, n_p))
     }
 }
 
@@ -201,8 +203,7 @@ impl<'a, P : Poisoned, TM : TagModifier + 'a> DijkstraControl for RodController<
             major_value : m.major_value + added.major_value,
             minor_value : m.minor_value + added.minor_value,
             actual_length : m.actual_length + added.actual_length,
-            illegal_node_hits : m.illegal_node_hits +
-            if Some(e.edge.to_node) == self.point_to_skip {1.0} else {0.0},
+            illegal_node_hits : m.illegal_node_hits + added.illegal_node_hits,
             node_potential : added.node_potential,
         };
         //println!("{:?}", res);
@@ -233,6 +234,56 @@ impl<'a, P : Poisoned, TM : TagModifier + 'a> DijkstraControl for RodController<
     }
 }
 
+pub fn create_field_no_poisoning(conversion : &Conversion, starting_node : NodeID, endings : VecMap<Distance>, metadata : &Metadata, closing : bool, skip_node : Option<NodeID>)
+    -> (Vec<SingleAction<Distance>>, Vec<usize>) {
+    let builder = DijkstraBuilder::new(starting_node, Distance::def());
+    let rod_controller = RodController{
+        max_length : metadata.requested_length.to_f64(),
+        poisoner_large : (),
+        poisoner_small : (),
+        endings : endings,
+        closing : closing,
+        modifier : metadata,
+        point_to_skip : skip_node,
+    };
+    builder.generate_dijkstra(&conversion.graph, &rod_controller)
+}
+
+pub fn create_field_poison(conversion : &Conversion, starting_node : NodeID, endings : VecMap<Distance>, metadata : &Metadata, closing : bool, skip_node : Option<NodeID>, poison_path : &Path)
+    -> (Vec<SingleAction<Distance>>, Vec<usize>) {
+    let builder = DijkstraBuilder::new(starting_node, Distance::def());
+    let large_random = util::selectors::get_random(CONFIG.min, CONFIG.max);
+    let small_random = large_random - CONFIG.increase;//util::selectors::get_random(0.3, 0.5);
+
+    let location_from = &conversion.graph.get(poison_path.first()).unwrap().located();
+    let location_to = &conversion.graph.get(poison_path.last()).unwrap().located();
+    let min_distance = util::distance::distance_lon_lat(location_from, location_to, Km::from_f64(EARTH_RADIUS));
+    let req_length = if closing {
+        metadata.requested_length
+    } else {
+        metadata.requested_length - super::util::path_length(&poison_path, &conversion.graph)
+    };
+
+    let min_distance = if req_length.to_f64() < min_distance.to_f64() * 1.2 {
+        min_distance * 1.2
+    } else {
+        req_length
+    };
+
+    let rod_controller = RodController {
+        max_length : min_distance.to_f64(),
+        poisoner_large : PoisonLine::new(location_from, location_to,
+        large_random, util::selectors::get_random(CONFIG.min_lin, CONFIG.max_lin)),
+        poisoner_small : PoisonLine::new(location_from, location_to,
+        small_random, util::selectors::get_random(CONFIG.min_lin, CONFIG.max_lin)),
+        endings : endings,
+        closing : closing,
+        modifier : metadata,
+        point_to_skip : skip_node,
+    };
+    builder.generate_dijkstra(&conversion.graph, &rod_controller)
+}
+
 pub fn create_rod(conversion : &Conversion, pos : &Location, metadata : &mut Metadata) -> Option<AnnotatedPath<Distance>> {
     let edge = match conversion.get_edge(pos) {Some(x) => x, _ => return None};
     let (starting_node, skip_node) = match metadata.original_route {
@@ -250,24 +301,18 @@ pub fn create_rod(conversion : &Conversion, pos : &Location, metadata : &mut Met
         },
         None => (edge.edge.from_node, None),
     };
-    let builder = DijkstraBuilder::new(starting_node, Distance::def());
-    println!("Reduced metadata : {:?}", metadata);
-    let rod_controller = RodController{
-        max_length : metadata.requested_length.to_f64(),
-        poisoner_large : (),
-        poisoner_small : (),
-        endings : VecMap::new(),
-        closing : false,
-        modifier : &*metadata,
-        point_to_skip : skip_node,
+    let (actions, endings) = if let Some(ref route) = metadata.original_route {
+        create_field_poison(conversion, starting_node, VecMap::new(), &*metadata, false, skip_node, route)
+    } else {
+        create_field_no_poisoning(conversion, starting_node, VecMap::new(), &*metadata, false, skip_node)
     };
-    let (actions, endings) = builder.generate_dijkstra(&conversion.graph, &rod_controller);
-
+    let path_length = metadata.original_route.as_ref().map(|r| super::util::path_length(r, &conversion.graph).to_f64()).unwrap_or(0.0);
     let mut selector = Selector::new_default_rng();
     for &ending in &endings {
-        if actions[ending].major.actual_length < metadata.requested_length.to_f64() / 2.0
+        let major = &actions[ending].major;
+        if major.actual_length + path_length < metadata.requested_length.to_f64() / 2.0
         {continue;}
-        selector.update(actions[ending].major.minor_value, ending);
+        selector.update(major.minor_value * (-major.illegal_node_hits * 5.0).exp(), ending);
     }
 
     selector.decompose().map(|last| {
@@ -282,38 +327,21 @@ use std::time;
 
 pub fn close_rod(conversion : &Conversion, pos : &Location, metadata : &mut Metadata, path : AnnotatedPath<Distance>) -> Option<(Path, Km)> {
     let now = time::Instant::now();
-    let map = path.as_map();
-    let map : VecMap<_> = map.into_iter().map(|(n, c)| (n, c.clone())).collect();
     let edge = match conversion.get_edge(pos) {Some(x) => x, None => return None};
     let starting_node = edge.edge.from_node;
-    let builder = DijkstraBuilder::new(starting_node, Distance::def());
-    let large_random = util::selectors::get_random(CONFIG.min, CONFIG.max);
-    let small_random = large_random - CONFIG.increase;//util::selectors::get_random(0.3, 0.5);
-    let original_route = metadata.original_route.take().unwrap_or_else(|| Path::new(Vec::new()));
+
+    let original_route = metadata.original_route.clone().unwrap_or_else(|| Path::new(Vec::new()));
     metadata.requested_length = metadata.requested_length - (original_route.get_elements(&conversion.graph).1)
         .into_iter().map(|x| x.dist).fold(Km::from_f64(0.0), |x, y| x + y);
-    let location_from = &conversion.graph.get(path.first().0).unwrap().located();
-    let location_to = &conversion.graph.get(path.last().0).unwrap().located();
-    let min_distance = util::distance::distance_lon_lat(location_from, pos, Km::from_f64(EARTH_RADIUS));
-    if metadata.requested_length.to_f64() < min_distance.to_f64() * 1.2 {
-        metadata.requested_length = min_distance * 1.2
-    }
-    let rod_controller = RodController {
-        max_length : metadata.requested_length.to_f64(),
-        poisoner_large : PoisonLine::new(location_from, location_to,
-        large_random, util::selectors::get_random(CONFIG.min_lin, CONFIG.max_lin)),
-        poisoner_small : PoisonLine::new(location_from, location_to,
-        small_random, util::selectors::get_random(CONFIG.min_lin, CONFIG.max_lin)),
-        endings : map,
-        closing : true,
-        modifier : metadata,
-        point_to_skip : None,
-    };
-    let (actions, endings) = builder.generate_dijkstra(&conversion.graph, &rod_controller);
+
+    let map = path.as_map();
+    let map : VecMap<_> = map.into_iter().map(|(n, c)| (n, c.clone())).collect();
+
+    let (actions, endings) = create_field_poison(conversion, starting_node, map, &*metadata, true , None, &path.as_path());
 
     let mut selector = Selector::new_default_rng();
     let mut selector_large = Selector::new_default_rng();
-    let map = rod_controller.endings;
+    let map = path.as_map();
     let mut count = 0;
     for &ending in &endings {
         if ending == 0 {
@@ -338,7 +366,6 @@ pub fn close_rod(conversion : &Conversion, pos : &Location, metadata : &mut Meta
     }
 
     let duration = time::Instant::now() - now;
-    let _ = writeln!(io::stderr(), "{} {} {}.{:09} {}", large_random, small_random, duration.as_secs(), duration.subsec_nanos(), count);
 
     let _ = writeln!(io::stderr(), "Routes selected : {} / {}", count, endings.len());
     let longest_index = selector.decompose().or(selector_large.decompose());
