@@ -23,3 +23,4 @@ pub const DILUTE_FAVOURITE : f64 = 1.5;
 pub const FALLOFF : f64 = 2.0;
 pub const ABS_MINIMUM : f64 = 0.2;
 pub const ABS_MAXIMUM : f64 = 5.0;
+pub const EVENT_IMPORTANCE : f64 = 3.0;

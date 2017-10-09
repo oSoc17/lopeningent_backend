@@ -41,16 +41,18 @@ pub struct Distance{
     pub actual_length : f64,
     pub illegal_node_hits : f64,
     pub node_potential : f64,
+    pub potential_track : f64,
 }
 
 impl Distance {
-    pub fn new(values : (f64, f64, f64, f64, f64)) -> Distance {
+    pub fn new(values : (f64, f64, f64, f64, f64, f64)) -> Distance {
         Distance {
             major_value : values.0,
             minor_value : values.1,
             actual_length : values.2,
             illegal_node_hits : values.3,
             node_potential : values.4,
+            potential_track : values.5
         }
     }
 
@@ -171,12 +173,12 @@ impl<'a, P : Poisoned, M : TagModifier + 'a> RodController<'a, P, M> {
         let p_s = self.poisoner_small.poison(&edge.average);
         let e = if self.endings.get(edge.edge.from_node as usize).is_some()
                   && self.endings.get(edge.edge.to_node as usize).is_some() {
-                    f64::INFINITY
+                     (M::tag_bounds().1 / next_potential).ln() / DILUTE_FAVOURITE
                 } else {
                     self.enjoyment(&edge.edge.tags)
                 };
         if e != 0.0 {
-            next_potential *= e.exp() * DILUTE_FAVOURITE;
+            next_potential *= (e * DILUTE_FAVOURITE).exp();
             let (min, max) = M::tag_bounds();
             if next_potential > max {
                 next_potential = max;
@@ -189,7 +191,9 @@ impl<'a, P : Poisoned, M : TagModifier + 'a> RodController<'a, P, M> {
         let n_p = next_potential;
         let random_factor = (edge.hits.load(Ordering::Relaxed) as f64 + 20.0);
         let random_factor = random_factor * random_factor * util::selectors::get_random(0.1, 1.0);
-        Distance::new((t * n_p * p_l * random_factor,  t * n_p * p_s * random_factor, t , hit_illegal_node, n_p))
+        let res = Distance::new((t * n_p * p_l * random_factor,  t * n_p * p_s * random_factor, t , hit_illegal_node, n_p, -e));
+        //let _ = writeln!(io::stderr(), "{} -> {} : {:?}", edge.edge.from_node, edge.edge.to_node, res);
+        res
     }
 }
 
@@ -205,8 +209,8 @@ impl<'a, P : Poisoned, TM : TagModifier + 'a> DijkstraControl for RodController<
             actual_length : m.actual_length + added.actual_length,
             illegal_node_hits : m.illegal_node_hits + added.illegal_node_hits,
             node_potential : added.node_potential,
+            potential_track : m.potential_track + added.potential_track,
         };
-        //println!("{:?}", res);
         res
     }
     fn filter(&self, m : &Self::M) -> bool {
@@ -312,7 +316,7 @@ pub fn create_rod(conversion : &Conversion, pos : &Location, metadata : &mut Met
         let major = &actions[ending].major;
         if major.actual_length + path_length < metadata.requested_length.to_f64() / 2.0
         {continue;}
-        selector.update(major.minor_value * (-major.illegal_node_hits * 5.0).exp(), ending);
+        selector.update(major.minor_value * (-major.illegal_node_hits * 5.0 + EVENT_IMPORTANCE *  major.potential_track / major.actual_length).exp(), ending);
     }
 
     selector.decompose().map(|last| {
@@ -351,17 +355,13 @@ pub fn close_rod(conversion : &Conversion, pos : &Location, metadata : &mut Meta
         let distance = &actions[ending].major;
         let total_distance = distance.actual_length + map[node as usize].actual_length;
         let total_weight = distance.minor_value + map[node as usize].minor_value;
-        let _ = write!(io::stderr(), "Totals of {} : abs({}) rel({}) ({:?}) ", ending, total_distance, total_weight, distance);
-        if total_distance <= metadata.requested_length.to_f64() * MIN_LENGTH_FACTOR {
-            //let _ = writeln!(io::stderr(), "Failure!");
-            continue;
-        }
-        //let _ = writeln!(io::stderr(), "Success!");
+        let events = distance.potential_track + map[node as usize].potential_track;
+        let _ = writeln!(io::stderr(), "Totals of {} : abs({}) rel({}) ({:?}) ", ending, total_distance, total_weight, distance);
         count += 1;
         if total_distance <= metadata.requested_length.to_f64() {
-            selector.update((total_distance).exp(), ending);
+            selector.update((total_distance + EVENT_IMPORTANCE * events / total_distance).exp(), ending);
         } else {
-            selector_large.update((-total_distance).exp(), ending);
+            selector_large.update((-total_distance + EVENT_IMPORTANCE * events / total_distance).exp(), ending);
         }
     }
 
@@ -372,16 +372,10 @@ pub fn close_rod(conversion : &Conversion, pos : &Location, metadata : &mut Meta
 
     longest_index.map(|longest_index| {
         let prev_node = &actions[actions[longest_index].previous_index].node_handle;
-        //let _ = writeln!(io::stderr(), "longest_index : {} {} {}", longest_index, actions[longest_index].previous_index, prev_node);
-        //let _ = writeln!(io::stderr(), "contains : {}", map.get(*prev_node as usize).is_some());
-        //let _ = writeln!(io::stderr(), "disabled : {}", actions[actions[longest_index].previous_index].disabled);
-
-
         let true_length = actions[longest_index].major.actual_length + map[actions[longest_index].node_handle as usize].actual_length;
         let _ = writeln!(io::stderr(), "Length: {}", true_length);
         let final_path = path.as_path().join(into_annotated_nodes(&actions, longest_index).as_path());
         let path = original_route.append(final_path);
-        let _ = writeln!(io::stderr(), "True length: {}", (path.get_elements(&conversion.graph).1).into_iter().map(|e| e.dist.to_f64()).fold(0.0, |x, y| x + y));
         (path, Km::from_f64(true_length))
     })
 }

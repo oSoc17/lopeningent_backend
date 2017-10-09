@@ -32,7 +32,8 @@ use std::f64::consts::PI;
 
 fn hav(a: f64) -> f64
 {
-    (1. - a.cos()) / 2.
+    let q = (a / 2.0).sin();
+    q * q
 }
 
 pub fn distance_lon_lat<A : Located, B : Located>(a : &A, b: &B, radius : Km) -> Km {
@@ -79,4 +80,5 @@ fn test_distance_to_edge() {
              Km::from_f64((2. as f64).sqrt()))
                     .to_f64()
                     .abs() < 1.0e-6);
+                    
 }

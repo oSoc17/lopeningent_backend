@@ -49,6 +49,8 @@ pub fn route<MF : Fn() -> Metadata>(conversion : &Conversion, from : &Location, 
         let mut metadata = metadata_supplier();
         let rod = logic::create_rod(conversion, from, &mut metadata).ok_or("Rod failed")?;
         string = serde_json::to_string_pretty(&geojson::into_geojson(rod.as_path(), &conversion.graph))?;
+        use std::io::Write;
+        use std::io;
         route = logic::close_rod(conversion, to, &mut metadata, rod);
         if route.is_some() {break;}
     }
