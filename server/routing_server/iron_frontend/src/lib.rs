@@ -39,6 +39,7 @@ struct DatabaseInfo {
     url : String,
     username : String,
     password : String,
+    schema : String,
 }
 
 #[derive(Serialize, Deserialize, Default)]
@@ -60,6 +61,8 @@ struct Config {
     hyperparameters : AlgorithmData,
 }
 
+use std::env;
+
 pub fn fire(config_filename : &str) -> Result<(), Box<Error>>{
     let config = match fs::File::open(config_filename) {
         Ok(file) => serde_json::from_reader(file)?,
@@ -71,8 +74,8 @@ pub fn fire(config_filename : &str) -> Result<(), Box<Error>>{
         }
     };
     let database_config = &config.database_config;
-    let database_url = format!("postgresql://{}:{}@{}", database_config.username, option_env!("DATABASE_PASSWORD").unwrap_or(&database_config.password), database_config.url);
-    let graph = logic::get_graph(database::load(&database_url)?)?;
+    let database_url = format!("postgresql://{}:{}@{}", database_config.username, env::var("DATABASE_PASSWORD").ok().as_ref().unwrap_or(&database_config.password), database_config.url);
+    let graph = logic::get_graph(database::load(&database_url, env::var("SCHEMA").ok().as_ref().unwrap_or(&database_config.schema))?)?;
     let conversion = logic::Conversion::get_default_conversion(graph);
     let conversion = Arc::new(conversion);
     let limit = Limit::new(conversion.clone(), 0.1);

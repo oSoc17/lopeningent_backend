@@ -2,6 +2,8 @@ use graph::Graph;
 use graph::NodeID;
 
 use vec_map::VecMap;
+use std::collections::HashSet;
+
 
 #[derive(Debug, Clone)]
 pub struct Path(Vec<NodeID>);
@@ -46,6 +48,18 @@ impl Path {
         };
         (self.0).truncate(size);
         true
+    }
+
+    pub fn get_first_occuring(&self, indices : &[NodeID]) -> Vec<NodeID> {
+        let mut res = Vec::new();
+        let mut to_hit : HashSet<_> = indices.iter().cloned().collect();
+        for &node_id in &self.0 {
+            if to_hit.contains(&node_id) {
+                to_hit.remove(&node_id);
+                res.push(node_id);
+            }
+        }
+        return res;
     }
 }
 

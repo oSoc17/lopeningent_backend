@@ -2,7 +2,8 @@
   "database_config": {
     "url": "localhost",
     "username": "postgres",
-    "password": "0987654321"
+    "password": "0987654321",
+    "schema": "lopeningent2"
   },
   "server_info": {
     "host": "127.0.0.1",

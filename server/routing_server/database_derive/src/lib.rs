@@ -50,7 +50,9 @@ fn impl_query(ast: &syn::DeriveInput) -> quote::Tokens {
         }).next().unwrap_or_else(|| panic!("No table_name specified for {}", name.as_ref()));
 
     // construct the query
-    let query = &format!("SELECT {} FROM {}{}{};", &select_fields[..select_fields.len() - 2], schema.as_ref().map_or("", |x| &**x), if schema.is_some() {"."} else {""}, table_name);
+    let query = &format!("SELECT {} FROM {{}}{{}}{};",
+                    &select_fields[..select_fields.len() - 2],
+                    table_name);
 
     // create a bunch of field initialisers for the constructor.
     let fields = field_vec.iter()
@@ -66,10 +68,10 @@ fn impl_query(ast: &syn::DeriveInput) -> quote::Tokens {
     // output
     quote! {
         impl Query for #name {
-            fn load(conn : &::postgres::Connection) -> Result<Vec<Self>, Box<::std::error::Error>> {
+            fn load(conn : &::postgres::Connection, schema : &str) -> Result<Vec<Self>, Box<::std::error::Error>> {
                 let mut res = Vec::new();
-                let query = #query;
-                for row in &conn.query(query, &[])? {
+                let query = format!(#query, schema, if schema != "" {"."} else {""});
+                for row in &conn.query(&query, &[])? {
                     let el = #name { #(#fields),* };
                     res.push(el);
                 }

@@ -66,7 +66,7 @@ pub trait DebugQuery {
 }
 
 pub trait Query : Sized {
-    fn load(conn : &::postgres::Connection) -> Result<Vec<Self>, Box<Error>>;
+    fn load(conn : &::postgres::Connection, schema : &str) -> Result<Vec<Self>, Box<Error>>;
 }
 
 #[derive(Query, Debug)]
@@ -166,14 +166,14 @@ fn test_slice_print() {
     assert_eq!(Update::print(&vec), "(0, 1, 3)".to_string());
 }
 
-pub fn load(database_url : &str) -> Result<Scheme, Box<Error>> {
+pub fn load(database_url : &str, schema : &str) -> Result<Scheme, Box<Error>> {
     let connection = Connection::connect(database_url, TlsMode::None)?;
     use std::io;
     use std::io::Write;
 
     Ok(Scheme {
-        nodes : Node::load(&connection)?,
-        edges : Edge::load(&connection)?,
-        pois : Poi::load(&connection)?,
+        nodes : Node::load(&connection, schema)?,
+        edges : Edge::load(&connection, schema)?,
+        pois : Poi::load(&connection, schema)?,
     })
 }

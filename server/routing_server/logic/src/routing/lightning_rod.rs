@@ -292,11 +292,12 @@ pub fn create_rod(conversion : &Conversion, pos : &Location, metadata : &mut Met
     let edge = match conversion.get_edge(pos) {Some(x) => x, _ => return None};
     let (starting_node, skip_node) = match metadata.original_route {
         Some(ref mut route) => {
-            let q : HashSet<_> = route.get_indices().iter().cloned().collect();
-            let res = if let Some(_) = q.get(&edge.edge.to_node) {
-                (edge.edge.from_node, edge.edge.to_node)
-            } else {
-                (edge.edge.to_node, edge.edge.from_node)
+            let edge_nodes = [edge.edge.from_node, edge.edge.to_node];
+            let edge_node_ref : &[NodeID] = &edge_nodes as &[NodeID];
+            let occurrences = route.get_first_occuring(edge_node_ref);
+            let res = match occurrences.into_iter().next() {
+                None => return None,
+                Some(x) => (edge.edge.from_node + edge.edge.to_node - x, x),
             };
             if ! route.truncate(res.1) {
                 return None;
