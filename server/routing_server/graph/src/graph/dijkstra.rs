@@ -1,17 +1,15 @@
 
 use std::collections::BinaryHeap;
 
-
-
-
-
-
 use vec_map::VecMap;
 
 use graph::Graph;
 use graph::HeapData;
 use graph::Majorising;
 use graph::NodeID;
+use std::error::Error;
+
+use util::vec_limit::LimitedVec;
 
 #[derive(Debug, PartialEq, Eq)]
 pub enum Ending {
@@ -89,26 +87,26 @@ where C::M : Debug, C::V : Debug, C::E : Debug
     }
 
     pub fn generate_dijkstra(self, graph : &Graph<C::V, C::E>, control : &C)
-         -> (Vec<SingleAction<C::M>>, Vec<usize>)
+         -> Result<(Vec<SingleAction<C::M>>, Vec<usize>), Box<Error>>
     {
         let mut possible_ending_found = false;
         let mut progress : VecMap<Vec<usize>> = VecMap::new();
         progress.insert(0, vec![0]);
         let mut heap = BinaryHeap::new();
-        let mut res_chain : Vec<SingleAction<C::M>>= Vec::new();
+        let mut res_chain : LimitedVec<SingleAction<C::M>>= LimitedVec::new(Vec::new());
         let mut res_endpoints : Vec<usize> = Vec::new();
         heap.push(HeapData::new(0, self.start_node, &self.start_value, control));
-        res_chain.push(SingleAction::new(0, self.start_node, self.start_value));
+        res_chain.push(SingleAction::new(0, self.start_node, self.start_value))?;
         while let Some(data) = heap.pop() {
-            if res_chain[data.index].disabled {
+            if res_chain.inner()[data.index].disabled {
                 continue;
             }
-            let ending = control.is_ending(graph.get(data.node).unwrap(), &res_chain[data.index].major);
+            let ending = control.is_ending(graph.get(data.node).unwrap(), &res_chain.inner()[data.index].major);
             if ending != Ending::No {
                 possible_ending_found = true;
             }
             let ignore_next_step = control.force_finish() && {
-                if ending == Ending::Yes && ! res_chain[data.index].ignore {
+                if ending == Ending::Yes && ! res_chain.inner()[data.index].ignore {
                     break;
                 }
                 ending == Ending::Kinda
@@ -116,30 +114,33 @@ where C::M : Debug, C::V : Debug, C::E : Debug
 
             if let Some(iter) = graph.get_conn_idval(data.node) {
                 for (next_node, next_edge) in iter {
-                    let next_major = control.add_edge(&res_chain[data.index].major, &next_edge);
+                    let next_major = control.add_edge(&res_chain.inner()[data.index].major, &next_edge);
                     if (!control.ignore_filter_until_ending() || possible_ending_found) && ! control.filter(&next_major) {
                         continue;
                     }
                     let mut h_vec = progress.entry(next_node as usize).or_insert_with(Vec::new);
                     //println!("Inserting {:?} into {:?}... (from {} to {}) ", next_major, h_vec.iter().map(|&c| &res_chain[c].major).collect::<Vec<_>>(), data.node , next_node);
                     for &e in h_vec.iter() {
-                        if res_chain[e].major.majorises_strict(&next_major) {
-                            res_chain[e].disabled = true;
+                        if res_chain.inner()[e].major.majorises_strict(&next_major) {
+                            res_chain.get_mut(e).unwrap().disabled = true;
                         }
                     }
-                    h_vec.retain(|&e| ! res_chain[e].disabled);
-                    if  h_vec.iter().filter(|&&e| next_major.majorises(&res_chain[e].major)).next() == None {
+                    h_vec.retain(|&e| ! res_chain.inner()[e].disabled);
+                    if  h_vec.iter().filter(|&&e| next_major.majorises(&res_chain.inner()[e].major)).next() == None {
                         //print!("Replacement. ");
-                        let index = res_chain.len();
+                        let index = res_chain.inner().len();
                         heap.push(HeapData::new(index, next_node, &next_major, control));
                         h_vec.push(index);
                         res_chain.push(SingleAction::new(data.index, next_node, next_major)
-                            .ignore(ignore_next_step))
+                            .ignore(ignore_next_step))?
                     }
                     //println!("Got {:?}", h_vec.iter().map(|&c| &res_chain[c].major).collect::<Vec<_>>());
                 }
             }
         }
+
+        let mut res_chain = res_chain.into_inner();
+
         for &index in progress.iter().flat_map(|(_, v)| v.iter()) {
             let action = &res_chain[index];
             if control.is_ending(graph.get(action.node_handle).unwrap(), &action.major) == Ending::Yes {
@@ -163,7 +164,7 @@ where C::M : Debug, C::V : Debug, C::E : Debug
                 }
             }
         }
-        (res_chain, res_endpoints)
+        Ok((res_chain, res_endpoints))
     }
 }
 

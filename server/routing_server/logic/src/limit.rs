@@ -29,7 +29,7 @@ impl Limit {
         thread::spawn(move || {
             loop {
                 rx.recv();
-                let _ = writeln!(io::stderr(), "Resetting...");
+                info!("Resetting...");
                 sx_inv.send(Limit::reset(&conv));
                 rx_2.recv();
             }
@@ -59,7 +59,7 @@ impl Limit {
             _ => (),
         }
         let count = self.hits.fetch_add(counter, Ordering::Relaxed);
-        let _ = writeln!(io::stderr(), "Currently at {}/{}", count, self.max_hits);
+        trace!("Currently at {}/{}", count, self.max_hits);
         if count > self.max_hits {
             match self.async_queue.try_send(()) {
                 Ok(_) => {self.async_sender.send(());},

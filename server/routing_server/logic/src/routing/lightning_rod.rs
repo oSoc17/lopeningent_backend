@@ -192,7 +192,7 @@ impl<'a, P : Poisoned, M : TagModifier + 'a> RodController<'a, P, M> {
         let random_factor = (edge.hits.load(Ordering::Relaxed) as f64 + 20.0);
         let random_factor = random_factor * random_factor * util::selectors::get_random(0.1, 1.0);
         let res = Distance::new((t * n_p * p_l * random_factor,  t * n_p * p_s * random_factor, t , hit_illegal_node, n_p, -e));
-        //let _ = writeln!(io::stderr(), "{} -> {} : {:?}", edge.edge.from_node, edge.edge.to_node, res);
+        //info!("{} -> {} : {:?}", edge.edge.from_node, edge.edge.to_node, res);
         res
     }
 }
@@ -250,7 +250,10 @@ pub fn create_field_no_poisoning(conversion : &Conversion, starting_node : NodeI
         modifier : metadata,
         point_to_skip : skip_node,
     };
-    builder.generate_dijkstra(&conversion.graph, &rod_controller)
+    match builder.generate_dijkstra(&conversion.graph, &rod_controller) {
+        Ok(x) => x,
+        Err(e) => {warn!("An error has occurred: {}", e); return (Vec::new(), Vec::new())}
+    }
 }
 
 pub fn create_field_poison(conversion : &Conversion, starting_node : NodeID, endings : VecMap<Distance>, metadata : &Metadata, closing : bool, skip_node : Option<NodeID>, poison_path : &Path)
@@ -285,7 +288,10 @@ pub fn create_field_poison(conversion : &Conversion, starting_node : NodeID, end
         modifier : metadata,
         point_to_skip : skip_node,
     };
-    builder.generate_dijkstra(&conversion.graph, &rod_controller)
+    match builder.generate_dijkstra(&conversion.graph, &rod_controller) {
+        Ok(x) => x,
+        Err(e) => {warn!("An error has occurred: {}", e); return (Vec::new(), Vec::new())}
+    }
 }
 
 pub fn create_rod(conversion : &Conversion, pos : &Location, metadata : &mut Metadata) -> Option<AnnotatedPath<Distance>> {
@@ -322,7 +328,7 @@ pub fn create_rod(conversion : &Conversion, pos : &Location, metadata : &mut Met
 
     selector.decompose().map(|last| {
 
-        //let _ = writeln!(io::stderr(), "Chosen rod : {:#?}", actions[last]);
+        //info!("Chosen rod : {:#?}", actions[last]);
         into_annotated_nodes(&actions, last)
     })
 
@@ -342,7 +348,10 @@ pub fn close_rod(conversion : &Conversion, pos : &Location, metadata : &mut Meta
     let map = path.as_map();
     let map : VecMap<_> = map.into_iter().map(|(n, c)| (n, c.clone())).collect();
 
-    let (actions, endings) = create_field_poison(conversion, starting_node, map, &*metadata, true , None, &path.as_path());
+    let (actions, endings) = create_field_poison(conversion, starting_node, map, &*metadata, true , None,
+        &path.get_path_filtered(|distance|
+            distance.actual_length >= metadata.requested_length.to_f64() * 0.125
+            && distance.actual_length <= metadata.requested_length.to_f64() * 0.375));
 
     let mut selector = Selector::new_default_rng();
     let mut selector_large = Selector::new_default_rng();
@@ -357,7 +366,7 @@ pub fn close_rod(conversion : &Conversion, pos : &Location, metadata : &mut Meta
         let total_distance = distance.actual_length + map[node as usize].actual_length;
         let total_weight = distance.minor_value + map[node as usize].minor_value;
         let events = distance.potential_track + map[node as usize].potential_track;
-        let _ = writeln!(io::stderr(), "Totals of {} : abs({}) rel({}) ({:?}) ", ending, total_distance, total_weight, distance);
+        trace!("Totals of {} : abs({}) rel({}) ({:?}) ", ending, total_distance, total_weight, distance);
         count += 1;
         if total_distance <= metadata.requested_length.to_f64() {
             selector.update((total_distance + EVENT_IMPORTANCE * events / total_distance).exp(), ending);
@@ -368,13 +377,13 @@ pub fn close_rod(conversion : &Conversion, pos : &Location, metadata : &mut Meta
 
     let duration = time::Instant::now() - now;
 
-    let _ = writeln!(io::stderr(), "Routes selected : {} / {}", count, endings.len());
+    info!("Routes selected : {} / {}", count, endings.len());
     let longest_index = selector.decompose().or(selector_large.decompose());
 
     longest_index.map(|longest_index| {
         let prev_node = &actions[actions[longest_index].previous_index].node_handle;
         let true_length = actions[longest_index].major.actual_length + map[actions[longest_index].node_handle as usize].actual_length;
-        let _ = writeln!(io::stderr(), "Length: {}", true_length);
+        debug!("Length: {}", true_length);
         let final_path = path.as_path().join(into_annotated_nodes(&actions, longest_index).as_path());
         let path = original_route.append(final_path);
         (path, Km::from_f64(true_length))

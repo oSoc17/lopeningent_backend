@@ -79,6 +79,10 @@ impl<D> AnnotatedPath<D> {
         &self.0[self.0.len() - 1]
     }
 
+    pub fn get_path_filtered<F : Fn(&D) -> bool>(&self, f : F) -> Path {
+        Path::new((self.0).iter().filter(|t| f(&t.1)).map(|t| t.0).collect())
+    }
+
     pub fn as_map(&self) -> VecMap<&D> {
         self.0.iter().map(|tuple| (tuple.0 as usize, &tuple.1)).collect()
     }

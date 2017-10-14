@@ -9,6 +9,8 @@ extern crate transform;
 extern crate buckets;
 extern crate vec_map;
 extern crate nalgebra as na;
+#[macro_use]
+extern crate log;
 
 mod data;
 mod annotated;

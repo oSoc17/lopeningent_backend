@@ -133,17 +133,16 @@ impl Update {
         return s;
     }
 
-    pub fn apply(&self, connection : &Connection, influence : f64) -> Result<(), Box<Error>> {
-        let option_schema = option_env!("SCHEMA");
-        let query = format!("UPDATE {}{}edges SET rating = rating * (1.0 - {3:}) + {4:} * {3:} WHERE eid IN {}", option_schema.as_ref().map_or("", |x| &**x), if option_schema.is_some() {"."} else {""}, &Update::print(&self.edges), influence, self.rating) ;
+    pub fn apply(&self, schema : &str, connection : &Connection, influence : f64) -> Result<(), Box<Error>> {
+        let query = format!("UPDATE {}{}edges SET rating = rating * (1.0 - {3:}) + {4:} * {3:} WHERE eid IN {}", schema, if schema != "" {"."} else {""}, &Update::print(&self.edges), influence, self.rating) ;
         println!("{}", query);
         connection.execute(&query, &[])?;
         Ok(())
     }
 
-    pub fn store(&self, database_url : &str, influence : f64) -> Result<(), Box<Error>> {
+    pub fn store(&self, database_url : &str, schema : &str, influence : f64) -> Result<(), Box<Error>> {
         let connection = Connection::connect(database_url, TlsMode::None)?;
-        self.apply(&connection, influence)?;
+        self.apply(schema, &connection, influence)?;
         Ok(())
     }
 }

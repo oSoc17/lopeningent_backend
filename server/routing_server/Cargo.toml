@@ -5,6 +5,9 @@ authors = ["gedox <gerwin.dox@ugent.be>"]
 
 [dependencies]
 iron_frontend = {path = "./iron_frontend"}
+fern = "*"
+chrono = "*"
+log = "*"
 
 [profile.release]
 #lto = true

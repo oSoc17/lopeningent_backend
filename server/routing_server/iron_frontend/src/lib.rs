@@ -13,6 +13,8 @@ extern crate serde;
 extern crate serde_derive;
 extern crate serde_urlencoded as fromurl;
 extern crate serde_json;
+#[macro_use]
+extern crate log;
 
 use newtypes::Located;
 use database::Update;
@@ -67,7 +69,7 @@ pub fn fire(config_filename : &str) -> Result<(), Box<Error>>{
     let config = match fs::File::open(config_filename) {
         Ok(file) => serde_json::from_reader(file)?,
         Err(_) => {
-            let _ = writeln!(io::stderr(), "Failed to open config, creating default config at {}...", config_filename);
+            warn!("Failed to open config, creating default config at {}...", config_filename);
             let res = Config::default();
             let _ = writeln!(fs::File::create(config_filename)?, "{}", serde_json::to_string_pretty::<Config>(&res)?);
             res
@@ -81,13 +83,13 @@ pub fn fire(config_filename : &str) -> Result<(), Box<Error>>{
     let limit = Limit::new(conversion.clone(), 0.1);
     let limit = Arc::new(limit);
     let mut mount = Mount::new();
-    let sender = async_updater(database_url, config.hyperparameters.rating_influence);
+    let sender = async_updater(database_url, env::var("SCHEMA").ok().unwrap_or(database_config.schema.clone()),  config.hyperparameters.rating_influence);
     mount.mount("/route/generate", GraphHandler::new(conversion.clone(), limit.clone()));
     mount.mount("/route/return", GraphHandler::new(conversion.clone(), limit.clone()));
     mount.mount("/route/rate", Rater::new(conversion.clone(), sender));
     let server_info = &config.server_info;
     let server_location = format!("{}:{}", server_info.host, server_info.port);
-    let _ = writeln!(io::stderr(), "We're up and running!");
+    info!("We're up and running!");
     let mut chain = iron::Chain::new(mount);
     chain.link_before(Logger);
     iron::Iron::new(chain).http(&server_location)?;
@@ -99,18 +101,18 @@ struct Logger;
 
 impl BeforeMiddleware for Logger {
     fn before(&self, req: &mut Request) -> IronResult<()> {
-        let _ = writeln!(io::stderr(), "Received {:?}", req);
+        info!("Received {:?}", req);
         Ok(())
     }
 }
 
-fn async_updater(database_url : String, influence : f64) -> Sender<Update> {
+fn async_updater(database_url : String, schema : String, influence : f64) -> Sender<Update> {
     use std::thread;
     let (sx, rx) = channel::<Update>();
     thread::spawn(move ||
         {
             for update in rx.into_iter() {
-                println!("{:?}", update.store(&database_url, influence));
+                println!("{:?}", update.store(&database_url, &schema, influence));
             }
         }
     );
@@ -167,7 +169,7 @@ impl RoutingUrlData {
 
 impl GraphHandler {
     fn handle_loc(&self, parse : RoutingUrlData) -> Result<Response, Box<Error>>  {
-        let _ = writeln!(io::stderr(), "Parsed: {:?}", parse);
+        info!("Parsed: {:?}", parse);
         let from = newtypes::Location::new(parse.lon, parse.lat);
         let mut metadata = parse.get_metadata()?;
         let to = match metadata.original_route {
@@ -177,7 +179,7 @@ impl GraphHandler {
                 Some(ref x) => x.located()
             }
         };
-        let _ = writeln!(io::stderr(), "Metadata: {:?}", metadata);
+        info!("Metadata: {:?}", metadata);
         let path = interface::route(
             &self.conversion,
             &from,
@@ -201,12 +203,13 @@ macro_rules! impl_handler {
                 let mut body = String::new();
                 request.body.read_to_string(&mut body).map_err(<Box<Error>>::from).and_then(|_|
                     {
-                        let _ = writeln!(io::stderr(), "Parsing {:?}:", body);
+                        info!("Parsing {:?}:", body);
                         let parse : Result<$data, _> = fromurl::from_str(&body);
                         parse.map_err(<Box<Error>>::from)
                             .and_then(|parse| self.handle_loc(parse).map_err(<Box<Error>>::from))
                     }).map_err(|e| {
-                        println!("{}", e.description());
+                        error!("{}", e.description());
+                        error!("Caused by data dump: {}", body);
                         iron::IronError::new(io::Error::new(io::ErrorKind::Other, e.description().to_string()), (iron::status::NotFound, "Empty route!".to_string()))}
                     )
             }

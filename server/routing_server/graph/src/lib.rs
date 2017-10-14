@@ -7,6 +7,7 @@ extern crate libc;
 
 extern crate rand;
 extern crate vec_map;
+extern crate util;
 
 mod graph;
 #[cfg(test)]

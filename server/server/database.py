@@ -6,8 +6,10 @@ from util import distance
 from time import time
 from multiprocessing import Process
 import threading, re, config, logging
+import os
 
 POOL = pool.ThreadedConnectionPool(1, 20, config.DB_CONN)
+SCHEMA = os.environ["SCHEMA"]
 
 def cast_into_point(value):
     match = re.match(r"\(([^)]+),([^)]+)\)", value)
@@ -21,7 +23,7 @@ def get_nodes(nodes):
     conn = POOL.getconn(key="node")
     cursor = conn.cursor()
 
-    cursor.execute("SELECT nid, coord FROM lopeningent.nodes;")
+    cursor.execute("SELECT nid, coord FROM {}.nodes;".format(SCHEMA))
 
     for node in cursor.fetchall():
         nid, coord = node
@@ -35,7 +37,7 @@ def get_edges(edges):
     conn = POOL.getconn(key="edge")
     cursor = conn.cursor()
 
-    cursor.execute("SELECT eid, rating, tags, from_node, to_node FROM lopeningent.edges;")
+    cursor.execute("SELECT eid, rating, tags, from_node, to_node FROM {}.edges;".format(SCHEMA))
 
     for edge in cursor.fetchall():
         eid, rating, tags, from_node, to_node = edge
@@ -49,7 +51,7 @@ def get_route_poi(node_list):
     cursor = conn.cursor()
     poi_id =list()
     for node in node_list:
-        cursor.execute("SELECT poi_id FROM lopeningent.nodes WHERE nid = %s;",(str(node),))
+        cursor.execute("SELECT poi_id FROM {}.nodes WHERE nid = %s;".format(SCHEMA),(str(node),))
         pid = cursor.fetchone()
         poi_id.append(pid[0])
 
@@ -93,7 +95,7 @@ def get_stats_user(uid):
     conn = POOL.getconn(key="get-stats")
     cursor = conn.cursor()
     userFound = []
-    cursor.execute("SELECT uid,avg_speed, avg_heartrate, avg_distance,tot_distance,tot_duration,avg_duration,runs,edit_time FROM lopeningent.users WHERE uid= %s LIMIT 1;",(str(uid),))
+    cursor.execute("SELECT uid,avg_speed, avg_heartrate, avg_distance,tot_distance,tot_duration,avg_duration,runs,edit_time FROM {}.users WHERE uid= %s LIMIT 1;".format(SCHEMA),(str(uid),))
 
     for user in cursor.fetchall():
         uid,avg_speed, avg_heartrate, avg_distance, tot_distance, tot_duration, avg_duration, runs,edit_time  = user
@@ -117,7 +119,7 @@ def update_stats_user(user):
         cursor = conn.cursor()
 
         cursor.execute("""
-                           UPDATE lopeningent.users
+                           UPDATE {0:}.users
                            SET
                            avg_speed     = (%(avg_speed)s),
                            avg_heartrate = (%(avg_heartrate)s),
@@ -128,7 +130,7 @@ def update_stats_user(user):
                            runs          = (%(runs)s),
                            edit_time     = (%(edit_time)s)
                            WHERE uid=%(uid)s;
-                           UPDATE lopeningent.users
+                           UPDATE {0:}.users
                            SET
                            avg_speed     = (%(avg_speed)s),
                            avg_heartrate = (%(avg_heartrate)s),
@@ -139,11 +141,11 @@ def update_stats_user(user):
                            runs          = (%(runs)s),
                            edit_time     = (%(edit_time)s)
                            WHERE uid=%(uid)s;
-                           INSERT INTO lopeningent.users
+                           INSERT INTO {0:}.users
                            (uid,avg_speed, avg_heartrate, avg_distance,tot_distance,tot_duration,avg_duration,runs,edit_time)
                            SELECT %(uid)s, %(avg_speed)s,%(avg_heartrate)s, %(avg_distance)s, %(tot_distance)s, %(tot_duration)s, %(avg_duration)s, %(runs)s,%(edit_time)s
-                           WHERE NOT EXISTS (SELECT 1 FROM lopeningent.users WHERE uid=%(uid)s);
-                        """, {'uid': user.uid, 'avg_speed': user.avg_speed, 'avg_heartrate': user.avg_heartrate, 'avg_distance': user.avg_distance, 'tot_distance': user.tot_distance, 'tot_duration': user.tot_duration, 'avg_duration': user.avg_duration, 'runs': user.runs, 'edit_time': user.edit_time })
+                           WHERE NOT EXISTS (SELECT 1 FROM {0:}.users WHERE uid=%(uid)s);
+                        """.format(SCHEMA), {'uid': user.uid, 'avg_speed': user.avg_speed, 'avg_heartrate': user.avg_heartrate, 'avg_distance': user.avg_distance, 'tot_distance': user.tot_distance, 'tot_duration': user.tot_duration, 'avg_duration': user.avg_duration, 'runs': user.runs, 'edit_time': user.edit_time })
         logging.debug("STATS DB:" + str(conn.status))
 
         conn.commit()
@@ -165,8 +167,8 @@ def update_edge_in_db(edge, new_rating):
 
     cursor.execute(
         """
-        SELECT * FROM lopeningent.edges WHERE from_node = %s AND to_node = %s;
-        """, (edge.id, edge.to)
+        SELECT * FROM {}.edges WHERE from_node = %s AND to_node = %s;
+        """.format(SCHEMA), (edge.id, edge.to)
     )
 
     eid, rating, _, _, _ = cursor.fetchone()
@@ -174,11 +176,11 @@ def update_edge_in_db(edge, new_rating):
 
     cursor.execute(
         """
-        UPDATE lopeningent.edges
+        UPDATE {}.edges
         SET
         rating = %s
         WHERE eid = %s
-        """, (new_rating, eid)
+        """.format(SCHEMA), (new_rating, eid)
     )
 
     cursor.close()
@@ -197,8 +199,8 @@ def get_poi_coords(types,route_poi):
         cursor.execute(
             """
             SELECT pid, name, description, lon, lat
-            FROM lopeningent.pois WHERE tag = %s
-            """,
+            FROM {}.pois WHERE tag = %s
+            """.format(SCHEMA),
             (type, )
         )
 
@@ -220,7 +222,7 @@ def get_poi_coords(types,route_poi):
 def get_poi_types():
     conn = POOL.getconn(key="get-poi-types")
     cursor = conn.cursor()
-    cursor.execute("SELECT DISTINCT tag FROM lopeningent.pois;")
+    cursor.execute("SELECT DISTINCT tag FROM {}.pois;".format(SCHEMA))
     return [row[0] for row in cursor.fetchall()]
     cursor.close()
     POOL.putconn(conn, key="get-poi-types")

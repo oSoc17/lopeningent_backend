@@ -22,10 +22,10 @@ pub const CONFIG : RandomConfig = RandomConfig {
 pub const MIN_LENGTH_FACTOR : f64 = 0.8;
 
 // Potential function
-pub const DILUTE_FAVOURITE : f64 = 1.0;
-pub const FALLOFF : f64 = 2.0;
-pub const ABS_MINIMUM : f64 = 0.2;
-pub const ABS_MAXIMUM : f64 = 5.0;
+pub const DILUTE_FAVOURITE : f64 = 0.5;
+pub const FALLOFF : f64 = 0.5;
+pub const ABS_MINIMUM : f64 = 0.5;
+pub const ABS_MAXIMUM : f64 = 2.0;
 
 // Meta choice
 pub const EVENT_IMPORTANCE : f64 = 2.0;
