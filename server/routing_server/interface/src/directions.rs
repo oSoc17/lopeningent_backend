@@ -5,6 +5,9 @@ use logic::{ApplicationGraph, PoiNode};
 use newtypes::{Located};
 use serialize;
 
+use tag_modifiers::Tags;
+use tag_modifiers::TagModifier;
+
 #[derive(Serialize)]
 pub struct DirectionalNode<'a> {
     pub lon : f64,
@@ -15,14 +18,17 @@ pub struct DirectionalNode<'a> {
 }
 
 impl<'a>  DirectionalNode<'a> {
-    pub fn new(poinode : &'a PoiNode, dir : &'static str) -> DirectionalNode<'a> {
+    pub fn new<T : TagModifier>(poinode : &'a PoiNode, dir : &'static str, tags : &T) -> DirectionalNode<'a> {
         let q = poinode.node.located();
         use std::ops::Deref;
         DirectionalNode {
             lon : q.lon,
             lat : q.lat,
             dir : dir,
-            pois : poinode.poi.as_ref().map(|vec| vec.iter().map(|arc| arc.deref()).collect())
+            pois : poinode.poi.as_ref()
+                .map(|vec| vec.iter()
+                    .map(|arc| arc.deref())
+                    .filter(|poi| tags.tag_modifier(&Tags::from(poi.tag.as_ref())) > 0.0).collect())
         }
     }
 }
@@ -39,30 +45,30 @@ pub struct Directions<'a> {
     pub tag : String,
 }
 
-pub fn into_directions<'a>(path : Path, graph : &'a ApplicationGraph) -> Directions<'a> {
+pub fn into_directions<'a, T : TagModifier>(path : Path, graph : &'a ApplicationGraph, tags : &T) -> Directions<'a> {
     let nodes = path.get_elements(graph).0;
     let threshold = 0.7;
-    let mut res = vec![DirectionalNode::new(&nodes[0], dir_none())];
+    let mut res = vec![DirectionalNode::new(&nodes[0], dir_none(), tags)];
     for ((a, b), c) in nodes.iter().zip(nodes[1..].iter()).zip(nodes[2..].iter()) {
         if a.node.nid == c.node.nid {
-            res.push(DirectionalNode::new(&b, dir_turn()));
+            res.push(DirectionalNode::new(&b, dir_turn(), tags));
             continue;
         }
         let value = angle(a, b, c);
         let topush = if value < -threshold {
-            DirectionalNode::new(&b, dir_left())
+            DirectionalNode::new(&b, dir_left(), tags)
         } else if value > threshold {
-            DirectionalNode::new(&b, dir_right())
+            DirectionalNode::new(&b, dir_right(), tags)
         } else {
-            DirectionalNode::new(&b, dir_forward())
+            DirectionalNode::new(&b, dir_forward(), tags)
         };
         if graph.get_edges(b.node.nid).unwrap().count() <= 2 {
-            res.push(DirectionalNode::new(&b, dir_none()));
+            res.push(DirectionalNode::new(&b, dir_none(), tags));
         } else {
             res.push(topush);
         }
     }
-    res.push(DirectionalNode::new(&nodes[nodes.len() - 1], dir_none()));
+    res.push(DirectionalNode::new(&nodes[nodes.len() - 1], dir_none(), tags));
     Directions {
         coordinates : res,
         tag : serialize::to_string(&path),

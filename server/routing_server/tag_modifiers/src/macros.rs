@@ -1,12 +1,13 @@
 macro_rules! struct_tag {
     {$($field : ident),*} => {
+
         #[derive(Debug, Default)]
         pub struct Tags {
             $(pub $field : bool),*
         }
 
         impl Tags {
-            pub fn from(t : Vec<String>) -> Tags {
+            pub fn from<'a, I : IntoIterator<Item=S>, S : AsRef<str>>(t : I) -> Tags {
                 let mut res = Tags::default();
                 for i in t {
                     match i.as_ref() {

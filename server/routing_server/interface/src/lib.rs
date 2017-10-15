@@ -12,6 +12,7 @@ extern crate base64;
 extern crate database;
 #[macro_use]
 extern crate log;
+extern crate tag_modifiers;
 
 use newtypes::Location;
 use std::error::Error;
@@ -60,8 +61,10 @@ pub fn route<MF : Fn() -> Metadata>(conversion : &Conversion, from : &Location, 
     use std::io::Write;
     let _ = fs::File::create("debug.json").ok().map(|mut f| f.write_all(string.as_bytes()));
     limit.improve(&route);
+    let metadata = metadata_supplier();
+    let converter = metadata.tag_converter;
     Ok(match routing_type {
-        Directions => serde_json::to_string_pretty(&directions::into_directions(route, &conversion.graph))?,
+        Directions => serde_json::to_string_pretty(&directions::into_directions(route, &conversion.graph, &converter))?,
         GeoJson => serde_json::to_string_pretty(&geojson::into_geojson(route, &conversion.graph))?,
     })
 }
