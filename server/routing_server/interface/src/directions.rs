@@ -5,31 +5,31 @@ use logic::{ApplicationGraph, PoiNode};
 use newtypes::{Located};
 use serialize;
 
+use std::collections::HashSet as Set;
+
 use tag_modifiers::Tags;
 use tag_modifiers::TagModifier;
 
 #[derive(Serialize)]
-pub struct DirectionalNode<'a> {
+pub struct DirectionalNode {
     pub lon : f64,
     pub lat : f64,
     #[serde(rename = "c")]
-    pub dir : &'static str,
-    pub pois : Option<Vec<&'a Poi>>,
+    pub dir : &'static str
 }
 
-impl<'a>  DirectionalNode<'a> {
-    pub fn new<T : TagModifier>(poinode : &'a PoiNode, dir : &'static str, tags : &T) -> DirectionalNode<'a> {
+impl DirectionalNode {
+    pub fn new<'a, T : TagModifier>(poinode : &'a PoiNode, dir : &'static str, tags : &T) -> (DirectionalNode, Option<Vec<&'a Poi>>) {
         let q = poinode.node.located();
         use std::ops::Deref;
-        DirectionalNode {
+        (DirectionalNode {
             lon : q.lon,
             lat : q.lat,
-            dir : dir,
-            pois : poinode.poi.as_ref()
-                .map(|vec| vec.iter()
-                    .map(|arc| arc.deref())
-                    .filter(|poi| tags.tag_modifier(&Tags::from(poi.tag.as_ref())) > 0.0).collect())
-        }
+            dir : dir
+        }, poinode.poi.as_ref()
+            .map(|vec| vec.iter()
+                .map(|arc| arc.deref())
+                .filter(|poi| tags.tag_modifier(&Tags::from(poi.tag.as_ref())) > 0.0).collect()))
     }
 }
 
@@ -41,8 +41,9 @@ fn dir_right() -> &'static str {"right"}
 
 #[derive(Serialize)]
 pub struct Directions<'a> {
-    pub coordinates : Vec<DirectionalNode<'a>>,
+    pub coordinates : Vec<DirectionalNode>,
     pub tag : String,
+    pub pois : Vec<&'a Poi>
 }
 
 pub fn into_directions<'a, T : TagModifier>(path : Path, graph : &'a ApplicationGraph, tags : &T) -> Directions<'a> {
@@ -69,9 +70,19 @@ pub fn into_directions<'a, T : TagModifier>(path : Path, graph : &'a Application
         }
     }
     res.push(DirectionalNode::new(&nodes[nodes.len() - 1], dir_none(), tags));
+
+    let mut set = Set::new();
+    let mut poi_vec = Vec::new();
+    for poi in res.iter().filter_map(|node| (node.1).as_ref()).flat_map(|vec| vec.iter().map(|arc| &**arc)) {
+        if set.insert(poi.pid) {
+            poi_vec.push(poi);
+        }
+    }
+
     Directions {
-        coordinates : res,
+        coordinates : res.into_iter().map(|(a, b)| a).collect(),
         tag : serialize::to_string(&path),
+        pois : poi_vec,
     }
 }
 
