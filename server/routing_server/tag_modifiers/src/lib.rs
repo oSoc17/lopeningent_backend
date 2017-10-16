@@ -3,7 +3,9 @@
 mod macros;
 
 struct_tag! {
-    tourism,
+    toerisme,
+    monumenten,
     water,
-    park
+    park,
+    ugent
 }

@@ -52,7 +52,7 @@ pub fn route<MF : Fn() -> Metadata>(conversion : &Conversion, from : &Location, 
     for _ in 0..20 {
         let mut metadata = metadata_supplier();
         let rod = logic::create_rod(conversion, from, &mut metadata).ok_or("Rod failed")?;
-        string = serde_json::to_string_pretty(&geojson::into_geojson(rod.as_path(), &conversion.graph))?;
+        string = serde_json::to_string_pretty(&geojson::into_geojson(rod.as_path(), &conversion.graph, &metadata.tag_converter))?;
         route = logic::close_rod(conversion, to, &mut metadata, rod);
         if route.is_some() {break;}
     }
@@ -62,10 +62,10 @@ pub fn route<MF : Fn() -> Metadata>(conversion : &Conversion, from : &Location, 
     let _ = fs::File::create("debug.json").ok().map(|mut f| f.write_all(string.as_bytes()));
     limit.improve(&route);
     let metadata = metadata_supplier();
-    let converter = metadata.tag_converter;
+    let converter = &metadata.tag_converter;
     Ok(match routing_type {
-        Directions => serde_json::to_string_pretty(&directions::into_directions(route, &conversion.graph, &converter))?,
-        GeoJson => serde_json::to_string_pretty(&geojson::into_geojson(route, &conversion.graph))?,
+        Directions => serde_json::to_string_pretty(&directions::into_directions(route, &conversion.graph, converter))?,
+        GeoJson => serde_json::to_string_pretty(&geojson::into_geojson(route, &conversion.graph, converter))?,
     })
 }
 

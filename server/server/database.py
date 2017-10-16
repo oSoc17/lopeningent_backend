@@ -198,7 +198,7 @@ def get_poi_coords(types,route_poi):
     for type in types:
         cursor.execute(
             """
-            SELECT pid, name, description, lon, lat
+            SELECT pid, name, description, lat, lon
             FROM {}.pois WHERE tag = %s
             """.format(SCHEMA),
             (type, )
