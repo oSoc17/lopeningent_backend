@@ -4,11 +4,11 @@
 
 
 
-use graph::NodeID;
-use graph::dijkstra::DijkstraControl;
+use NodeID;
+use dijkstra::DijkstraControl;
 use num::traits::WrappingSub;
 
-/// HeapData struct
+/// `HeapData` struct
 
 #[derive(Eq, PartialEq, Debug, PartialOrd, Ord)]
 pub struct HeapData

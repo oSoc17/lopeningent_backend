@@ -42,9 +42,7 @@ impl Km {
     /// ```
     pub fn from_f64_checked(f : f64) -> Option<Km> {
         // Beware rounding errors!
-        if f >= Km(i64::max_value()).to_f64() {
-            None
-        } else if f < Km(i64::min_value()).to_f64() {
+        if f >= Km(i64::max_value()).to_f64() || f < Km(i64::min_value()).to_f64() {
             None
         } else {Some(Km::from_f64(f))}
     }
@@ -144,7 +142,7 @@ impl Location {
     }
 
     /// Creates a new unit vector on the 3d sphere.
-    pub fn into_3d(&self) -> Vector3<f64> {
+    pub fn as_3d(&self) -> Vector3<f64> {
         let rlon = self.lon * PI / 180.0;
         let rlat = self.lat * PI / 180.0;
         Vector3::new(rlon.sin() * rlat.cos(), rlon.cos() * rlat.cos(), rlat.sin())

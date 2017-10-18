@@ -79,7 +79,7 @@ impl Distance {
     }
 
     /// Used for Majorising.
-    fn into_majorising(&self) -> (f64, f64, f64) {
+    fn as_majorising(&self) -> (f64, f64, f64) {
         (self.major_value, self.minor_value, self.illegal_node_hits)//, self.node_potential)
     }
 }
@@ -87,7 +87,7 @@ impl Distance {
 
 impl Majorising for Distance {
     fn majorises(&self, other : &Self) -> bool {
-        self.into_majorising().majorises(&other.into_majorising())
+        self.as_majorising().majorises(&other.as_majorising())
     }
 }
 
@@ -141,8 +141,8 @@ impl PoisonLine {
     /// Create a new PoisonLine from two endpoints, a size factor, and a treshold.
     pub fn new(start : &Location, end : &Location, factor : f64, maximum : f64) -> PoisonLine {
         PoisonLine {
-            start : start.into_3d(),
-            end : end.into_3d(),
+            start : start.as_3d(),
+            end : end.as_3d(),
             radius : EARTH_RADIUS,
             size : util::distance::distance_lon_lat(start, end, Km::from_f64(EARTH_RADIUS)).to_f64() * factor,
             maximum_ln : maximum.ln(),
@@ -203,8 +203,7 @@ impl<'a, P : Poisoned, M : TagModifier + 'a> RodController<'a, P, M> {
         let n_p = next_potential;
         let random_factor = edge.hits.load(Ordering::Relaxed) as f64 + 20.0;
         let random_factor = random_factor * random_factor * util::selectors::get_random(0.1, 1.0);
-        let res = Distance::new((t * n_p * p_l * random_factor,  t * n_p * p_s * random_factor, t , hit_illegal_node, n_p, -e));
-        res
+        Distance::new((t * n_p * p_l * random_factor,  t * n_p * p_s * random_factor, t , hit_illegal_node, n_p, -e))
     }
 }
 
@@ -214,15 +213,14 @@ impl<'a, P : Poisoned, TM : TagModifier + 'a> DijkstraControl for RodController<
     type M = Distance;
     fn add_edge(&self, m : &Self::M, e : &Self::E) -> Self::M {
         let added = self.annotate(e, m.node_potential);
-        let res = Distance {
+        Distance {
             major_value : m.major_value + added.major_value,
             minor_value : m.minor_value + added.minor_value,
             actual_length : m.actual_length + added.actual_length,
             illegal_node_hits : m.illegal_node_hits + added.illegal_node_hits,
             node_potential : added.node_potential,
             potential_track : m.potential_track + added.potential_track,
-        };
-        res
+        }
     }
     fn filter(&self, m : &Self::M) -> bool {
         m.actual_length < self.max_length
@@ -266,7 +264,7 @@ pub fn create_field_no_poisoning(serving_model : &ServingModel, starting_node : 
     };
     match builder.generate_dijkstra(&serving_model.graph, &rod_controller) {
         Ok(x) => x,
-        Err(e) => {warn!("An error has occurred: {}", e); return (Vec::new(), Vec::new())}
+        Err(e) => {warn!("An error has occurred: {}", e); (Vec::new(), Vec::new())}
     }
 }
 
@@ -285,7 +283,7 @@ pub fn create_field_poison(serving_model : &ServingModel, starting_node : NodeID
     let req_length = if closing {
         metadata.requested_length
     } else {
-        metadata.requested_length - super::util::path_length(&poison_path, &serving_model.graph)
+        metadata.requested_length - super::util::path_length(poison_path, &serving_model.graph)
     };
 
     let min_distance = if req_length.to_f64() < min_distance.to_f64() * 1.2 {
@@ -308,7 +306,7 @@ pub fn create_field_poison(serving_model : &ServingModel, starting_node : NodeID
     };
     match builder.generate_dijkstra(&serving_model.graph, &rod_controller) {
         Ok(x) => x,
-        Err(e) => {warn!("An error has occurred: {}", e); return (Vec::new(), Vec::new())}
+        Err(e) => {warn!("An error has occurred: {}", e); (Vec::new(), Vec::new())}
     }
 }
 
@@ -360,7 +358,7 @@ pub fn create_rod(serving_model : &ServingModel, pos : &Location, metadata : &mu
 }
 
 /// Close a rod.
-pub fn close_rod(serving_model : &ServingModel, pos : &Location, metadata : &mut Metadata, path : AnnotatedPath<Distance>) -> Option<(Path, Km)> {
+pub fn close_rod(serving_model : &ServingModel, pos : &Location, metadata : &mut Metadata, path : &AnnotatedPath<Distance>) -> Option<(Path, Km)> {
     // Find the starting point of our rod.
     let edge = match serving_model.get_edge(pos) {Some(x) => x, None => return None};
     let starting_node = edge.edge.from_node;
@@ -404,7 +402,7 @@ pub fn close_rod(serving_model : &ServingModel, pos : &Location, metadata : &mut
     }
 
     info!("Routes selected : {} / {}", count, endings.len());
-    let longest_index = selector.decompose().or(selector_large.decompose());
+    let longest_index = selector.decompose().or_else(|| selector_large.decompose());
 
     longest_index.map(|longest_index| {
         // Compute the actual length of the path.

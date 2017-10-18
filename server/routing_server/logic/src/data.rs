@@ -1,4 +1,4 @@
-/// This module loads all data from the database into graphs and serving_models.
+/// This module loads all data from the database into graphs and serving models.
 
 use graph::{Graph, NodeID};
 use database::{Scheme, Poi};
@@ -49,7 +49,7 @@ pub fn get_graph(scheme : Scheme) -> Result<ApplicationGraph, Box<Error>> {
                 (from, AnnotatedEdge{
                     edge : edge,
                     dist : dist,
-                    average : Location::average(&from_loc.located(), &to_loc.located()).into_3d(),
+                    average : Location::average(&from_loc.located(), &to_loc.located()).as_3d(),
                     hits : AtomicUsize::new(0),}
                 , to)
         }).collect()
@@ -71,7 +71,7 @@ pub struct ServingModel {
 pub fn get_projector(graph : &ApplicationGraph) -> Projector {
     let avg = transform::average(graph.get_all_nodes()
         .map(|node| node.located())
-        .map(|location| location.into_3d()).collect::<Vec<_>>().iter());
+        .map(|location| location.as_3d()).collect::<Vec<_>>().iter());
 
     Projector::new(avg, na::Vector3::new(0.0, 0.0, 1.0), Km::from_f64(EARTH_RADIUS))
 }
@@ -82,7 +82,7 @@ impl ServingModel {
         let z = Km::from_f64(0.0);
         let interval = graph.get_all_nodes()
         .map(|node| node.located())
-        .map(|location| projector.map(&location.into_3d()).into())
+        .map(|location| projector.map(&location.as_3d()).into())
         .map(|tuple| Interval::from(tuple,tuple, Km::from_f64(TOLERANCE)))
         .fold(Interval::from((z, z), (z, z), z), |a, b| &a + &b);
 
@@ -93,8 +93,8 @@ impl ServingModel {
             for edge in edges {
                 let (from, to) = (graph.get(edge.edge.from_node).unwrap(), graph.get(edge.edge.to_node).unwrap());
                 let interval = Interval::from(
-                    projector.map(&from.located().into_3d()).into(),
-                    projector.map(&to.located().into_3d()).into(),
+                    projector.map(&from.located().as_3d()).into(),
+                    projector.map(&to.located().as_3d()).into(),
                     Km::from_f64(TOLERANCE)
                 );
                 grid.add(interval, &(edge.edge.from_node, edge.edge.to_node));
@@ -115,13 +115,13 @@ impl ServingModel {
 
     /// Get the edge closest to a location.
     pub fn get_edge(&self, location : &Location) -> Option<&AnnotatedEdge> {
-        let pos = self.projector.map(&location.into_3d()).into();
+        let pos = self.projector.map(&location.as_3d()).into();
         let choices = self.grid.get(pos);
         choices.iter()
         .fold(None, |sum, edge| {
             let edge = self.graph.get_edge(edge.0, edge.1).unwrap();
-            let from = self.projector.map(&self.graph.get(edge.edge.from_node).unwrap().node.located().into_3d()).into();
-            let to = self.projector.map(&self.graph.get(edge.edge.to_node).unwrap().node.located().into_3d()).into();
+            let from = self.projector.map(&self.graph.get(edge.edge.from_node).unwrap().node.located().as_3d()).into();
+            let to = self.projector.map(&self.graph.get(edge.edge.to_node).unwrap().node.located().as_3d()).into();
             let dist = util::distance::distance_to_edge(pos, from, to);
             let _ : &Option<(Km, &AnnotatedEdge)> = &sum;
             match sum {
@@ -137,8 +137,8 @@ impl ServingModel {
         let mut res = self.graph.list_ids().flat_map(move |f| self.graph.get_connids(f).unwrap().map(move |t| (f, t)))
         .map(|(from, to)| (&self.graph.get(from).unwrap().node, &self.graph.get(to).unwrap().node))
         .map(|(from_node, to_node)| (
-            self.projector.map(&from_node.located().into_3d()).into(),
-            self.projector.map(&to_node.located().into_3d()).into()
+            self.projector.map(&from_node.located().as_3d()).into(),
+            self.projector.map(&to_node.located().as_3d()).into()
         )).map(|((fx, fy), (tx, ty))|
             ((self.grid.get_max_x() - fx, self.grid.get_max_y() - fy),
             (self.grid.get_max_x() - tx, self.grid.get_max_y() - ty))

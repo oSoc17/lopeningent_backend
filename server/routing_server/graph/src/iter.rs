@@ -7,12 +7,12 @@ use std::collections::HashMap;
 use std::collections::btree_map::Iter as BTreeIter;
 use std::cell::Ref;
 
-use graph::graph::Element;
+use graph::Element;
 use vec_map::Keys;
 use vec_map::Values;
 
-use graph::graph::NodeID;
-use graph::graph::EdgeID;
+use NodeID;
+use EdgeID;
 
 macro_rules! iter_impl {
     (

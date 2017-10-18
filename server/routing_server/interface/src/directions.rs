@@ -52,16 +52,16 @@ pub struct Directions<'a> {
 }
 
 /// Creates the type=direction output for the graph.
-pub fn into_directions<'a, T : TagModifier>(path : Path, graph : &'a ApplicationGraph, tags : &T) -> Directions<'a> {
+pub fn into_directions<'a, T : TagModifier>(path : &Path, graph : &'a ApplicationGraph, tags : &T) -> Directions<'a> {
     let nodes = path.get_elements(graph).0;
     let threshold = 0.7;
     // starting node does not have a precessor.
-    let mut res = vec![DirectionalNode::new(&nodes[0], dir_none(), tags)];
+    let mut res = vec![DirectionalNode::new(nodes[0], dir_none(), tags)];
     for ((a, b), c) in nodes.iter().zip(nodes[1..].iter()).zip(nodes[2..].iter()) {
 
         // Turnaround.
         if a.node.nid == c.node.nid {
-            res.push(DirectionalNode::new(&b, dir_turn(), tags));
+            res.push(DirectionalNode::new(b, dir_turn(), tags));
             continue;
         }
 
@@ -69,23 +69,23 @@ pub fn into_directions<'a, T : TagModifier>(path : Path, graph : &'a Application
         let value = angle(a, b, c);
         let topush = if value < -threshold {
             // Left
-            DirectionalNode::new(&b, dir_left(), tags)
+            DirectionalNode::new(b, dir_left(), tags)
         } else if value > threshold {
             // Right
-            DirectionalNode::new(&b, dir_right(), tags)
+            DirectionalNode::new(b, dir_right(), tags)
         } else {
             // Forward
-            DirectionalNode::new(&b, dir_forward(), tags)
+            DirectionalNode::new(b, dir_forward(), tags)
         };
 
         // If there is no other choice, ignore.
         if graph.get_edges(b.node.nid).unwrap().count() <= 2 {
-            res.push(DirectionalNode::new(&b, dir_none(), tags));
+            res.push(DirectionalNode::new(b, dir_none(), tags));
         } else {
             res.push(topush);
         }
     }
-    res.push(DirectionalNode::new(&nodes[nodes.len() - 1], dir_none(), tags));
+    res.push(DirectionalNode::new(nodes[nodes.len() - 1], dir_none(), tags));
 
     // Get the Poi's, and remove duplicates.
     let mut set = Set::new();
@@ -98,15 +98,15 @@ pub fn into_directions<'a, T : TagModifier>(path : Path, graph : &'a Application
 
     Directions {
         coordinates : res.into_iter().map(|(a, _)| a).collect(),
-        tag : serialize::to_string(&path),
+        tag : serialize::to_string(path),
         pois : poi_vec,
     }
 }
 
 fn angle(a : &PoiNode, b : &PoiNode, c : &PoiNode) -> f64 {
-    let a_loc = a.node.located().into_3d();
-    let b_loc = b.node.located().into_3d();
-    let c_loc = c.node.located().into_3d();
+    let a_loc = a.node.located().as_3d();
+    let b_loc = b.node.located().as_3d();
+    let c_loc = c.node.located().as_3d();
     let ab_vec = (b_loc - a_loc).normalize();
     let bc_vec = (c_loc - b_loc).normalize();
     ab_vec.cross(&bc_vec).dot(&b_loc)

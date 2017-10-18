@@ -7,7 +7,7 @@ use std::collections::BTreeMap;
 
 use error::Error;
 
-use graph::iter;
+use iter;
 use vec_map::VecMap;
 
 /// Node id type.
@@ -40,7 +40,7 @@ impl<'a, V : 'a, E : 'a> Graph<V, E> {
     ///
     /// # Examples
     /// ```
-    /// use graph::Graph;
+    /// use Graph;
     /// let graph = Graph::new(
     ///             vec![(0, "A"), (5, "B")],
     ///             vec![(0, "Edge from A to B", 5)]
@@ -67,7 +67,7 @@ impl<'a, V : 'a, E : 'a> Graph<V, E> {
     ///
     /// # Examples
     /// ```
-    /// use graph::Graph;
+    /// use Graph;
     /// let graph = Graph::new(
     ///             vec![(0, "A"), (5, "B")],
     ///             vec![(0, "Edge from A to B", 5)]
@@ -84,7 +84,7 @@ impl<'a, V : 'a, E : 'a> Graph<V, E> {
     ///
     /// # Examples
     /// ```
-    /// use graph::Graph;
+    /// use Graph;
     /// let graph = Graph::new(
     ///             vec![(0, "A"), (5, "B")],
     ///             vec![(0, "Edge from A to B", 5)]
@@ -94,7 +94,7 @@ impl<'a, V : 'a, E : 'a> Graph<V, E> {
     /// assert_eq!(graph.get(1), None);
     /// ```
     pub fn get(&self, index : NodeID) -> Option<&V> {
-        return self.data.get(index as usize).map(|e| &e.v)
+        self.data.get(index as usize).map(|e| &e.v)
     }
 
     /// Retrieve all connections to a node
@@ -106,7 +106,7 @@ impl<'a, V : 'a, E : 'a> Graph<V, E> {
     ///
     /// # Examples
     /// ```
-    /// use graph::Graph;
+    /// use Graph;
     /// let graph = Graph::new(
     ///             vec![(0, "A"), (5, "B")],
     ///             vec![(0, "Edge from A to B", 5)]
@@ -117,7 +117,7 @@ impl<'a, V : 'a, E : 'a> Graph<V, E> {
     /// assert_eq!(connections.next(), Some((5, &"Edge from A to B")));
     /// assert_eq!(connections.next(), None);
     /// ```
-    pub fn get_conn_idval<'b>(&'b self, index : NodeID) -> Option<iter::ConnIdVal<'b, E>> {
+    pub fn get_conn_idval(&self, index : NodeID) -> Option<iter::ConnIdVal<E>> {
         self.data.get(index as usize)
             .map(|e| e.links.iter())
             .map(iter::ConnIdVal::new)
@@ -128,7 +128,7 @@ impl<'a, V : 'a, E : 'a> Graph<V, E> {
     ///
     /// # Examples
     /// ```
-    /// use graph::Graph;
+    /// use Graph;
     /// let graph = Graph::new(
     ///             vec![(0, "A"), (5, "B")],
     ///             vec![(0, "Edge from A to B", 5)]
@@ -146,7 +146,7 @@ impl<'a, V : 'a, E : 'a> Graph<V, E> {
     ///
     /// # Examples
     /// ```
-    /// use graph::Graph;
+    /// use Graph;
     /// let graph = Graph::new(
     ///             vec![(0, "A"), (5, "B")],
     ///             vec![(0, "Edge from A to B", 5)]
@@ -164,7 +164,7 @@ impl<'a, V : 'a, E : 'a> Graph<V, E> {
     ///
     /// # Examples
     /// ```
-    /// use graph::Graph;
+    /// use Graph;
     /// let graph = Graph::new(
     ///             vec![(0, "A"), (5, "B")],
     ///             vec![(0, "Edge from A to B", 5)]
@@ -183,7 +183,7 @@ impl<'a, V : 'a, E : 'a> Graph<V, E> {
     ///
     /// # Examples
     /// ```
-    /// use graph::Graph;
+    /// use Graph;
     /// let mut graph = Graph::new(
     ///             vec![(0, "A"), (5, "B")],
     ///             vec![(0, "Edge from A to B", 5)]

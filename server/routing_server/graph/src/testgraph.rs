@@ -1,8 +1,11 @@
-use graph::Graph;
+//! Utility to create simple graphs for testing.
 
-use graph::NodeID;
+use Graph;
+
+use NodeID;
 use error::Error;
 
+/// Create a simple checkerboard graph.
 pub fn create_testgraph<V, E, FV : FnMut(usize, usize) -> V, FE : FnMut(NodeID, NodeID) -> E>
     (w : usize, h : usize, fv : FV, fe : FE) -> Result<Graph<V, E>, Error> {
     let mut fv = fv;

@@ -40,7 +40,7 @@ enum Geometry {
 }
 
 /// Construct the return type.
-pub fn into_geojson<'a, T : TagModifier>(path : Path, graph : &'a ApplicationGraph, tags : &T) -> GeoJson<'a> {
+pub fn into_geojson<'a, T : TagModifier>(path : &Path, graph : &'a ApplicationGraph, tags : &T) -> GeoJson<'a> {
     let (nodes, _) = path.get_elements(graph);
     let mut set = Set::new();
     let mut poi_vec = Vec::new();

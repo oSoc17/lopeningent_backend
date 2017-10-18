@@ -390,7 +390,7 @@ warning: missing documentation for a method
 warning: missing documentation for a method
    --> newtypes/src/newtypes.rs:140:5
     |
-140 | /     pub fn into_3d(&self) -> Vector3<f64> {
+140 | /     pub fn as_3d(&self) -> Vector3<f64> {
 141 | |         let rlon = self.lon * PI / 180.0;
 142 | |         let rlat = self.lat * PI / 180.0;
 143 | |         Vector3::new(rlon.sin() * rlat.cos(), rlon.cos() * rlat.cos(), rlat.sin())
@@ -1489,7 +1489,7 @@ warning: missing documentation for a method
    --> logic/src/data.rs:100:5
     |
 100 | /     pub fn get_edge(&self, location : &Location) -> Option<&AnnotatedEdge> {
-101 | |         let pos = self.projector.map(&location.into_3d()).into();
+101 | |         let pos = self.projector.map(&location.as_3d()).into();
 102 | |         let choices = self.grid.get(pos);
 103 | |         choices.iter()
 ...   |

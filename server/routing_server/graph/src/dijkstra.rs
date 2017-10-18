@@ -1,15 +1,15 @@
 //! Implementation of the Ford-Bellman algorithm using Pareto fronts for multidimensional cost functions.
 //!
-//! This implementation uses a chain of SingleActions to compute a path: every action contains information
+//! This implementation uses a chain of `SingleActions` to compute a path: every action contains information
 //! about which node it has reached, and points to its parent to form a vector tree.
 use std::collections::BinaryHeap;
 
 use vec_map::VecMap;
 
-use graph::Graph;
-use graph::HeapData;
-use graph::Majorising;
-use graph::NodeID;
+use Graph;
+use HeapData;
+use Majorising;
+use NodeID;
 use std::error::Error;
 
 use util::vec_limit::LimitedVec;
@@ -162,7 +162,7 @@ impl<C : DijkstraControl> DijkstraBuilder<C>
             if let Some(iter) = graph.get_conn_idval(data.node) {
                 for (next_node, next_edge) in iter {
                     // Compute the cost of adding the edge.
-                    let next_major = control.add_edge(&res_chain.inner()[data.index].major, &next_edge);
+                    let next_major = control.add_edge(&res_chain.inner()[data.index].major, next_edge);
 
                     // Apply the filter
                     if (!control.ignore_filter_until_ending() || possible_ending_found) && ! control.filter(&next_major) {
@@ -170,7 +170,7 @@ impl<C : DijkstraControl> DijkstraBuilder<C>
                     }
 
                     // Disable any end points that it majorises.
-                    let mut h_vec = progress.entry(next_node as usize).or_insert_with(Vec::new);
+                    let h_vec = progress.entry(next_node as usize).or_insert_with(Vec::new);
                     for &e in h_vec.iter() {
                         if res_chain.inner()[e].major.majorises_strict(&next_major) {
                             res_chain.get_mut(e).unwrap().disabled = true;
@@ -181,7 +181,7 @@ impl<C : DijkstraControl> DijkstraBuilder<C>
                     h_vec.retain(|&e| ! res_chain.inner()[e].disabled);
 
                     // If no majorising actions can be found, add this to the
-                    if  h_vec.iter().filter(|&&e| next_major.majorises(&res_chain.inner()[e].major)).next() == None {
+                    if  h_vec.iter().find(|&&e| next_major.majorises(&res_chain.inner()[e].major)) == None {
                         let index = res_chain.inner().len();
                         heap.push(HeapData::new(index, next_node, &next_major, control));
                         h_vec.push(index);
@@ -216,8 +216,8 @@ impl<C : DijkstraControl> DijkstraBuilder<C>
                 }
             }
             // Retrieve the rest.
-            for index in 0..res_chain.len() {
-                if ! res_chain[index].disabled {
+            for (index, element) in res_chain.iter().enumerate() {
+                if ! element.disabled {
                     res_endpoints.push(index)
                 }
             }
@@ -226,13 +226,13 @@ impl<C : DijkstraControl> DijkstraBuilder<C>
     }
 }
 
-use graph::Path;
-use graph::AnnotatedPath;
+use Path;
+use AnnotatedPath;
 
 
 /// Trace back a chain from an ending point, retrieving a path.
 pub fn into_nodes<M : Majorising>(res_chain : &Vec<SingleAction<M>>, start : usize) -> Path {
-    return into_annotated_nodes_functor(res_chain, start, |_| ()).as_path()
+    into_annotated_nodes_functor(res_chain, start, |_| ()).as_path()
 }
 
 /// Trace back a chain from an ending point, retrieving a path with annotations.

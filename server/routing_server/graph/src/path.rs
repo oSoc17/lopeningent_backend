@@ -1,8 +1,8 @@
 //! A data structure containing a path through the graph. This path only contains
 //! node indices and thus needs the referenced graph in order to keep existing.
 
-use graph::Graph;
-use graph::NodeID;
+use Graph;
+use NodeID;
 
 use vec_map::VecMap;
 use std::collections::HashSet;
@@ -64,7 +64,7 @@ impl Path {
 
     /// Limit the path until it hits node with id last_index.
     pub fn truncate(&mut self, last_index : NodeID) -> bool {
-        let size = match (self.0).iter().enumerate().filter(|&(_, &i)| i == last_index).next() {
+        let size = match (self.0).iter().enumerate().find(|&(_, &i)| i == last_index) {
             Some((n, _)) => n + 1,
             None => return false,
         };
@@ -82,7 +82,7 @@ impl Path {
                 res.push(node_id);
             }
         }
-        return res;
+        res
     }
 }
 

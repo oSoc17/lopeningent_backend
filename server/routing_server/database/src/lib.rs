@@ -54,7 +54,7 @@ impl<T : Convert> Convert for Option<T> {
 impl<T : Convert> Convert for Vec<T> {
     type From = Vec<T::From>;
     fn convert(from : Self::From) -> Self {
-        from.into_iter().map(|t| T::convert(t)).collect()
+        from.into_iter().map(T::convert).collect()
     }
 }
 
@@ -149,7 +149,7 @@ impl Update {
     }
 
     fn print(slice : &[EdgeID]) -> String {
-        if slice.len() == 0 {
+        if slice.is_empty() {
             return "()".to_string();
         }
         let mut s = String::new();
@@ -160,7 +160,7 @@ impl Update {
             s.push_str(&id.to_string());
         }
         s.push_str(")");
-        return s;
+        s
     }
 
     /// Apply this update to the database.

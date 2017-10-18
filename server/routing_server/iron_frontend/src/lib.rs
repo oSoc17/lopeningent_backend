@@ -83,13 +83,13 @@ pub fn fire(config_filename : &str) -> Result<(), Box<Error>>{
     let graph = logic::get_graph(database::load(&database_url, env::var("SCHEMA").ok().as_ref().unwrap_or(&database_config.schema))?)?;
     let serving_model = logic::ServingModel::get_default_serving_model(graph);
     let serving_model = Arc::new(serving_model);
-    let limit = Limit::new(serving_model.clone(), 0.1);
+    let limit = Limit::new(Arc::clone(&serving_model), 0.1);
     let limit = Arc::new(limit);
     let mut mount = Mount::new();
-    let sender = async_updater(database_url, env::var("SCHEMA").ok().unwrap_or(database_config.schema.clone()),  config.hyperparameters.rating_influence);
-    mount.mount("/route/generate", GraphHandler::new(serving_model.clone(), limit.clone()));
-    mount.mount("/route/return", GraphHandler::new(serving_model.clone(), limit.clone()));
-    mount.mount("/route/rate", Rater::new(serving_model.clone(), sender));
+    let sender = async_updater(database_url, env::var("SCHEMA").ok().unwrap_or_else(|| database_config.schema.clone()),  config.hyperparameters.rating_influence);
+    mount.mount("/route/generate", GraphHandler::new(Arc::clone(&serving_model), Arc::clone(&limit)));
+    mount.mount("/route/return", GraphHandler::new(Arc::clone(&serving_model), Arc::clone(&limit)));
+    mount.mount("/route/rate", Rater::new(Arc::clone(&serving_model), sender));
     let server_info = &config.server_info;
     let server_location = format!("{}:{}", server_info.host, server_info.port);
     info!("We're up and running!");
@@ -114,7 +114,7 @@ fn async_updater(database_url : String, schema : String, influence : f64) -> Sen
     let (sx, rx) = channel::<Update>();
     thread::spawn(move ||
         {
-            for update in rx.into_iter() {
+            for update in rx {
                 println!("{:?}", update.store(&database_url, &schema, influence));
             }
         }
@@ -130,7 +130,7 @@ struct GraphHandler {
 impl GraphHandler {
     fn new(serving_model : Arc<ServingModel>, limit : Arc<Limit>) -> GraphHandler {
         GraphHandler {
-            serving_model : serving_model.clone(),
+            serving_model : serving_model,
             limit : limit,
         }
     }
@@ -153,15 +153,15 @@ impl RoutingUrlData {
         let mut res = Metadata::default();
         res.requested_length = newtypes::Km::from_f64(self.distance);
         if let Some(ref s) = self.visited_path {
-            res.original_route = Some(interface::serialize::to_path(&s)?);
+            res.original_route = Some(interface::serialize::to_path(s)?);
         }
         let v = String::new();
-        let tag_vec : Vec<_> = self.tags.as_ref().unwrap_or(&v).split("/").collect();
+        let tag_vec : Vec<_> = self.tags.as_ref().unwrap_or(&v).split('/').collect();
         for tag in &tag_vec {
             let size = 1.0 / tag_vec.len() as f64;
             res.add(tag, size);
         }
-        let neg_tag_vec : Vec<_> = self.neg_tags.as_ref().unwrap_or(&v).split("/").collect();
+        let neg_tag_vec : Vec<_> = self.neg_tags.as_ref().unwrap_or(&v).split('/').collect();
         for tag in &neg_tag_vec {
             let size = 1.0 / neg_tag_vec.len() as f64;
             res.add(tag, -size);
@@ -179,7 +179,7 @@ impl GraphHandler {
             None => from.clone(),
             Some(ref path) => match self.serving_model.graph.get(path.last()) {
                 None => from.clone(),
-                Some(ref x) => x.located()
+                Some(x) => x.located()
             }
         };
         info!("Metadata: {:?}", metadata);
@@ -188,7 +188,7 @@ impl GraphHandler {
             &from,
             &to,
             || metadata.clone(),
-            parse.type_.as_ref().map(|s| interface::RoutingType::from(s))
+            &parse.type_.as_ref().map(|s| interface::RoutingType::from(s))
                 .unwrap_or(interface::RoutingType::Directions),
             &self.limit
             )?;

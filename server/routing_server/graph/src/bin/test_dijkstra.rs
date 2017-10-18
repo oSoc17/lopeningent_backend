@@ -17,7 +17,7 @@ fn main() {
 
     let controller = Controller;
     let builder = DijkstraBuilder::new(0, (0.0, 0.0));
-    let (actions, entries) = builder.generate_dijkstra(&graph, &controller);
+    let (actions, entries) = builder.generate_dijkstra(&graph, &controller).unwrap();
     println!("{:#?}", actions);
     println!("{:#?}", entries.iter().map(|index| &actions[*index]).collect::<Vec<_>>());
     println!("{}", actions.len());

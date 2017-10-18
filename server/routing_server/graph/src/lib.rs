@@ -9,9 +9,20 @@ extern crate rand;
 extern crate vec_map;
 extern crate util;
 
-mod graph;
-#[cfg(test)]
-mod tests;
-pub mod error;
 
-pub use graph::*;
+mod graph;
+pub mod iter;
+pub mod dijkstra;
+mod heapdata;
+mod ordering;
+mod path;
+pub mod error;
+pub mod testgraph;
+
+pub use graph::Graph;
+pub use heapdata::HeapData;
+pub use graph::{NodeID, EdgeID};
+pub use path::{Path, AnnotatedPath};
+
+
+pub use self::ordering::*;

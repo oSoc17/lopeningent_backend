@@ -53,15 +53,15 @@ impl RoutingType {
 }
 
 /// Create a string holding the Json representation of a route.
-pub fn route<MF : Fn() -> Metadata>(serving_model : &ServingModel, from : &Location, to : &Location, metadata_supplier : MF, routing_type : RoutingType, limit : &Limit) -> Result<String, Box<Error>> {
+pub fn route<MF : Fn() -> Metadata>(serving_model : &ServingModel, from : &Location, to : &Location, metadata_supplier : MF, routing_type : &RoutingType, limit : &Limit) -> Result<String, Box<Error>> {
     info!("Creating a route from ({}, {}) to ({}, {}) with metadata {:?}", from.lon, from.lat, to.lon, to.lat, metadata_supplier());
     let mut route = None;
     let mut string = String::new();
     for _ in 0..20 {
         let mut metadata = metadata_supplier();
         let rod = logic::create_rod(serving_model, from, &mut metadata).ok_or("Rod failed")?;
-        string = serde_json::to_string_pretty(&geojson::into_geojson(rod.as_path(), &serving_model.graph, &metadata.tag_converter))?;
-        route = logic::close_rod(serving_model, to, &mut metadata, rod);
+        string = serde_json::to_string_pretty(&geojson::into_geojson(&rod.as_path(), &serving_model.graph, &metadata.tag_converter))?;
+        route = logic::close_rod(serving_model, to, &mut metadata, &rod);
         if route.is_some() {break;}
     }
     let route = route.ok_or("Closure failed")?.0;
@@ -71,9 +71,9 @@ pub fn route<MF : Fn() -> Metadata>(serving_model : &ServingModel, from : &Locat
     limit.improve(&route);
     let metadata = metadata_supplier();
     let converter = &metadata.tag_converter;
-    Ok(match routing_type {
-        Directions => serde_json::to_string_pretty(&directions::into_directions(route, &serving_model.graph, converter))?,
-        GeoJson => serde_json::to_string_pretty(&geojson::into_geojson(route, &serving_model.graph, converter))?,
+    Ok(match *routing_type {
+        Directions => serde_json::to_string_pretty(&directions::into_directions(&route, &serving_model.graph, converter))?,
+        GeoJson => serde_json::to_string_pretty(&geojson::into_geojson(&route, &serving_model.graph, converter))?,
     })
 }
 
@@ -81,6 +81,5 @@ pub fn route<MF : Fn() -> Metadata>(serving_model : &ServingModel, from : &Locat
 pub fn rate(graph : &ApplicationGraph, route : &Path, rating : f64) -> Update {
     let edges = route.get_elements(graph).1;
     let edges_ids : Vec<_> = edges.into_iter().map(|edge| edge.edge.eid).collect();
-    let update = Update::new(edges_ids, rating);
-    return update;
+    Update::new(edges_ids, rating)
 }

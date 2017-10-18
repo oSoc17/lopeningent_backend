@@ -26,7 +26,7 @@ impl Limit {
         let (sx, rx) = sync_channel(1);
         let (sx_2, rx_2) = sync_channel(1);
         let (sx_inv, rx_inv) = channel();
-        let conv = serving_model.clone();
+        let conv = Arc::clone(&serving_model);
         thread::spawn(move || {
             loop {
                 if rx.recv().is_err() {break;};
@@ -57,17 +57,13 @@ impl Limit {
             counter += 1;
             serving_model.graph.get_edge(from, to).unwrap().hits.fetch_add(1, Ordering::Relaxed);
         }
-        match self.async_receiver.try_lock().map(|u| u.try_recv()) {
-            Ok(Ok(x)) => {self.hits.fetch_sub(x, Ordering::Relaxed);},
-            _ => (),
+        if let Ok(Ok(x)) = self.async_receiver.try_lock().map(|u| u.try_recv()) {
+             self.hits.fetch_sub(x, Ordering::Relaxed);
         }
         let count = self.hits.fetch_add(counter, Ordering::Relaxed);
         trace!("Currently at {}/{}", count, self.max_hits);
-        if count > self.max_hits {
-            match self.async_queue.try_send(()) {
-                Ok(_) => {let _ = self.async_sender.send(());},
-                _ => (),
-            }
+        if count > self.max_hits && self.async_queue.try_send(()).is_ok() {
+            let _ = self.async_sender.send(());
         }
     }
 

@@ -16,7 +16,7 @@ macro_rules! struct_tag {
 
         impl Tags {
             /// Retrieve a tag
-            pub fn from<'a, I : IntoIterator<Item=S>, S : AsRef<str>>(t : I) -> Tags {
+            pub fn from<I : IntoIterator<Item=S>, S : AsRef<str>>(t : I) -> Tags {
                 let mut res = Tags::default();
                 for i in t {
                     match i.as_ref() {
@@ -42,7 +42,7 @@ macro_rules! struct_tag {
             }
         }
 
-        /// Simple implementation of a TagModifier.
+        /// Simple implementation of a `TagModifier`.
         #[derive(Debug, Default, Clone)]
         pub struct TagConverter {
             $(

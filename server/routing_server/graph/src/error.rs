@@ -10,8 +10,8 @@ pub enum Error {
     ///
     /// # Examples
     /// ```
-    /// use graph::Graph;
-    /// use graph::error::Error;
+    /// use Graph;
+    /// use error::Error;
     /// let graph = Graph::new(
     ///             vec![(0, "A"), (5, "B")],
     ///             vec![(1, "Edge from _ to _", 2)]
@@ -23,7 +23,7 @@ pub enum Error {
     /// Note that only the source node matters:
     ///
     /// ```
-    /// # use graph::Graph;
+    /// # use Graph;
     /// let graph = Graph::new(
     ///             vec![(0, "A"), (5, "B")],
     ///             vec![(0, "Edge from A to _", 2)]
@@ -35,7 +35,7 @@ pub enum Error {
     /// However, other methods might fail.
     ///
     /// ```
-    /// # use graph::Graph;
+    /// # use Graph;
     /// # let graph = Graph::new(
     /// #             vec![(0, "A"), (5, "B")],
     /// #             vec![(0, "Edge from A to _", 2)]
