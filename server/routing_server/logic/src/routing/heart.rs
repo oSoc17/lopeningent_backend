@@ -1,3 +1,5 @@
+/// Experimental algorithm for routing. Do not use yet (can't even compile it.)
+
 use PoiNode;
 use AnnotatedEdge;
 use graph::dijkstra::{DijkstraBuilder, DijkstraControl, SingleAction, Ending};

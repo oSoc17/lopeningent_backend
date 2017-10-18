@@ -1,6 +1,7 @@
 #![warn(missing_docs)]
-
-
+//! The frontend for running the server.
+//!
+//! Might be replaced with a Hyper-based server one day.
 extern crate graph;
 extern crate newtypes;
 extern crate interface;
@@ -25,7 +26,7 @@ use iron::Handler;
 use iron::{IronResult, Request, Response, BeforeMiddleware};
 use mount::Mount;
 use interface::Metadata;
-use interface::Conversion;
+use interface::ServingModel;
 use interface::Limit;
 use std::io;
 use std::io::{Write, Read};
@@ -65,6 +66,8 @@ struct Config {
 
 use std::env;
 
+/// Launch the server.
+
 pub fn fire(config_filename : &str) -> Result<(), Box<Error>>{
     let config = match fs::File::open(config_filename) {
         Ok(file) => serde_json::from_reader(file)?,
@@ -78,15 +81,15 @@ pub fn fire(config_filename : &str) -> Result<(), Box<Error>>{
     let database_config = &config.database_config;
     let database_url = format!("postgresql://{}:{}@{}", database_config.username, env::var("DATABASE_PASSWORD").ok().as_ref().unwrap_or(&database_config.password), database_config.url);
     let graph = logic::get_graph(database::load(&database_url, env::var("SCHEMA").ok().as_ref().unwrap_or(&database_config.schema))?)?;
-    let conversion = logic::Conversion::get_default_conversion(graph);
-    let conversion = Arc::new(conversion);
-    let limit = Limit::new(conversion.clone(), 0.1);
+    let serving_model = logic::ServingModel::get_default_serving_model(graph);
+    let serving_model = Arc::new(serving_model);
+    let limit = Limit::new(serving_model.clone(), 0.1);
     let limit = Arc::new(limit);
     let mut mount = Mount::new();
     let sender = async_updater(database_url, env::var("SCHEMA").ok().unwrap_or(database_config.schema.clone()),  config.hyperparameters.rating_influence);
-    mount.mount("/route/generate", GraphHandler::new(conversion.clone(), limit.clone()));
-    mount.mount("/route/return", GraphHandler::new(conversion.clone(), limit.clone()));
-    mount.mount("/route/rate", Rater::new(conversion.clone(), sender));
+    mount.mount("/route/generate", GraphHandler::new(serving_model.clone(), limit.clone()));
+    mount.mount("/route/return", GraphHandler::new(serving_model.clone(), limit.clone()));
+    mount.mount("/route/rate", Rater::new(serving_model.clone(), sender));
     let server_info = &config.server_info;
     let server_location = format!("{}:{}", server_info.host, server_info.port);
     info!("We're up and running!");
@@ -120,14 +123,14 @@ fn async_updater(database_url : String, schema : String, influence : f64) -> Sen
 }
 
 struct GraphHandler {
-    conversion : Arc<Conversion>,
+    serving_model : Arc<ServingModel>,
     limit : Arc<Limit>,
 }
 
 impl GraphHandler {
-    fn new(conversion : Arc<Conversion>, limit : Arc<Limit>) -> GraphHandler {
+    fn new(serving_model : Arc<ServingModel>, limit : Arc<Limit>) -> GraphHandler {
         GraphHandler {
-            conversion : conversion.clone(),
+            serving_model : serving_model.clone(),
             limit : limit,
         }
     }
@@ -171,17 +174,17 @@ impl GraphHandler {
     fn handle_loc(&self, parse : RoutingUrlData) -> Result<Response, Box<Error>>  {
         info!("Parsed: {:?}", parse);
         let from = newtypes::Location::new(parse.lon, parse.lat);
-        let mut metadata = parse.get_metadata()?;
+        let metadata = parse.get_metadata()?;
         let to = match metadata.original_route {
             None => from.clone(),
-            Some(ref path) => match self.conversion.graph.get(path.last()) {
+            Some(ref path) => match self.serving_model.graph.get(path.last()) {
                 None => from.clone(),
                 Some(ref x) => x.located()
             }
         };
         info!("Metadata: {:?}", metadata);
         let path = interface::route(
-            &self.conversion,
+            &self.serving_model,
             &from,
             &to,
             || metadata.clone(),
@@ -217,7 +220,7 @@ macro_rules! impl_handler {
     }
 }
 struct Rater {
-    conversion : Arc<Conversion>,
+    serving_model : Arc<ServingModel>,
     sender : Mutex<Sender<Update>>,
 }
 
@@ -228,15 +231,15 @@ struct RatingData {
 }
 
 impl Rater {
-    pub fn new(conversion : Arc<Conversion>, sender : Sender<Update>) -> Rater {
+    pub fn new(serving_model : Arc<ServingModel>, sender : Sender<Update>) -> Rater {
         Rater {
-            conversion : conversion,
+            serving_model : serving_model,
             sender : Mutex::new(sender),
         }
     }
 
     fn handle_loc(&self, parse : RatingData) -> Result<Response, Box<Error>> {
-        let update = interface::rate(&self.conversion.graph, &interface::serialize::to_path(&parse.tag)?, parse.rating);
+        let update = interface::rate(&self.serving_model.graph, &interface::serialize::to_path(&parse.tag)?, parse.rating);
         {
             self.sender.lock().map_err(|e| e.to_string())?.send(update)?;
         }

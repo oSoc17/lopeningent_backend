@@ -1,5 +1,7 @@
+/// The heart of the routing algorithm.
+
 use graph::{Path, AnnotatedPath};
-use data::Conversion;
+use data::ServingModel;
 
 use graph::dijkstra::DijkstraBuilder;
 use graph::dijkstra::{DijkstraControl, Ending, SingleAction};
@@ -7,19 +9,15 @@ use graph::dijkstra::into_annotated_nodes;
 use graph::Majorising;
 use graph::NodeID;
 
-use database::{Tags, TagConverter};
+use database::Tags;
 use database::TagModifier;
 use annotated::{PoiNode, AnnotatedEdge};
-
 
 use newtypes::{Location, Located};
 use newtypes::ToF64;
 use newtypes::Km;
 
 use std::f64;
-use std::io;
-use std::io::Write;
-use std::collections::HashSet;
 
 use std::sync::atomic::Ordering;
 
@@ -33,18 +31,25 @@ use util::selectors::Selector;
 use consts::*;
 use super::util::Metadata;
 
-
+/// Structure for computing the length of a route.
 #[derive(PartialEq, Debug, Clone, Default)]
 pub struct Distance{
+    /// Major poison value
     pub major_value : f64,
+    /// Minor poison value
     pub minor_value : f64,
+    /// The actual length
     pub actual_length : f64,
+    /// Whether the path goes through an illegal node (turnaround)
     pub illegal_node_hits : f64,
+    /// Modifier for subsequent edges
     pub node_potential : f64,
+    /// Tracks the total poi hits.
     pub potential_track : f64,
 }
 
 impl Distance {
+    /// New
     pub fn new(values : (f64, f64, f64, f64, f64, f64)) -> Distance {
         Distance {
             major_value : values.0,
@@ -56,20 +61,24 @@ impl Distance {
         }
     }
 
+    /// Create a default distance
     pub fn def() -> Distance {
         let mut res = Self::default();
         res.node_potential = 1.0;
         res
     }
 
+    /// Get the actual length.
     pub fn get_length(&self) -> f64 {
         self.actual_length
     }
 
+    /// Get the potential of this node
     pub fn get_potential(&self) -> f64 {
         self.major_value
     }
 
+    /// Used for Majorising.
     fn into_majorising(&self) -> (f64, f64, f64) {
         (self.major_value, self.minor_value, self.illegal_node_hits)//, self.node_potential)
     }
@@ -82,6 +91,7 @@ impl Majorising for Distance {
     }
 }
 
+/// Poisoner trait, for routing.
 trait Poisoned {
     fn poison(&self, pos : &na::Vector3<f64>) -> f64;
 }
@@ -98,6 +108,7 @@ struct PoisonMiddle {
 }
 
 impl PoisonMiddle {
+    #[allow(unused)]
     fn new(start : &Location, end : &Location) -> PoisonMiddle {
         PoisonMiddle {
             midpoint : Location::average(start, &Location::average(start, end)),
@@ -117,7 +128,7 @@ impl Poisoned for PoisonMiddle {
     }
 }
 */
-
+/// Simple poisoner, that computes the distance to an infinite line and exponentiates the result.
 pub struct PoisonLine {
     start : na::Vector3<f64>,
     end : na::Vector3<f64>,
@@ -127,6 +138,7 @@ pub struct PoisonLine {
 }
 
 impl PoisonLine {
+    /// Create a new PoisonLine from two endpoints, a size factor, and a treshold.
     pub fn new(start : &Location, end : &Location, factor : f64, maximum : f64) -> PoisonLine {
         PoisonLine {
             start : start.into_3d(),
@@ -189,10 +201,9 @@ impl<'a, P : Poisoned, M : TagModifier + 'a> RodController<'a, P, M> {
         }
         let hit_illegal_node = if Some(edge.edge.to_node) == self.point_to_skip {1.0} else {0.0};
         let n_p = next_potential;
-        let random_factor = (edge.hits.load(Ordering::Relaxed) as f64 + 20.0);
+        let random_factor = edge.hits.load(Ordering::Relaxed) as f64 + 20.0;
         let random_factor = random_factor * random_factor * util::selectors::get_random(0.1, 1.0);
         let res = Distance::new((t * n_p * p_l * random_factor,  t * n_p * p_s * random_factor, t , hit_illegal_node, n_p, -e));
-        //info!("{} -> {} : {:?}", edge.edge.from_node, edge.edge.to_node, res);
         res
     }
 }
@@ -238,9 +249,12 @@ impl<'a, P : Poisoned, TM : TagModifier + 'a> DijkstraControl for RodController<
     }
 }
 
-pub fn create_field_no_poisoning(conversion : &Conversion, starting_node : NodeID, endings : VecMap<Distance>, metadata : &Metadata, closing : bool, skip_node : Option<NodeID>)
+/// Create a shortest path tree in the graph without any poisoning.
+pub fn create_field_no_poisoning(serving_model : &ServingModel, starting_node : NodeID, endings : VecMap<Distance>, metadata : &Metadata, closing : bool, skip_node : Option<NodeID>)
     -> (Vec<SingleAction<Distance>>, Vec<usize>) {
     let builder = DijkstraBuilder::new(starting_node, Distance::def());
+
+    // simple builder.
     let rod_controller = RodController{
         max_length : metadata.requested_length.to_f64(),
         poisoner_large : (),
@@ -250,25 +264,28 @@ pub fn create_field_no_poisoning(conversion : &Conversion, starting_node : NodeI
         modifier : metadata,
         point_to_skip : skip_node,
     };
-    match builder.generate_dijkstra(&conversion.graph, &rod_controller) {
+    match builder.generate_dijkstra(&serving_model.graph, &rod_controller) {
         Ok(x) => x,
         Err(e) => {warn!("An error has occurred: {}", e); return (Vec::new(), Vec::new())}
     }
 }
 
-pub fn create_field_poison(conversion : &Conversion, starting_node : NodeID, endings : VecMap<Distance>, metadata : &Metadata, closing : bool, skip_node : Option<NodeID>, poison_path : &Path)
+/// Create a shortest path tree using the given path to poison the result.
+pub fn create_field_poison(serving_model : &ServingModel, starting_node : NodeID, endings : VecMap<Distance>, metadata : &Metadata, closing : bool, skip_node : Option<NodeID>, poison_path : &Path)
     -> (Vec<SingleAction<Distance>>, Vec<usize>) {
+    // simple builder
     let builder = DijkstraBuilder::new(starting_node, Distance::def());
     let large_random = util::selectors::get_random(CONFIG.min, CONFIG.max);
     let small_random = large_random - CONFIG.increase;//util::selectors::get_random(0.3, 0.5);
 
-    let location_from = &conversion.graph.get(poison_path.first()).unwrap().located();
-    let location_to = &conversion.graph.get(poison_path.last()).unwrap().located();
+    // Create the poisoner.
+    let location_from = &serving_model.graph.get(poison_path.first()).unwrap().located();
+    let location_to = &serving_model.graph.get(poison_path.last()).unwrap().located();
     let min_distance = util::distance::distance_lon_lat(location_from, location_to, Km::from_f64(EARTH_RADIUS));
     let req_length = if closing {
         metadata.requested_length
     } else {
-        metadata.requested_length - super::util::path_length(&poison_path, &conversion.graph)
+        metadata.requested_length - super::util::path_length(&poison_path, &serving_model.graph)
     };
 
     let min_distance = if req_length.to_f64() < min_distance.to_f64() * 1.2 {
@@ -277,6 +294,7 @@ pub fn create_field_poison(conversion : &Conversion, starting_node : NodeID, end
         req_length
     };
 
+    // create the controller.
     let rod_controller = RodController {
         max_length : min_distance.to_f64(),
         poisoner_large : PoisonLine::new(location_from, location_to,
@@ -288,14 +306,17 @@ pub fn create_field_poison(conversion : &Conversion, starting_node : NodeID, end
         modifier : metadata,
         point_to_skip : skip_node,
     };
-    match builder.generate_dijkstra(&conversion.graph, &rod_controller) {
+    match builder.generate_dijkstra(&serving_model.graph, &rod_controller) {
         Ok(x) => x,
         Err(e) => {warn!("An error has occurred: {}", e); return (Vec::new(), Vec::new())}
     }
 }
 
-pub fn create_rod(conversion : &Conversion, pos : &Location, metadata : &mut Metadata) -> Option<AnnotatedPath<Distance>> {
-    let edge = match conversion.get_edge(pos) {Some(x) => x, _ => return None};
+/// Create a rod.
+pub fn create_rod(serving_model : &ServingModel, pos : &Location, metadata : &mut Metadata) -> Option<AnnotatedPath<Distance>> {
+    let edge = match serving_model.get_edge(pos) {Some(x) => x, _ => return None};
+
+    // check whether we have a previous route. In this case, we'd like to mark our previous point as illegal.
     let (starting_node, skip_node) = match metadata.original_route {
         Some(ref mut route) => {
             let edge_nodes = [edge.edge.from_node, edge.edge.to_node];
@@ -312,12 +333,16 @@ pub fn create_rod(conversion : &Conversion, pos : &Location, metadata : &mut Met
         },
         None => (edge.edge.from_node, None),
     };
+
+    // create the tree.
     let (actions, endings) = if let Some(ref route) = metadata.original_route {
-        create_field_poison(conversion, starting_node, VecMap::new(), &*metadata, false, skip_node, route)
+        create_field_poison(serving_model, starting_node, VecMap::new(), &*metadata, false, skip_node, route)
     } else {
-        create_field_no_poisoning(conversion, starting_node, VecMap::new(), &*metadata, false, skip_node)
+        create_field_no_poisoning(serving_model, starting_node, VecMap::new(), &*metadata, false, skip_node)
     };
-    let path_length = metadata.original_route.as_ref().map(|r| super::util::path_length(r, &conversion.graph).to_f64()).unwrap_or(0.0);
+
+    // Select the best path from the tree.
+    let path_length = metadata.original_route.as_ref().map(|r| super::util::path_length(r, &serving_model.graph).to_f64()).unwrap_or(0.0);
     let mut selector = Selector::new_default_rng();
     for &ending in &endings {
         let major = &actions[ending].major;
@@ -334,25 +359,28 @@ pub fn create_rod(conversion : &Conversion, pos : &Location, metadata : &mut Met
 
 }
 
-use std::time;
-
-pub fn close_rod(conversion : &Conversion, pos : &Location, metadata : &mut Metadata, path : AnnotatedPath<Distance>) -> Option<(Path, Km)> {
-    let now = time::Instant::now();
-    let edge = match conversion.get_edge(pos) {Some(x) => x, None => return None};
+/// Close a rod.
+pub fn close_rod(serving_model : &ServingModel, pos : &Location, metadata : &mut Metadata, path : AnnotatedPath<Distance>) -> Option<(Path, Km)> {
+    // Find the starting point of our rod.
+    let edge = match serving_model.get_edge(pos) {Some(x) => x, None => return None};
     let starting_node = edge.edge.from_node;
 
+    // Retrieve the original route, to append at the end.
     let original_route = metadata.original_route.clone().unwrap_or_else(|| Path::new(Vec::new()));
-    metadata.requested_length = metadata.requested_length - (original_route.get_elements(&conversion.graph).1)
+    metadata.requested_length = metadata.requested_length - (original_route.get_elements(&serving_model.graph).1)
         .into_iter().map(|x| x.dist).fold(Km::from_f64(0.0), |x, y| x + y);
 
+    // Create the possible ending points
     let map = path.as_map();
     let map : VecMap<_> = map.into_iter().map(|(n, c)| (n, c.clone())).collect();
 
-    let (actions, endings) = create_field_poison(conversion, starting_node, map, &*metadata, true , None,
+    // Get the tree.
+    let (actions, endings) = create_field_poison(serving_model, starting_node, map, &*metadata, true , None,
         &path.get_path_filtered(|distance|
             distance.actual_length >= metadata.requested_length.to_f64() * 0.125
             && distance.actual_length <= metadata.requested_length.to_f64() * 0.375));
 
+    // Find the best path in the tree.
     let mut selector = Selector::new_default_rng();
     let mut selector_large = Selector::new_default_rng();
     let map = path.as_map();
@@ -375,15 +403,14 @@ pub fn close_rod(conversion : &Conversion, pos : &Location, metadata : &mut Meta
         }
     }
 
-    let duration = time::Instant::now() - now;
-
     info!("Routes selected : {} / {}", count, endings.len());
     let longest_index = selector.decompose().or(selector_large.decompose());
 
     longest_index.map(|longest_index| {
-        let prev_node = &actions[actions[longest_index].previous_index].node_handle;
+        // Compute the actual length of the path.
         let true_length = actions[longest_index].major.actual_length + map[actions[longest_index].node_handle as usize].actual_length;
         debug!("Length: {}", true_length);
+        // Simplify and join the path.
         let final_path = path.as_path().join(into_annotated_nodes(&actions, longest_index).as_path());
         let path = original_route.append(final_path);
         (path, Km::from_f64(true_length))

@@ -15,4 +15,5 @@ pub use self::path::{Path, AnnotatedPath};
 
 pub use self::ordering::*;
 
+#[cfg(test)]
 pub mod testgraph;

@@ -36,6 +36,7 @@ fn hav(a: f64) -> f64
     q * q
 }
 
+/// Computes the distance in lon-lat format.
 pub fn distance_lon_lat<A : Located, B : Located>(a : &A, b: &B, radius : Km) -> Km {
     let a = a.located();
     let b = b.located();
@@ -48,6 +49,7 @@ pub fn distance_lon_lat<A : Located, B : Located>(a : &A, b: &B, radius : Km) ->
 
 use na::Vector2;
 
+/// Computes the distance between an edge and a point.
 pub fn distance_to_edge(point: (Km, Km), start: (Km, Km), end: (Km, Km)) -> Km {
     let point = Vector2::new((point.0).to_f64(), (point.1).to_f64());
     let start = Vector2::new((start.0).to_f64(), (start.1).to_f64());
@@ -80,5 +82,5 @@ fn test_distance_to_edge() {
              Km::from_f64((2. as f64).sqrt()))
                     .to_f64()
                     .abs() < 1.0e-6);
-                    
+
 }

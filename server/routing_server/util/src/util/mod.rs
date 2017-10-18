@@ -1,3 +1,4 @@
+//! Simple utilities.
 
 pub mod selectors;
 pub mod distance;

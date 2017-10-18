@@ -16,18 +16,18 @@ use std::io::Write;
 fn main() {
     let graph = get_graph(load("postgresql://postgres:0987654321@localhost").unwrap()).unwrap();
     //graph.debug();
-    let conversion = logic::Conversion::get_default_conversion(graph);
+    let serving_model = logic::ServingModel::get_default_serving_model(graph);
     use std::fs;
     /*
     let mut file = fs::File::create("/home/gerwin/debug.svg").unwrap();
-    file.write(&conversion.debug().into_bytes()).unwrap();
+    file.write(&serving_model.debug().into_bytes()).unwrap();
     */
     let location = Location::new(3.7, 51.0);
-    let edge = conversion.get_edge(&location).unwrap();
+    let edge = serving_model.get_edge(&location).unwrap();
     // println!("{:?}, {:?}", graph.get(edge.edge.from_node), graph.get(edge.edge.to_node));
     let metadata =  Metadata {requested_length : Km::from_f64(20.0), tag_modifier : TagConverter::default()};
     let now = time::Instant::now();
-    let res = interface::route(&conversion, &location, &location , &metadata, interface::RoutingType::Directions).unwrap();
+    let res = interface::route(&serving_model, &location, &location , &metadata, interface::RoutingType::Directions).unwrap();
     // println!("{:?}", rod);
     // println!("{:?}", vertices);
     let duration = time::Instant::now() - now;

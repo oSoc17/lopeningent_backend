@@ -1,3 +1,5 @@
+/// This module loads all data from the database into graphs and serving_models.
+
 use graph::{Graph, NodeID};
 use database::{Scheme, Poi};
 
@@ -21,8 +23,11 @@ use transform;
 use na;
 
 
-
+/// Turns a scheme into a graph.
 pub fn get_graph(scheme : Scheme) -> Result<ApplicationGraph, Box<Error>> {
+
+    // Good luck debugging this.
+
     let nodes = scheme.nodes;
     let edges = scheme.edges;
     let pois = scheme.pois;
@@ -52,12 +57,17 @@ pub fn get_graph(scheme : Scheme) -> Result<ApplicationGraph, Box<Error>> {
     Ok(Graph::new(poinodes.into_iter().map(|node| (node.node.nid, node)), edges_collected)?)
 }
 
-pub struct Conversion {
+/// Collection of all necessary data for edge locating and routing.
+pub struct ServingModel {
+    /// The graph.
     pub graph : ApplicationGraph,
+    /// The projector mapping graph nodes to points ready for consumption by the grid.
     pub projector : Projector,
+    /// The grid containing all edges in the graph.
     pub grid : Grid<(NodeID, NodeID)>,
 }
 
+/// Returns a minimal-distortion projector.
 pub fn get_projector(graph : &ApplicationGraph) -> Projector {
     let avg = transform::average(graph.get_all_nodes()
         .map(|node| node.located())
@@ -66,8 +76,9 @@ pub fn get_projector(graph : &ApplicationGraph) -> Projector {
     Projector::new(avg, na::Vector3::new(0.0, 0.0, 1.0), Km::from_f64(EARTH_RADIUS))
 }
 
-impl Conversion {
-    pub fn get_conversion(graph : ApplicationGraph, projector : Projector) -> Conversion {
+impl ServingModel {
+    /// Retrieve a serving model.
+    pub fn get_serving_model(graph : ApplicationGraph, projector : Projector) -> ServingModel {
         let z = Km::from_f64(0.0);
         let interval = graph.get_all_nodes()
         .map(|node| node.located())
@@ -89,18 +100,20 @@ impl Conversion {
                 grid.add(interval, &(edge.edge.from_node, edge.edge.to_node));
             }
         }
-        Conversion {
+        ServingModel {
             graph : graph,
             projector : projector,
             grid : grid,
         }
     }
 
-    pub fn get_default_conversion(graph : ApplicationGraph) -> Conversion {
+    /// Retrieve a serving model with minimal distortion
+    pub fn get_default_serving_model(graph : ApplicationGraph) -> ServingModel {
         let projector = get_projector(&graph);
-        Self::get_conversion(graph, projector)
+        Self::get_serving_model(graph, projector)
     }
 
+    /// Get the edge closest to a location.
     pub fn get_edge(&self, location : &Location) -> Option<&AnnotatedEdge> {
         let pos = self.projector.map(&location.into_3d()).into();
         let choices = self.grid.get(pos);
@@ -118,6 +131,7 @@ impl Conversion {
         }).map(|(_, edge)| edge)
     }
 
+    /// Print this graph into svg format.
     pub fn debug(&self) -> String {
         let start_string = "<svg xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\">\n".to_string();
         let mut res = self.graph.list_ids().flat_map(move |f| self.graph.get_connids(f).unwrap().map(move |t| (f, t)))

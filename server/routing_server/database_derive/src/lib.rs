@@ -23,8 +23,6 @@ pub fn query(input: TokenStream) -> TokenStream {
 }
 
 fn impl_query(ast: &syn::DeriveInput) -> quote::Tokens {
-    use std::env;
-    let schema = env::var("SCHEMA").ok();
     let name = &ast.ident;
 
     // get a list of all fields in this struct.

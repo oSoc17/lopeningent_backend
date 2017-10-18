@@ -10,7 +10,9 @@ use error::Error;
 use graph::iter;
 use vec_map::VecMap;
 
+/// Node id type.
 pub type NodeID = u64;
+/// Edge id type.
 pub type EdgeID = u64;
 
 /// Element in a graph
@@ -200,10 +202,13 @@ impl<'a, V : 'a, E : 'a> Graph<V, E> {
         self.data.get_mut(from as usize).and_then(|el| el.links.get_mut(&to))
     }
 
+    /// Retrieve an edge between from and to.
     pub fn get_edge(&'a self, from : NodeID, to : NodeID) -> Option<&'a E> {
         self.data.get(from as usize).and_then(|el| el.links.get(&to))
     }
 
+    /// Retrieve all nodes in this graph, with data.
+    /// Syntactically equivalent to ```graph.list_ids().map(|i| graph.get(i).unwrap())```
     pub fn get_all_nodes(&'a self) -> iter::ListAllNodes<'a, V, E> {
         iter::ListAllNodes::new(self.data.values())
     }
@@ -211,6 +216,9 @@ impl<'a, V : 'a, E : 'a> Graph<V, E> {
 
 use std::fmt::Debug;
 impl<V : Debug, E : Debug> Graph<V, E> {
+    /// Prints a debug version of the graph.
+    ///
+    /// Note: this quickly becomes huge and unwieldy.
     pub fn debug(&self) {
         for id in self.list_ids() {
             println!("{:?} -> {:?}", self.get(id).unwrap(), self.get_conn_idval(id).unwrap().map(|(id, val)| (val, self.get(id).unwrap())).collect::<Vec<_>>());

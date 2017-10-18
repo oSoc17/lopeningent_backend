@@ -13,8 +13,11 @@ use num::traits::WrappingSub;
 #[derive(Eq, PartialEq, Debug, PartialOrd, Ord)]
 pub struct HeapData
 {
+    /// Hint for speedup using heap.
     pub hint : u64,
+    /// SingleAction vector index.
     pub index : usize,
+    /// representative node.
     pub node: NodeID,
 }
 

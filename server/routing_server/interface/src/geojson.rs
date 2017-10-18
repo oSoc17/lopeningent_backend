@@ -5,6 +5,7 @@ use database::Poi;
 
 use tag_modifiers::Tags;
 use tag_modifiers::TagModifier;
+/// Module for converting a path to a GeoJson-compatible format.
 
 /**
     Some serialisation boilerplate.
@@ -15,28 +16,30 @@ struct Distance {
     perceived : f64
 }
 
+/// The struct.
 #[derive(Serialize)]
 pub struct GeoJson<'a> {
     #[serde(rename = "type")]
-    pub type_ : String,
-    pub features : Vec<Feature>,
-    pub pois : Vec<&'a Poi>
+    type_ : String,
+    features : Vec<Feature>,
+    pois : Vec<&'a Poi>
 }
 
 #[derive(Serialize, Deserialize)]
-pub struct Feature {
+struct Feature {
     #[serde(rename = "type")]
-    pub type_ : String,
-    pub geometry : Geometry,
+    type_ : String,
+    geometry : Geometry,
 }
 
 #[derive(Serialize, Deserialize)]
 #[serde(tag = "type")]
-pub enum Geometry {
+enum Geometry {
     LineString{coordinates : Vec<(f64, f64)>},
     Point{coordinates : (f64, f64)}
 }
 
+/// Construct the return type.
 pub fn into_geojson<'a, T : TagModifier>(path : Path, graph : &'a ApplicationGraph, tags : &T) -> GeoJson<'a> {
     let (nodes, _) = path.get_elements(graph);
     let mut set = Set::new();

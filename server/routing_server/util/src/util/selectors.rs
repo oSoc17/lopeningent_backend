@@ -82,6 +82,7 @@ impl<T, R : Rng> Selector<T, R> {
     }
 }
 
+/// Retrieve a random value between min and max.
 pub fn get_random(min : f64, max : f64) -> f64 {
     let mut rng = rand::thread_rng();
     let distribution = rand::distributions::Range::new(min, max);

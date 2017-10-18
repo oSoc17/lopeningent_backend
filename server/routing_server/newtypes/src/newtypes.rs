@@ -1,6 +1,6 @@
-//! Newtype structures.
-//!
-//! Mostly implementation of a fixed point Km representation.
+/// Newtype structures.
+///
+/// Mostly implementation of a fixed point Km representation.
 
 use std::ops::{Add, Sub, Mul, Div};
 use num::Zero;
@@ -117,26 +117,33 @@ impl fmt::Display for Km {
     }
 }
 
+/// Position in the world
 #[derive(PartialEq, PartialOrd, Debug, Clone)]
 pub struct Location {
+    /// Longitude
     pub lon : f64,
+    /// Latitude
     pub lat : f64
 }
 
 impl Location {
+    /// Create a new location
     pub fn new(lon : f64, lat : f64) -> Location {
         Location { lon : lon, lat : lat }
     }
 
+    /// Retrieve the midpoint.
     pub fn average(a : &Location, b : &Location) -> Location {
         Location::new((a.lon + b.lon) / 2.0, (a.lat + b.lat) / 2.0)
     }
 
+    /// I don't know why I even made this function.
     pub fn into_radians(self) -> (f64, f64) {
         (self.lat * PI / 180.0,
          self.lon * PI / 180.0)
     }
 
+    /// Creates a new unit vector on the 3d sphere.
     pub fn into_3d(&self) -> Vector3<f64> {
         let rlon = self.lon * PI / 180.0;
         let rlat = self.lat * PI / 180.0;
@@ -156,7 +163,9 @@ impl Hash for Location {
     }
 }
 
+/// This struct has a location on the map.
 pub trait Located {
+    /// The aforementioned location.
     fn located(&self) -> Location;
 }
 

@@ -2,6 +2,12 @@ use newtypes::Km;
 use std::ops::Add;
 use num::Zero;
 
+/// The interval structure.
+/// This structure contains data of a rectangle.
+///
+/// Addition of two intervals is defined as the smallest interval containing both of them.
+
+/// Structure representing a twodimensional array.
 #[derive(Clone, Copy)]
 pub struct Interval {
     minx: Km,
@@ -11,6 +17,7 @@ pub struct Interval {
 }
 
 impl Interval {
+    /// Create an interval from two diagonal corners, and a tolerance (adding a boundary to the interval).
     pub fn from(start: (Km, Km), end: (Km, Km), tolerance: Km) -> Interval {
         let x = if start.0 < end.0 {
                      (start.0, end.0)
@@ -29,10 +36,13 @@ impl Interval {
             maxy: y.1 + tolerance,
         }
     }
+
+    #[allow(missing_docs)]
     pub fn min(&self) -> (Km, Km) {
         (self.minx, self.miny)
     }
 
+    #[allow(missing_docs)]
     pub fn max(&self) -> (Km, Km) {
         (self.maxx, self.maxy)
     }

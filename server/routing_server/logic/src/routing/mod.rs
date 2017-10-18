@@ -1,3 +1,5 @@
+/// Module for all things routing.
+
 mod lightning_rod;
 mod util;
 

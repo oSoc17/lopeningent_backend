@@ -1,7 +1,9 @@
+/// Simple transform functionality.
 use newtypes::{Km};
 use na::Vector3;
 use newtypes::ToF64;
 
+/// A location.
 pub struct Coordinate<T>(pub T, pub T);
 
 impl<T: Clone> Clone for Coordinate<T> {
@@ -22,12 +24,14 @@ impl<T: Into<Km>> Into<Vector3<f64>> for Coordinate<T> {
     }
 }
 
+/// A projector. This projector maps a lat-lon coordinate into a x-y coordinate, by converting it to a coordinate on the unit sphere and then projecting on a plane.
 pub struct Projector {
     up: Vector3<f64>,
     perp: Vector3<f64>,
     radius: Km,
 }
 
+/// Computes a unit vector that is the average of all points.
 pub fn average<'a, I>(vec_iter: I) -> Vector3<f64>
     where I: Iterator<Item = &'a Vector3<f64>>
 {
@@ -37,6 +41,7 @@ pub fn average<'a, I>(vec_iter: I) -> Vector3<f64>
 }
 
 impl Projector {
+    /// Creates a new projector from a ray perpendicular to the projection plane, an upwards vector, and the earth radius.
     pub fn new(ray: Vector3<f64>, up: Vector3<f64>, radius: Km) -> Projector {
         let up = up - ray * ray.dot(&up) / (ray.dot(&ray) * up.dot(&up)).sqrt();
         Projector {
@@ -45,6 +50,8 @@ impl Projector {
             radius: radius,
         }
     }
+
+    /// Maps a vector to a coordinate.
     pub fn map(&self, v: &Vector3<f64>) -> Coordinate<Km> {
         Coordinate(self.radius * v.dot(&self.perp),
                    self.radius * v.dot(&self.up))

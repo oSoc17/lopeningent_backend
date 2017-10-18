@@ -1439,7 +1439,7 @@ warning: missing documentation for a function
 warning: missing documentation for a struct
   --> logic/src/data.rs:51:1
    |
-51 | / pub struct Conversion {
+51 | / pub struct ServingModel {
 52 | |     pub graph : ApplicationGraph,
 53 | |     pub projector : Projector,
 54 | |     pub grid : Grid<(NodeID, NodeID)>,
@@ -1467,7 +1467,7 @@ warning: missing documentation for a struct field
 warning: missing documentation for a method
   --> logic/src/data.rs:66:5
    |
-66 | /     pub fn get_conversion(graph : ApplicationGraph, projector : Projector) -> Conversion {
+66 | /     pub fn get_serving_model(graph : ApplicationGraph, projector : Projector) -> ServingModel {
 67 | |         let z = Km::from_f64(0.0);
 68 | |         let interval = graph.get_all_nodes()
 69 | |         .map(|node| node.located())
@@ -1479,9 +1479,9 @@ warning: missing documentation for a method
 warning: missing documentation for a method
   --> logic/src/data.rs:95:5
    |
-95 | /     pub fn get_default_conversion(graph : ApplicationGraph) -> Conversion {
+95 | /     pub fn get_default_serving_model(graph : ApplicationGraph) -> ServingModel {
 96 | |         let projector = get_projector(&graph);
-97 | |         Self::get_conversion(graph, projector)
+97 | |         Self::get_serving_model(graph, projector)
 98 | |     }
    | |_____^
 
@@ -1637,8 +1637,8 @@ warning: missing documentation for a method
 warning: missing documentation for a function
    --> logic/src/routing.rs:239:1
     |
-239 | / pub fn create_rod(conversion : &Conversion, pos : &Location, metadata : &Metadata) -> Option<AnnotatedPath<Distance>> {
-240 | |     let edge = match conversion.get_edge(pos) {Some(x) => x, _ => return None};
+239 | / pub fn create_rod(serving_model : &ServingModel, pos : &Location, metadata : &Metadata) -> Option<AnnotatedPath<Distance>> {
+240 | |     let edge = match serving_model.get_edge(pos) {Some(x) => x, _ => return None};
 241 | |     let (starting_node, skip_node) = match metadata.original_route {
 242 | |         Some(ref route) => {
 ...   |
@@ -1649,7 +1649,7 @@ warning: missing documentation for a function
 warning: missing documentation for a function
    --> logic/src/routing.rs:282:1
     |
-282 | / pub fn close_rod(conversion : &Conversion, pos : &Location, metadata : &Metadata, path : AnnotatedPath<Distance>) -> Option<(Path, Km)> {
+282 | / pub fn close_rod(serving_model : &ServingModel, pos : &Location, metadata : &Metadata, path : AnnotatedPath<Distance>) -> Option<(Path, Km)> {
 283 | |     let now = time::Instant::now();
 284 | |     let map = path.as_map();
 285 | |     let map : VecMap<_> = map.into_iter().map(|(n, c)| (n, c.clone())).collect();
@@ -1827,10 +1827,10 @@ warning: missing documentation for a method
 warning: missing documentation for a function
   --> interface/src/lib.rs:44:1
    |
-44 | / pub fn route(conversion : &Conversion, from : &Location, to : &Location, metadata : &Metadata, routing_type : RoutingType) -> Result<String, Box<Error>> {
+44 | / pub fn route(serving_model : &ServingModel, from : &Location, to : &Location, metadata : &Metadata, routing_type : RoutingType) -> Result<String, Box<Error>> {
 45 | |     let mut route = None;
 46 | |     for _ in 0..20 {
-47 | |         let rod = logic::create_rod(conversion, from, metadata).ok_or("Rod failed")?;
+47 | |         let rod = logic::create_rod(serving_model, from, metadata).ok_or("Rod failed")?;
 ...  |
 55 | |     })
 56 | | }
