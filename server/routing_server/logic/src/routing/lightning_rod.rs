@@ -30,6 +30,7 @@ use util::selectors::Selector;
 
 use consts::*;
 use super::util::Metadata;
+use super::error::RoutingError;
 
 /// Structure for computing the length of a route.
 #[derive(PartialEq, Debug, Clone, Default)]
@@ -311,8 +312,9 @@ pub fn create_field_poison(serving_model : &ServingModel, starting_node : NodeID
 }
 
 /// Create a rod.
-pub fn create_rod(serving_model : &ServingModel, pos : &Location, metadata : &mut Metadata) -> Option<AnnotatedPath<Distance>> {
-    let edge = match serving_model.get_edge(pos) {Some(x) => x, _ => return None};
+pub fn create_rod(serving_model : &ServingModel, pos : &Location, metadata : &mut Metadata)
+    -> Result<AnnotatedPath<Distance>, RoutingError> {
+    let edge = match serving_model.get_edge(pos) {Some(x) => x, _ => return Err(RoutingError::NoSuchEdge(pos.clone()))};
 
     // check whether we have a previous route. In this case, we'd like to mark our previous point as illegal.
     let (starting_node, skip_node) = match metadata.original_route {
@@ -321,11 +323,11 @@ pub fn create_rod(serving_model : &ServingModel, pos : &Location, metadata : &mu
             let edge_node_ref : &[NodeID] = &edge_nodes as &[NodeID];
             let occurrences = route.get_first_occuring(edge_node_ref);
             let res = match occurrences.into_iter().next() {
-                None => return None,
+                None => return Err(RoutingError::NotIntersectingRoute(edge.edge.from_node, edge.edge.to_node)),
                 Some(x) => (edge.edge.from_node + edge.edge.to_node - x, x),
             };
             if ! route.truncate(res.1) {
-                return None;
+                return Err(RoutingError::NotIntersectingRoute(edge.edge.from_node, edge.edge.to_node));
             }
             (res.0, Some(res.1))
         },
@@ -353,14 +355,15 @@ pub fn create_rod(serving_model : &ServingModel, pos : &Location, metadata : &mu
 
         //info!("Chosen rod : {:#?}", actions[last]);
         into_annotated_nodes(&actions, last)
-    })
+    }).ok_or(RoutingError::NothingSelected)
 
 }
 
 /// Close a rod.
-pub fn close_rod(serving_model : &ServingModel, pos : &Location, metadata : &mut Metadata, path : &AnnotatedPath<Distance>) -> Option<(Path, Km)> {
+pub fn close_rod(serving_model : &ServingModel, pos : &Location, metadata : &mut Metadata, path : &AnnotatedPath<Distance>)
+    -> Result<(Path, Km), RoutingError> {
     // Find the starting point of our rod.
-    let edge = match serving_model.get_edge(pos) {Some(x) => x, None => return None};
+    let edge = match serving_model.get_edge(pos) {Some(x) => x, None => return Err(RoutingError::NoSuchEdge(pos.clone()))};
     let starting_node = edge.edge.from_node;
 
     // Retrieve the original route, to append at the end.
@@ -412,5 +415,5 @@ pub fn close_rod(serving_model : &ServingModel, pos : &Location, metadata : &mut
         let final_path = path.as_path().join(into_annotated_nodes(&actions, longest_index).as_path());
         let path = original_route.append(final_path);
         (path, Km::from_f64(true_length))
-    })
+    }).ok_or(RoutingError::NothingSelected)
 }

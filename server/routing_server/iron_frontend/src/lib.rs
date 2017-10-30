@@ -90,6 +90,7 @@ pub fn fire(config_filename : &str) -> Result<(), Box<Error>>{
     mount.mount("/route/generate", GraphHandler::new(Arc::clone(&serving_model), Arc::clone(&limit)));
     mount.mount("/route/return", GraphHandler::new(Arc::clone(&serving_model), Arc::clone(&limit)));
     mount.mount("/route/rate", Rater::new(Arc::clone(&serving_model), sender));
+    mount.mount("/route/debug", Debugger::new(Arc::clone(&serving_model)));
     let server_info = &config.server_info;
     let server_location = format!("{}:{}", server_info.host, server_info.port);
     info!("We're up and running!");
@@ -248,5 +249,32 @@ impl Rater {
     }
 }
 
+#[derive(Deserialize, Serialize, Default, Debug)]
+struct DebuggingData {
+    password : String,
+}
+
+/// For debugging shenanigans
+struct Debugger {
+    serving_model : Arc<ServingModel>,
+
+}
+
+impl Debugger {
+    pub fn new(serving_model : Arc<ServingModel>) -> Debugger {
+        Debugger {
+            serving_model : serving_model,
+        }
+    }
+
+    fn handle_loc(&self, parse : DebuggingData) -> Result<Response, Box<Error>> {
+        if &parse.password != "Help, I've been transformed into a frog!" {
+            Err("Sorry, you're not allowed!")?;
+        }
+        Ok(Response::with((iron::status::Ok, self.serving_model.debug())))
+    }
+}
+
 impl_handler!(Rater, RatingData);
 impl_handler!(GraphHandler, RoutingUrlData);
+impl_handler!(Debugger, DebuggingData);

@@ -25,4 +25,5 @@ pub use annotated::{AnnotatedEdge, PoiNode, ApplicationGraph};
 pub use consts::*;
 pub use routing::{Distance, Metadata};
 pub use routing::{create_rod, close_rod};
+pub use routing::RoutingError;
 pub use limit::Limit;

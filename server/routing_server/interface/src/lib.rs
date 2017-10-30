@@ -24,6 +24,7 @@ pub use logic::ServingModel;
 pub use logic::Metadata;
 pub use logic::ApplicationGraph;
 pub use logic::Limit;
+pub use logic::RoutingError;
 pub use graph::Path;
 
 use database::Update;
@@ -53,18 +54,19 @@ impl RoutingType {
 }
 
 /// Create a string holding the Json representation of a route.
-pub fn route<MF : Fn() -> Metadata>(serving_model : &ServingModel, from : &Location, to : &Location, metadata_supplier : MF, routing_type : &RoutingType, limit : &Limit) -> Result<String, Box<Error>> {
+pub fn route<MF : Fn() -> Metadata>(serving_model : &ServingModel, from : &Location, to : &Location, metadata_supplier : MF, routing_type : &RoutingType, limit : &Limit)
+    -> Result<String, Box<Error>> {
     info!("Creating a route from ({}, {}) to ({}, {}) with metadata {:?}", from.lon, from.lat, to.lon, to.lat, metadata_supplier());
-    let mut route = None;
+    let mut route = Err(RoutingError::Empty);
     let mut string = String::new();
     for _ in 0..20 {
         let mut metadata = metadata_supplier();
-        let rod = logic::create_rod(serving_model, from, &mut metadata).ok_or("Rod failed")?;
+        let rod = logic::create_rod(serving_model, from, &mut metadata).map_err(|e| format!("Rod failed: {:?}", e))?;
         string = serde_json::to_string_pretty(&geojson::into_geojson(&rod.as_path(), &serving_model.graph, &metadata.tag_converter))?;
         route = logic::close_rod(serving_model, to, &mut metadata, &rod);
-        if route.is_some() {break;}
+        if route.is_ok() {break;}
     }
-    let route = route.ok_or("Closure failed")?.0;
+    let route = route.map_err(|e| format!("Closure failed: {:?}", e))?.0;
     use std::fs;
     use std::io::Write;
     let _ = fs::File::create("debug.json").ok().map(|mut f| f.write_all(string.as_bytes()));
