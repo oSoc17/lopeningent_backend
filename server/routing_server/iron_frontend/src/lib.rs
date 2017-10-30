@@ -226,7 +226,7 @@ struct Rater {
 
 #[derive(Deserialize, Serialize, Default, Debug)]
 struct RatingData {
-    tag : String,
+    visited_path : String,
     rating : f64,
 }
 
@@ -239,7 +239,7 @@ impl Rater {
     }
 
     fn handle_loc(&self, parse : RatingData) -> Result<Response, Box<Error>> {
-        let update = interface::rate(&self.serving_model.graph, &interface::serialize::to_path(&parse.tag)?, parse.rating);
+        let update = interface::rate(&self.serving_model.graph, &interface::serialize::to_path(&parse.visited_path)?, parse.rating);
         {
             self.sender.lock().map_err(|e| e.to_string())?.send(update)?;
         }
