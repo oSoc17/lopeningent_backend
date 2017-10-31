@@ -188,7 +188,6 @@ impl<C : DijkstraControl> DijkstraBuilder<C>
                         res_chain.push(SingleAction::new(data.index, next_node, next_major)
                             .ignore(ignore_next_step))?
                     }
-                    //println!("Got {:?}", h_vec.iter().map(|&c| &res_chain[c].major).collect::<Vec<_>>());
                 }
             }
         }

@@ -123,6 +123,7 @@ version = "0.1.0"
 dependencies = [
  "database_derive 0.1.0",
  "graph 0.1.0",
+ "log 0.3.8 (registry+https://github.com/rust-lang/crates.io-index)",
  "newtypes 0.1.0",
  "postgres 0.15.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde 1.0.15 (registry+https://github.com/rust-lang/crates.io-index)",

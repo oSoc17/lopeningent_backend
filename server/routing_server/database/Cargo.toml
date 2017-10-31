@@ -11,3 +11,4 @@ graph = {path = "../graph"}
 serde = "*"
 serde_derive = "*"
 tag_modifiers = {path = "../tag_modifiers"}
+log = "*"

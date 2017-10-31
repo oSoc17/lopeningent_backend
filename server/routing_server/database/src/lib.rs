@@ -13,6 +13,8 @@ extern crate serde;
 #[macro_use]
 extern crate serde_derive;
 extern crate tag_modifiers;
+#[macro_use]
+extern crate log;
 
 use postgres::TlsMode;
 use postgres::Connection;
@@ -166,7 +168,7 @@ impl Update {
     /// Apply this update to the database.
     pub fn apply(&self, schema : &str, connection : &Connection, influence : f64) -> Result<(), Box<Error>> {
         let query = format!("UPDATE {}{}edges SET rating = rating * (1.0 - {3:}) + {4:} * {3:} WHERE eid IN {}", schema, if schema != "" {"."} else {""}, &Update::print(&self.edges), influence, self.rating) ;
-        println!("{}", query);
+        info!("{}", query);
         connection.execute(&query, &[])?;
         Ok(())
     }

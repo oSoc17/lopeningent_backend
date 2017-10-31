@@ -116,7 +116,7 @@ fn async_updater(database_url : String, schema : String, influence : f64) -> Sen
     thread::spawn(move ||
         {
             for update in rx {
-                println!("{:?}", update.store(&database_url, &schema, influence));
+                info!("{:?}", update.store(&database_url, &schema, influence));
             }
         }
     );

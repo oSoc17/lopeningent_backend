@@ -221,7 +221,9 @@ impl<V : Debug, E : Debug> Graph<V, E> {
     /// Note: this quickly becomes huge and unwieldy.
     pub fn debug(&self) {
         for id in self.list_ids() {
-            println!("{:?} -> {:?}", self.get(id).unwrap(), self.get_conn_idval(id).unwrap().map(|(id, val)| (val, self.get(id).unwrap())).collect::<Vec<_>>());
+            use std::io;
+            use std::io::Write;
+            let _ = writeln!(io::stdout(), "{:?} -> {:?}", self.get(id).unwrap(), self.get_conn_idval(id).unwrap().map(|(id, val)| (val, self.get(id).unwrap())).collect::<Vec<_>>());
         }
     }
 }
