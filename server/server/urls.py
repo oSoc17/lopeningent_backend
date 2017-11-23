@@ -24,5 +24,6 @@ urlpatterns = [
     # url(r'^route/return/', route.return_home),
     # url(r'^route/rate/', route.rate_route),
     url(r'^poi/coords/', pois.get_coords),
+    url(r'^poi/save/', pois.save_coords),
     url(r'^poi/types/', pois.get_types)
 ]

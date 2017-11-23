@@ -105,7 +105,7 @@ def load_pois(poi_dir):
         return {
             "name": name,
             "description": descr,
-            "coord": (element["lat"], element["lon"])
+            "coord": ((element["lat"]), (element["lon"]))
         }
 
     for pset in pois:

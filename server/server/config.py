@@ -8,7 +8,7 @@ TOLERANCE = 0.1
 BINSIZE = 0.1
 
 # Database connection parameters
-DB_CONN = "host=localhost user=postgres password=0987654321"
+DB_CONN = "host=localhost user=postgres password=idlab_lopeningent"
 
 DEFAULT_ROUTING_CONFIG = {
     'max_length': 10.0,

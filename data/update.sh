@@ -2,7 +2,8 @@
 # Author: Tim Baccaert <github.com/timaert>
 
 fullpath=$(dirname "$0")
-
+export SCHEMA=lopeningent2
+export DATABASE_PASSWORD=idlab_lopeningent cd $1
 # These are parameters for OSM's bounding box of Ghent.
 # The overpass-api is a third-party host for the latest OSM data.
 
@@ -18,7 +19,7 @@ lat2=51.1100
 
 # This downloads the latest map data from OSM,
 # the result is stored inside the raw_ghent.osm xml file.
-# curl -sSf "$url=$lon1,$lat1,$lon2,$lat2" -o $fullpath/raw_ghent.osm
+  curl -sSf "$url=$lon1,$lat1,$lon2,$lat2" -o $fullpath/raw_ghent.osm
 
 # We're filtering out the ways which are suitable for pedestrians.
 # https://wiki.openstreetmap.org/wiki/Pedestrian
